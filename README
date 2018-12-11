@@ -1,0 +1,12 @@
+Contains python scripts used for reading layer 1 pixel clusters and fitting distriubtions based on the clusters
+
+scripts require the following python packages:
+
+- numpy
+
+- scipy 
+
+- matplotlib.pyplot
+
+- pyROOT
+
