@@ -73,7 +73,7 @@ def make_hot_array(input_array, factor):
 
         if 0 <= module <= 3:
             module_true = module - 4
-        elif 4 <= pixel[4] <= 7:
+        elif 4 <= module <= 7:
             module_true = module - 3
 
         if 0 <= ladder <= 5:
@@ -85,7 +85,7 @@ def make_hot_array(input_array, factor):
     return pixel_array
 
 
-def main(inputFiles):
+def main(inputFiles, factor):
     occ = make_map(inputFiles)
     kernel = np.array([[1./8., 1./8., 1./8.],
                        [1./8., -1, 1./8.],
@@ -93,19 +93,20 @@ def main(inputFiles):
 
     occ_convolved = convolve(occ, kernel, mode='constant', cval=0.0)
 
-    pixels = make_hot_array(occ_convolved, 5)
+    plt.imshow(occ_convolved, cmap=plt.cm.gray)
+    plt.savefig('hot_map_'+str(factor)+'_61218.jpg', bbox_inches='tight')
+    plt.close()
+
+    pixels = make_hot_array(occ_convolved, factor)
     return pixels
 
 
 if __name__ == "__main__":
     from inputFiles_cfi import *
 
-    pixel_array = main(input_files_2)
+    pixel_array = main(input_files_2, 5)
 
-    np.save('hot_pixels_5_61218.npy', final_array)
+    np.save('hot_pixels_5_61218.npy', pixel_array)
 
-    plt.imshow(map, cmap=plt.cm.gray)
-    plt.savefig('hot_map_3_61218.jpg', bbox_inches='tight')
-    plt.close()
 
 
