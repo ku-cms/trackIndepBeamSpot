@@ -28,6 +28,94 @@ def r_color_map(r):
     return -12. * r + 279.
 
 
+def pix_quadrant(gx_, gy_):
+    quad = 0
+    if gx_ > 0 and gy_ > 0:
+        quad = 1
+    elif gx_ < 0 < gy_:
+        quad = 2
+    elif gx_ < 0 and gy_ < 0:
+        quad = 3
+    elif gy_ < 0 < gx_:
+        quad = 4
+
+    return quad
+
+
+def edge_pix_map(row_, col_):
+
+    if 8 < col_ < 46:
+        edge_col = False
+    elif 60 < col_ < 96:
+        edge_col = False
+    elif 112 < col_ < 148:
+        edge_col = False
+    elif 164 < col_ < 200:
+        edge_col = False
+    elif 216 < col_ < 252:
+        edge_col = False
+    elif 268 < col_ < 304:
+        edge_col = False
+    elif 320 < col_ < 356:
+        edge_col = False
+    elif 372 < col_ < 408:
+        edge_col = False
+    else:
+        edge_col = True
+
+    if 8 < row_ < 72:
+        edge_row = False
+    elif 88 < row_ < 152:
+        edge_row = False
+    else:
+        edge_row = True
+
+    return edge_row, edge_col
+
+
+def ladder_quad_map(ladder):
+    ladder = str(ladder)
+
+    ladder_map = {
+        '-6' : 3,
+        '-5' : 3,
+        '-4' : 3,
+        '-3' : 4,
+        '-2' : 4,
+        '-1' : 4,
+        '1' : 1,
+        '2' : 1,
+        '3' : 1,
+        '4' : 2,
+        '5' : 2,
+        '6' : 2,
+    }
+
+    return ladder_map[ladder]
+
+
+def roc_map(row, col):
+    row_map = [[0, 79],
+               [80, 159]]
+    col_map = [[0, 51],
+               [52, 103],
+               [104, 155],
+               [156, 207],
+               [208, 259],
+               [260, 311],
+               [312, 363],
+               [364, 415]]
+    for i, ind in enumerate(row_map):
+        if ind[0] <= row <= ind[1]:
+            row_index = i
+            break
+    for i, ind in enumerate(col_map):
+        if ind[0] <= col <= ind[1]:
+            col_index = i
+            break
+    return row_index, col_index
+
+
 def ladder_map(detid):
     if 303075300 < detid < 303075400:
         ladder = 0

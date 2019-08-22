@@ -8,32 +8,48 @@ from array import array
 from collections import OrderedDict
 
 
-def read_clusters(input_files):
+def read_clusters(input_files, directory):
     tChain = rt.TChain('pixelTree')
     for f in input_files:
-        tChain.Add(f)
+        tChain.Add(directory + f)
 
-    of = rt.TFile(input_files[0].split('_')[0] + '_out_61218.root', 'recreate')
+    of = rt.TFile(input_files[0].split('_')[0] + '_out_realistic_10000evts_1pix_0p01_15719.root', 'recreate')
 
     nEvents = tChain.GetEntries()
 
     r_phi_array = []
 
     clust_per_mod = OrderedDict()
+    clust_per_mod_outer = OrderedDict()
+    clust_per_mod_pair = OrderedDict()
     mods = [-4, -3, -2, -1, 1, 2, 3, 4]
+    mods_pairs = ['-4-3', '-3-2', '-2-1', '-11', '12', '23', '34', '-44', '-33', '-22']
 
     for mod in mods:
         clust_per_mod[mod] = {}
+        clust_per_mod_outer[mod] = {}
         if mod < 0:
             clust_per_mod[mod]['TH2F'] = rt.TH2F('h_clust_r_phi_neg_'+str(abs(mod)), 'cluster r vs phi', 1000, -rt.TMath.Pi(), rt.TMath.Pi(), 1000, 2.0, 3.5)
-            clust_per_mod[mod]['TH1F'] = rt.TH1F('h_clust_phi_neg_'+str(abs(mod)), 'cluster phi', 1000, -rt.TMath.Pi(), rt.TMath.Pi())
+            clust_per_mod[mod]['TH1F'] = rt.TH1F('h_clust_phi_neg_'+str(abs(mod)), 'cluster phi', 5000, -rt.TMath.Pi(), rt.TMath.Pi())
+            clust_per_mod[mod]['quad'] = rt.TH1F('h_clust_missing_neg_'+str(abs(mod)), 'cluster quadrant', 4, 1, 5)
             clust_per_mod[mod]['TGraph'] = None
             clust_per_mod[mod]['r_phi_array'] = []
+            clust_per_mod_outer[mod]['TH2F'] = rt.TH2F('h_clust_outer_r_phi_neg_'+str(abs(mod)), 'cluster r vs phi', 1000, -rt.TMath.Pi(), rt.TMath.Pi(), 1000, 2.0, 3.5)
+            clust_per_mod_outer[mod]['TH1F'] = rt.TH1F('h_clust_outer_phi_neg_'+str(abs(mod)), 'cluster phi', 5000, -rt.TMath.Pi(), rt.TMath.Pi())
+            clust_per_mod_outer[mod]['quad'] = rt.TH1F('h_clust_outer_missing_neg_'+str(abs(mod)), 'cluster quadrant', 4, 1, 5)
+            clust_per_mod_outer[mod]['TGraph'] = None
+            clust_per_mod_outer[mod]['r_phi_array'] = []
         else:
-            clust_per_mod[mod]['TH2F'] = rt.TH2F('h_clust_r_phi_'+str(abs(mod)), 'cluster r vs phi', 1000, -rt.TMath.Pi(), rt.TMath.Pi(), 1000, 2.0, 3.5)
-            clust_per_mod[mod]['TH1F'] = rt.TH1F('h_clust_phi_'+str(abs(mod)), 'cluster phi', 1000, -rt.TMath.Pi(), rt.TMath.Pi())
+            clust_per_mod[mod]['TH2F'] = rt.TH2F('h_clust_r_phi_'+str(abs(mod)), 'cluster r vs phi', 10000, -rt.TMath.Pi(), rt.TMath.Pi(), 1000, 2.0, 3.5)
+            clust_per_mod[mod]['TH1F'] = rt.TH1F('h_clust_phi_'+str(abs(mod)), 'cluster phi', 5000, -rt.TMath.Pi(), rt.TMath.Pi())
+            clust_per_mod[mod]['quad'] = rt.TH1F('h_clust_missing_'+str(abs(mod)), 'cluster quadrant', 4, 1, 5)
             clust_per_mod[mod]['TGraph'] = None
             clust_per_mod[mod]['r_phi_array'] = []
+            clust_per_mod_outer[mod]['TH2F'] = rt.TH2F('h_clust_outer_r_phi_'+str(abs(mod)), 'cluster r vs phi', 1000, -rt.TMath.Pi(), rt.TMath.Pi(), 1000, 2.0, 3.5)
+            clust_per_mod_outer[mod]['TH1F'] = rt.TH1F('h_clust_outer_phi_'+str(abs(mod)), 'cluster phi', 5000, -rt.TMath.Pi(), rt.TMath.Pi())
+            clust_per_mod_outer[mod]['quad'] = rt.TH1F('h_clust_outer_missing_'+str(abs(mod)), 'cluster quadrant', 4, 1, 5)
+            clust_per_mod_outer[mod]['TGraph'] = None
+            clust_per_mod_outer[mod]['r_phi_array'] = []
 
     clustOccOut_init_prehot = rt.TH1F('hClustOccOut_init_prehot', 'Occ vs phi', 100, -3.5, 3.5)
     clustOccIn_init_prehot = rt.TH1F('hClustOccIn_init_prehot', 'Occ vs phi', 100, -3.5, 3.5)
@@ -56,31 +72,51 @@ def read_clusters(input_files):
     clustRZ = rt.TH2F('hClustRZ', 'Clusters R vs Z', 1000, -30., 30., 1000, 0., 20.)
     clustRPhiZ = rt.TH3F('hClustRPhiZ', 'Clusters R vs phi vs z', 500, -3.5, 3.5, 500, 2.0, 4.0, 500, -30, 30)
     clustPerRoc = rt.TH1F('hClustPerRoc', 'Clusters per roc pair along ladders', 10, -4, 4)
+    beamspot_x = rt.TH1F('hBsX', 'beam spot location, x direction', 50, -1, 1)
+    beamspot_y = rt.TH1F('hBsY', 'beam spot location, y direction', 50, -1, 1)
+    beamspot_width_x = rt.TH1F('hwidthBsX', 'beam spot width, x direction', 50, -1, 1)
+    beamspot_width_y = rt.TH1F('hwidthBsY', 'beam spot width, y direction', 50, -1, 1)
 
     nClusTot = 0.
 
     # load numpy array that contains list of hot pixels
-    hot_pixels = np.load('hot_pixels_5_61218.npy')
+    # hot_pixels = np.load('hot_pixels_rereco_5_29119.npy')
+    # hot_pixels = np.load('hot_pixels_design_3_10419.npy')
+    # hot_pixels = np.load('hot_pixels_realistic_3_21519.npy')
+    # hot_rocs = np.load('hot_rocs_realistic_3_10419.npy')
+    # hot_pixels = np.load('hot_pixels_express_5_29119.npy')
 
     # turn the numpy array into a python list for ease of use in future conditional statement
     # needs to be updated at some point so that it uses a numpy array instead of list
-    list_hot_pixels = list(hot_pixels)
-    for i, pix in enumerate(list_hot_pixels):
-        list_hot_pixels[i] = list(pix)
-
-    for iev in xrange(nEvents):
-        if iev % 1 == 0:
+    # list_hot_pixels = list(hot_pixels)
+    # for i, pix in enumerate(list_hot_pixels):
+    #    list_hot_pixels[i] = list(pix)
+    # hot_pixels = [list(pix) for pix in hot_pixels]
+    # hot_rocs = [list(roc) for roc in hot_rocs]
+    for iev in xrange(10000):
+        if iev % 10 == 0:
             print('Event: ', iev, '/ ', nEvents)
         tChain.GetEntry(iev)
         nClus = tChain.ClN
         nClusTot += nClus
         if iev == 0:
             print(nClus)
+        beamspot_x.Fill(tChain.BsX)
+        beamspot_y.Fill(tChain.BsY)
+        beamspot_width_x.Fill(tChain.Bs_widthX)
+        beamspot_width_y.Fill(tChain.Bs_widthY)
         for iCl in xrange(nClus):
 
             layer = tChain.ClLayer[iCl]
 
             if layer != 1: continue
+            clus_size_x = tChain.ClSizeX[iCl]
+            clus_size_y = tChain.ClSizeY[iCl]
+            clus_charge = tChain.ClCharge[iCl]
+            if clus_charge < 0: continue
+            # if clus_charge > 30: continue
+            if clus_size_x > 1: continue
+            if clus_size_y > 1: continue
 
             clusGX = tChain.ClGx[iCl]
             clusGY = tChain.ClGy[iCl]
@@ -155,8 +191,8 @@ def read_clusters(input_files):
                 clustOccOut_init_prehot.Fill(clPhi)
 
             # check to see if pixel exists in the list of hot pixels, the inefficient part of the code
-            if [int(clRow), int(clCol), clMod, clLadder] in list_hot_pixels:
-                continue
+            # if [int(clRow), int(clCol), clMod, clLadder] in list_hot_pixels:
+            #     continue
 
             clustRPhiZ.Fill(clPhi, clR, clusGZ)
 
@@ -167,6 +203,19 @@ def read_clusters(input_files):
                 clustR_init.Fill(clR)
 
                 if notEdgeCol and notEdgeRow_8:
+                    # check to see if pixel exists in the list of hot pixels, the inefficient part of the code
+                    # roc_row, roc_col = roc_map(int(clRow), int(clCol))
+                    # try:
+                    #     hot_rocs.index([int(roc_row), int(roc_col), clMod, clLadder])
+                    #     continue
+                    # except ValueError:
+                    #     pass
+                    # try:
+                    #     hot_pixels.index([int(clRow), int(clCol), clMod, clLadder])
+                    #     continue
+                    # except ValueError:
+                    #     pass
+                    # for mod in mods_pairs:
                     clust_per_mod[clMod]['TH2F'].Fill(clPhi, clR)
                     clust_per_mod[clMod]['TH1F'].Fill(clPhi)
                     clust_per_mod[clMod]['r_phi_array'].append((clPhi, clR))
@@ -182,12 +231,26 @@ def read_clusters(input_files):
             elif outer:
                 clustOccOut_init.Fill(clPhi)
                 if notEdgeCol and notEdgeRow_8:
+                    roc_row, roc_col = roc_map(int(clRow), int(clCol))
+                    # try:
+                    #     hot_rocs.index([int(roc_row), int(roc_col), clMod, clLadder])
+                    #     continue
+                    # except ValueError:
+                    #     pass
+                    # try:
+                    #     hot_pixels.index([int(clRow), int(clCol), clMod, clLadder])
+                    #     continue
+                    # except ValueError:
+                    #     pass
                     clustOccOut.Fill(clPhi)
                     clustRPhi_outer.Fill(clPhi, clR)
+                    clust_per_mod_outer[clMod]['TH2F'].Fill(clPhi, clR)
+                    clust_per_mod_outer[clMod]['TH1F'].Fill(clPhi)
+                    clust_per_mod_outer[clMod]['r_phi_array'].append((clPhi, clR))
 
-    clustOccIn_plus.Scale(1. / nEvents)
-    clustOccIn.Scale(1. / nEvents)
-    clustOccIn_prescale.Scale(1. / nEvents)
+    # clustOccIn_plus.Scale(1. / nEvents)
+    # clustOccIn.Scale(1. / nEvents)
+    # clustOccIn_prescale.Scale(1. / nEvents)
     r_phi_map = []
 
     for ibin in xrange(clustRPhi.GetNbinsX()):
@@ -233,8 +296,8 @@ def read_clusters(input_files):
     g_r_phi = rt.TGraph(n_vals, phi_vals, r_vals)
 
     for mod in clust_per_mod.keys():
-        clust_per_mod[mod]['TH2F'].Scale(1. / nEvents)
-        clust_per_mod[mod]['TH1F'].Scale(1. / nEvents)
+        # clust_per_mod[mod]['TH2F'].Scale(1. / nEvents)
+        # clust_per_mod[mod]['TH1F'].Scale(1. / nEvents)
         r_vals = array('d')
         phi_vals = array('d')
         for phi, r in clust_per_mod[mod]['r_phi_array']:
@@ -247,6 +310,61 @@ def read_clusters(input_files):
         else:
             clust_per_mod[mod]['TGraph'].SetName('gr_r_phi_'+str(mod))
         clust_per_mod[mod]['TGraph'].Write()
+        for phi, r in clust_per_mod_outer[mod]['r_phi_array']:
+            r_vals.append(r)
+            phi_vals.append(phi)
+        n_vals = len(clust_per_mod_outer[mod]['r_phi_array'])
+        clust_per_mod_outer[mod]['TGraph'] = rt.TGraph(n_vals, phi_vals, r_vals)
+        if mod < 0:
+            clust_per_mod_outer[mod]['TGraph'].SetName('gr_r_phi_neg_'+str(mod))
+        else:
+            clust_per_mod_outer[mod]['TGraph'].SetName('gr_r_phi_'+str(mod))
+        clust_per_mod_outer[mod]['TGraph'].Write()
+
+    # for pix in hot_pixels:
+    #     row = pix[0]
+    #     col = pix[1]
+
+    #     edge_row, edge_col = edge_pix_map(row, col)
+
+    #     if edge_row or edge_col:
+    #         continue
+    #     mod = pix[2]
+    #     lad = pix[3]
+
+    #     if lad == -6 or lad == 1:
+    #         continue
+
+    #     quad = ladder_quad_map(lad)
+
+    #     inner_ladders = np.array([-5, -3, -1, 2, 4, 6])
+    #     outer_ladders = np.array([-6, -4, -2, 1, 3, 5])
+    #     if np.any(inner_ladders[inner_ladders==lad]):
+    #         clust_per_mod[mod]['quad'].Fill(quad)
+    #     elif np.any(outer_ladders[outer_ladders==lad]):
+    #         clust_per_mod_outer[mod]['quad'].Fill(quad)
+
+    # for roc in hot_rocs:
+    #     mod = roc[2]
+    #     lad = roc[3]
+
+    #     if lad == -6 or lad == 1:
+    #         continue
+
+    #     quad = ladder_quad_map(str(lad))
+
+    #     inner_ladders = np.array([-5, -3, -1, 2, 4, 6])
+    #     outer_ladders = np.array([-6, -4, -2, 1, 3, 5])
+    #     n_pixels = 2304
+    #     if np.any(inner_ladders[inner_ladders==lad]):
+    #         for ipix in xrange(n_pixels):
+    #             clust_per_mod[mod]['quad'].Fill(quad)
+    #     elif np.any(outer_ladders[outer_ladders==lad]):
+    #         for ipix in xrange(n_pixels):
+    #             clust_per_mod_outer[mod]['quad'].Fill(quad)
+
+
+
     of.Write()
     g_r_phi.Write()
     of.Close()
@@ -255,7 +373,17 @@ def read_clusters(input_files):
 if __name__ == "__main__":
     from inputFiles_cfi import *
     t_start = time.time()
-    read_clusters(input_files_2)
+    # directory = './files/rereco/'
+    directory = './files/pixeltrees_mc/realistic/'
+    # directory = './files/pixeltrees_mc/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p01/190709_213444/0000/'
+    # directory = './files/pixeltrees_mc/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1/190709_213454/0000/'
+    # directory = './files/pixeltrees_mc/RelValTTbar_13TeV/crab_RelValTTbar_13TeVrealistic_0/190710_173122/0000/'
+    # directory = './files/pixeltrees_mc/RelValTTbar_13TeV/crab_RelValTTbar_13TeVrealistic_0p1/190710_173131/0000/'
+    # directory = './files/pixeltrees_mc/design/'
+    # directory = './files/324970/'
+    # read_clusters(input_files_design, directory)
+    read_clusters(input_files_realistic, directory)
+    # read_clusters(input_files_express, directory)
     t_stop = time.time()
     print t_stop - t_start
 
