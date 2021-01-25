@@ -26,7 +26,6 @@ def make_cluster_map(input_files_):
     for iev, event in enumerate(chain):
         if iev % 10 == 0:
             print 'Event', iev, ' / ', n_events
-        #if iev > 200000: break
         n_cl = event.ClN
 
         for icl in xrange(n_cl):
@@ -37,13 +36,9 @@ def make_cluster_map(input_files_):
             if not(303000000 < detid_cl < 304000000):
                 continue  # layer 1
 
-
-            clus_size = chain.ClSize[icl]
-            clus_size_x = chain.ClSizeX[icl]
-            clus_size_y = chain.ClSizeY[icl]
-            if clus_size < 1: continue
-            if clus_size > 50: continue
-            #if clus_size < 50: continue
+            clus_size_x = event.ClSizeX[icl]
+            clus_size_y = event.ClSizeY[icl]
+            #if clus_size_y + clus_size_x < 3: continue
             #if chain.ClTkN[icl] < 1: continue 
 
             row_cl = int(event.ClRow[icl])
@@ -53,9 +48,9 @@ def make_cluster_map(input_files_):
             # remove if not an inner ladder
             if ladder_cl not in [-5, -3, -1, 2, 4, 6]: continue
 
-
             charge = event.ClCharge[icl]
-            if charge > 1000: continue
+            if charge > 150: continue
+            if charge < 15: continue
             gx_cl = event.ClGx[icl]
             gy_cl = event.ClGy[icl]
             gr_cl = np.sqrt(gx_cl**2 + gy_cl**2) 
@@ -79,7 +74,7 @@ def make_cluster_map(input_files_):
             edge_row, edge_col = edge_pix_map(row_cl, col_cl)
             if edge_row or edge_col: continue 
 
-            occ_array[row_cl+(160*ladder_index)][col_cl+(416*module_index)][0] += 1
+            occ_array[row_cl+(160*ladder_index)][col_cl+(416*module_index)][0] += charge
     return occ_array
 
 
@@ -188,7 +183,7 @@ def read_clusters(input_files, f_name_):
             clus_size_x = tChain.ClSizeX[iCl]
             clus_size_y = tChain.ClSizeY[iCl]
             clus_charge = tChain.ClCharge[iCl]
-            if clus_charge < 0: continue
+            if clus_charge < 10: continue
             #if clus_charge < 50: continue
             # if clus_size_x != 2: continue
             # if clus_size_y != 2: continue
@@ -467,112 +462,54 @@ if __name__ == "__main__":
     #read_clusters(file_list, 'design_0_nosmear_fix_ge_2pix')
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeV0_GEN_SIM_smear/191211_193431/0000/'
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_zneg10_GEN_SIM/190819_222156/0000/'
-    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVGEN_SIM_nosmear_100k-a36a67a47de16eaa403e9f7b1d06e8ce/191009_213009/0000/'
-    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/submil/RelValTTbar_13TeV/crab_crab_design_0p01_GEN_SIM_RAW_RECO_submil_eschmitzcrab_design_0p01_GEN_SIM_RAW_RECO_submil/200727_143047/0000/'
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018B'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018B_no_outer_all_pix_200k.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018A'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018A_no_outer_all_pix.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018A'
-    #directory2 = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018B'
-    #file_list = get_list_of_files(directory)
-    #file_list2 = get_list_of_files(directory2)
-    #for f in file_list2:
-    #    file_list.append(f)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018AB_no_outer_all_pix.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018C'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018C_no_outer_all_pix.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018C2'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018C2_no_outer_all_pix.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018D'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018D_no_outer_all_pix_200k.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018D2'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018D2_no_outer_all_pix_200k.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_II_GEN/190819_222054/0000/'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_neg0p1_0p08_no_outer_all_pix_smear_25k.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_I_GEN/190819_222205/0000/'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p1_0p08_no_outer_all_pix_smear_25k.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVRAW_eschmitzcrab_design_0p2/190930_182712/0000/'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p2_no_outer_all_pix_PU.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVRAW_eschmitzcrab_design_0p3/190930_182723/0000/'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p3_no_outer_all_pix_PU.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVRAW_eschmitzcrab_design_0p3/190930_182723/0000/'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p3_no_outer_all_pix_PU.npy', occ_map)
-    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/smeared_z10/RelValTTbar_13TeV/crab_crab_design_z10_GEN_SIM_RAW_RECO_smeared_z10_eschmitzcrab_design_z10_GEN_SIM_RAW_RECO_smeared_z10/200910_204426/0000/'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p1_z10_no_outer_all_pix_smear.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/new_nosmear/RelValTTbar_13TeV/crab_crab_RelValTTbar_13TeV_RAW_nosmear__eschmitzcrab_design_0p3_GEN_SIM_nosmear_newZ_100k/200528_201737/0000/'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p3_no_outer_all_pix_nosmear_25k.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/new_nosmear/RelValTTbar_13TeV/crab_crab_RelValTTbar_13TeV_RAW_nosmear__eschmitzcrab_design_0p2_GEN_SIM_nosmear_newZ_100k/200528_201744/0000/'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p2_no_outer_all_pix_nosmear_25k.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/new_nosmear/RelValTTbar_13TeV/crab_crab_RelValTTbar_13TeV_RAW_nosmear__eschmitzcrab_design_0p1_II_GEN_SIM_nosmear_newZ_100k/200528_201751/0000/'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p1_II_no_outer_all_pix_nosmear_25k.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_z0_GEN_SIM/190819_222147/0000/'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p1_no_outer_all_pix_nosmear_25k.npy', occ_map)
-    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000/'
+    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVGEN_SIM_nosmear_100k-a36a67a47de16eaa403e9f7b1d06e8ce/191009_213009/0000/'
     file_list = get_list_of_files(directory)
     occ_map = make_cluster_map(file_list)  
-    np.save('design_0p1_no_outer_all_pix_smear_charge l1000_size_1_50.npy', occ_map)
-    directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000/'
+    np.save('design_0_no_outer_all_pix_nosmear_chargel150_g15.npy', occ_map)
+    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/nosmear_newZ/RelValTTbar_13TeV/crab_RelValTTbar_13TeV0p1_neg0p08_GEN_SIM/200519_042750/0000/'
+    file_list = get_list_of_files(directory)
+    occ_map = make_cluster_map(file_list)  
+    np.save('design_0p1_no_outer_all_pix_nosmear_chargel150_g15.npy', occ_map)
+    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/new_nosmear/RelValTTbar_13TeV/crab_crab_RelValTTbar_13TeV_RAW_nosmear__eschmitzcrab_design_0p2_GEN_SIM_nosmear_newZ_100k/200528_201744/0000/'
+    file_list = get_list_of_files(directory)
+    occ_map = make_cluster_map(file_list)  
+    np.save('design_0p2_no_outer_all_pix_nosmear_chargel150_g15.npy', occ_map)
+    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/new_nosmear/RelValTTbar_13TeV/crab_crab_RelValTTbar_13TeV_RAW_nosmear__eschmitzcrab_design_0p3_GEN_SIM_nosmear_newZ_100k/200528_201737/0000/'
+    file_list = get_list_of_files(directory)
+    occ_map = make_cluster_map(file_list)  
+    np.save('design_0p3_no_outer_all_pix_nosmear_chargel150_g15.npy', occ_map)
+    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/new_nosmear/RelValTTbar_13TeV/crab_crab_RelValTTbar_13TeV_RAW_nosmear__eschmitzcrab_design_0p1_II_GEN_SIM_nosmear_newZ_100k/200528_201751/0000/'
+    file_list = get_list_of_files(directory)
+    occ_map = make_cluster_map(file_list)  
+    np.save('design_0p1_II_no_outer_all_pix_nosmear_chargel150_g15.npy', occ_map)
+    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_II_GEN/190819_222054/0000/'
+    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/nosmear_newZ/RelValTTbar_13TeV/crab_RelValTTbar_13TeVz10_GEN_SIM_nosmear/200519_042806/0000/'
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p2_no_outer_all_pix_smear_25k.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p3_GEN_SIM/190819_222127/0000/'
+    #np.save('design_z10_0_no_outer_ge_2pix_nosmear_phifix.npy', occ_map)
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/nosmear_newZ/RelValTTbar_13TeV/crab_RelValTTbar_13TeVzneg10_GEN_SIM_nosmear/200519_042758/0000/'
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p3_no_outer_all_pix_smear_25k.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_z10_GEN_SIM/190819_222215/0000/'
+    #np.save('design_zneg10_0_no_outer_ge_2pix_nosmear_phifix.npy', occ_map)
+    #read_clusters(file_list, 'design_0_smear_ge_2pix')
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_z10_GEN_SIM/190819_222215/0000/'
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0p1_z10_no_outer_all_pix_nosmear.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/nosmear_newZ/RelValTTbar_13TeV/crab_RelValTTbar_13TeVz10_GEN_SIM_nosmear/200519_042806/0000/'
+    #np.save('design_z10_no_outer_ge_2pix.npy', occ_map)
+
+
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000/'
     #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0_z10_no_outer_all_pix_nosmear.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeV0_GEN_SIM_smear/191211_193431/0000/'
+    #read_clusters(file_list, 'design_0p2_ge_2pix')
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p3_GEN_SIM/190819_222127/0000/'
     #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_0_no_outer_all_pix_smear.npy', occ_map)
-    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/submil/RelValTTbar_13TeV/crab_crab_design_neg0p05_GEN_SIM_RAW_RECO_submil_eschmitzcrab_design_neg0p05_GEN_SIM_RAW_RECO_submil/200727_143039/0000/'
+    #read_clusters(file_list, 'design_0p3_ge_2pix')
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p5_GEN_SIM/190819_222113/0000/'
     #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_neg0p05_no_outer_all_pix_nosmear.npy', occ_map)
-    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/submil/RelValTTbar_13TeV/crab_crab_design_neg0p08_GEN_SIM_RAW_RECO_submil_eschmitzcrab_design_neg0p08_GEN_SIM_RAW_RECO_submil/200727_143031/0000/'
+    #read_clusters(file_list, 'design_0p5_ge_2pix')
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_1p0_GEN_SIM/190819_222104/0000/'
     #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('design_neg0p08_no_outer_all_pix_nosmear_25k.npy', occ_map)
+    #read_clusters(file_list, 'design_1p0_ge_2pix')
 
     t_stop = time.time()
     print t_stop - t_start

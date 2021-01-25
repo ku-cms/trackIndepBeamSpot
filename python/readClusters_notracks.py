@@ -16,6 +16,7 @@ def make_cluster_map(input_files_):
     """
     chain = rt.TChain('pixelTree')
     for f in input_files_:
+        print f
         chain.Add(f)
 
     # creating empty array to be used as map
@@ -37,13 +38,11 @@ def make_cluster_map(input_files_):
             if not(303000000 < detid_cl < 304000000):
                 continue  # layer 1
 
+            if event.ClTkN[icl] > 0: continue
 
-            clus_size = chain.ClSize[icl]
-            clus_size_x = chain.ClSizeX[icl]
-            clus_size_y = chain.ClSizeY[icl]
-            if clus_size < 1: continue
-            if clus_size > 50: continue
-            #if clus_size < 50: continue
+            #clus_size_x = chain.ClSizeX[icl]
+            #clus_size_y = chain.ClSizeY[icl]
+            #if clus_size_y + clus_size_x < 3: continue
             #if chain.ClTkN[icl] < 1: continue 
 
             row_cl = int(event.ClRow[icl])
@@ -55,7 +54,7 @@ def make_cluster_map(input_files_):
 
 
             charge = event.ClCharge[icl]
-            if charge > 1000: continue
+            #if charge > 50: continue
             gx_cl = event.ClGx[icl]
             gy_cl = event.ClGy[icl]
             gr_cl = np.sqrt(gx_cl**2 + gy_cl**2) 
@@ -469,14 +468,6 @@ if __name__ == "__main__":
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_zneg10_GEN_SIM/190819_222156/0000/'
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVGEN_SIM_nosmear_100k-a36a67a47de16eaa403e9f7b1d06e8ce/191009_213009/0000/'
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/submil/RelValTTbar_13TeV/crab_crab_design_0p01_GEN_SIM_RAW_RECO_submil_eschmitzcrab_design_0p01_GEN_SIM_RAW_RECO_submil/200727_143047/0000/'
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018B'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018B_no_outer_all_pix_200k.npy', occ_map)
-    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018A'
-    #file_list = get_list_of_files(directory)
-    #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018A_no_outer_all_pix.npy', occ_map)
     #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018A'
     #directory2 = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018B'
     #file_list = get_list_of_files(directory)
@@ -484,23 +475,27 @@ if __name__ == "__main__":
     #for f in file_list2:
     #    file_list.append(f)
     #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018AB_no_outer_all_pix.npy', occ_map)
+    #np.save('singlemu_2018AB_no_outer_notracks.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018A'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('singlemu_2018A_no_outer_notracks.npy', occ_map)
     #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018C'
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018C_no_outer_all_pix.npy', occ_map)
+    #np.save('singlemu_2018C_no_outer_notracks.npy', occ_map)
     #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018C2'
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018C2_no_outer_all_pix.npy', occ_map)
+    #np.save('singlemu_2018C2_no_outer_notracks.npy', occ_map)
     #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018D'
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018D_no_outer_all_pix_200k.npy', occ_map)
+    #np.save('singlemu_2018D_no_outer_notracks_200k.npy', occ_map)
     #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018D2'
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
-    #np.save('singlemu_2018D2_no_outer_all_pix_200k.npy', occ_map)
+    #np.save('singlemu_2018D2_no_outer_notracks_200k.npy', occ_map)
     #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_II_GEN/190819_222054/0000/'
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
@@ -544,8 +539,8 @@ if __name__ == "__main__":
     directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000/'
     file_list = get_list_of_files(directory)
     occ_map = make_cluster_map(file_list)  
-    np.save('design_0p1_no_outer_all_pix_smear_charge l1000_size_1_50.npy', occ_map)
-    directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000/'
+    np.save('design_0p1_no_outer_all_pix_smear_notracks.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000/'
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
     #np.save('design_0p2_no_outer_all_pix_smear_25k.npy', occ_map)
