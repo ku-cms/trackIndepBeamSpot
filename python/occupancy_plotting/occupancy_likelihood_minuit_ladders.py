@@ -47,8 +47,8 @@ def remake_arrays(input_arr_):
     # fig, axs = plt.subplots(8, 8, sharex=False, sharey=False, figsize=(160, 160), tight_layout=True) #all rocs and modules
     # fig, axs = plt.subplots(12, 2, sharex=True, sharey=True, figsize=(20, 20), tight_layout=False) # fraction of rocs and modules
     # fig, axs = plt.subplots(1, sharex=True, sharey=True, figsize=(20, 20), tight_layout=True) # fraction of rocs and modules
-    fig = plt.figure() # fraction of rocs and modules
-    axs = fig.add_subplot(111, projection='3d') # fraction of rocs and modules
+    #fig = plt.figure() # fraction of rocs and modules
+    #axs = fig.add_subplot(111, projection='3d') # fraction of rocs and modules
 
     # minus - 0-383
     # plus - 384-767
@@ -189,31 +189,26 @@ def remake_arrays(input_arr_):
     #z_array = np.concatenate(z_clean)
     #occ = np.concatenate(occ_clean)
 
-    def nll(x0, y0, z0, n, b1, b2, b3, a3, c3, a1, c1):
-    #def nll(x0, y0, z0, n, b1, b2, b3, c3, c1, a1a, a1b, a1c, a3a, a3b, a3c):
-    #def nll(x0, y0, z0, n, b1a, b2a, b3a, a3a, c3a, b1b, b3b, a3b, c3b):
-    #def nll(x0, y0, z0, n, b1, b2, b3, a1, a2, a3, c1, c2, c3):
-    #def nll(x0, y0, z0, n):
+    #def nll(x0, y0, z0, n, b1, b2, b3, a1a, a1b, a1c, a3a, a3b, a3c, c1a, c1c, c3a, c3c):
+    #def nll(x0, y0, z0, n, b1, b2, b3, a1a, a1b, a1c, a3a, a3b, a3c, c1, c3):
+    def nll(x0, y0, z0, n, b1, b2, b3, a1, a3, c1, c3):
 
         # func_tmp = 0
         ri = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
         phi_cor = np.arctan2(y_array-y0, x_array-x0)
+        #a = np.float64(a_par(phi_cor, np.abs(z_array-z0), a1a, a1b, a1c, b2, a3a, a3b, a3c))
         a = np.float64(b_par(phi_cor, a1, b2, a3))
-        #a = np.float64(a_par(phi_array, z_array, a1a, a1b, a1c, b2, a3a, a3b, a3c))
         b = np.float64(b_par(phi_cor, b1, b2, b3))
+        #c = np.float64(a_par(phi_cor, np.abs(z_array-z0), c1a, a1b, c1c, b2, c3a, a3b, c3c))
         c = np.float64(b_par(phi_cor, c1, b2, c3))
 
-        #func_array = -np.log(1 / (np.sqrt(2 * np.pi * occ))) + (n * func(ri, aa, ab, ba, bb, ca, cb) - occ) ** 2 / (2 * np.pi * occ)
-        func_array = -np.log(1 / (np.sqrt(2 * np.pi * occ))) + (n * func(ri, b, a, c) - occ) ** 2 / (2 * np.pi * occ)
-        #func_array = -np.log(1 / (np.sqrt(2 * np.pi * occ))) + (n * func(ri) - occ) ** 2 / (2 * np.pi * occ)
-        # for z smearing
-        # func_array = -np.log(1 / (occ * np.sqrt(2 * np.pi))) + (n * func(ri) - occ) ** 2 / (2 * occ) + (z0 - z_true)**2 / (2*sigma_z**2)
+        func_array = -np.log(1 / (np.sqrt(2 * np.pi * occ))) + (n * func(ri, a, b, c) - occ) ** 2 / (2 * np.pi * occ)
 
         return np.sum(func_array)
 
     # axs.plot(phi_array, occ, 'b*')
     # axs.plot(z_condense, occ_condense, 'b*')
-    axs.plot(z_array, phi_array, occ, 'b*')
+    # axs.plot(z_array, phi_array, occ, 'b*')
     # bin_values, bins, patches = axs.hist(z_array, bins=64, range=(np.min(z_array),np.max(z_array)), weights=occ, density=False)
     # patches = axs.hist2d(z_array, phi_array, bins=(62,12), weights=occ, density=False)
 
@@ -228,24 +223,40 @@ def remake_arrays(input_arr_):
     #                    fix_z0=False,
     #                    limit_x0=(-10, 10), limit_y0=(-10, 10), limit_z0=(-25, 25), limit_n=(None, None),
     #                    errordef=1)
-    minuit = im.Minuit(nll, x0=0, y0=0, z0=-0.019, n=1,
-                       b1=0.0, b2=0.0, b3=1.167,
-                       a1=4e4, a3=1.26e5,
-                       c1=1e3, c3=3.12e3,
-                       error_x0=0.001, error_y0=0.001, error_z0=0.001, error_n=0.01,
+    minuit = im.Minuit(nll, x0=0, y0=0.0, z0=-0.019,
+                       n=1,
+                       b1=0.01, b2=-2.2, b3=1.182,
+                       a1a=1e3, a1b=-0.231, a1c=1e3,
+                       a3a=1.7e4, a3b=-0.2118, a3c=3000,
+                       c1=190, c3=1645,
+                       #c1a=790, c1c=67,
+                       #c3a=1e4, c3c=2000,
+                       error_x0=0.001, error_y0=0.001, error_z0=0.001,
+                       error_n=0.01,
                        error_b1=0.01, error_b2=0.01, error_b3=0.01,
-                       error_a1=10, error_a3=0.1,
-                       error_c1=10, error_c3=0.1,
-                       # error_a1c=0.1, error_c1=0.1,
-                       #fix_b3=True, fix_a3=True, fix_c3=True,
-                       fix_a1=False, fix_c1=False,
-                       #fix_z0=True,
+                       #fix_x0=True, fix_y0=True, fix_z0=True,
+                       #error_a1=10,
+                       #error_a3=0.1,
+                       error_c1=1,
+                       error_c3=1,
+                       fix_n=True,
+                       #fix_b1=True, fix_b2=True, fix_b3=True,
+                       #fix_a1a=False, fix_a1c=False,
+                       #fix_a1b=False,
+                       #fix_a3a=True, fix_a3c=True,
+                       #fix_a3b=False,
+                       #fix_c1a=False, fix_c1c=False,
+                       #fix_c3a=True, fix_c3c=True,
+                       #fix_c1b=True,
+                       #fix_c3b=True,
                        limit_x0=(-1, 1), limit_y0=(-1, 1), limit_z0=(-1, 1),
                        # limit_b1=(0, 2),
-                       limit_b2=(-np.pi, np.pi),
-                       limit_b3=(1, 3),
-                       # limit_a1a=(0.01, None), limit_a1b=(0.01, None), limit_a1c=(0.01, None),
-                       # limit_a3a=(0.01, None), limit_a3b=(0.01, None), limit_a3c=(0.01, None),
+                       limit_b2=(-np.pi, np.pi), limit_b3=(1, 3),
+                       #limit_a1a=(0.01, None), limit_a1b=(-1, 0), limit_a1c=(0.01, None),
+                       #limit_a3a=(0.01, None), limit_a3b=(-1, 0), limit_a3c=(0.01, None),
+                       #limit_c1=(50, None), limit_c3=(0.01, None),
+                       #limit_c1a=(0.01, None), limit_c1c=(0.01, None),
+                       #limit_c3a=(0.01, None), limit_c3c=(0.01, None),
                        # limit_a1=(0., 1e6),
                        # limit_c1=(0, 1e4),
                        errordef=1)
@@ -262,26 +273,21 @@ def remake_arrays(input_arr_):
     #                   errordef=1)
 
     # print(minuit.get_param_states())
+    minuit.set_strategy(2)
     minuit.migrad()
+    #minuit.hesse()
+    #minuit.minos()
     print(minuit.get_param_states())
     print(minuit.get_fmin())
 
     # axs.legend()
 
-    plt.show()
+    # plt.show()
 
 
-#def func(x, a, b, c, r0):
-#    return a*(1/(x-r0)**(2*b)) + c
-
-#def func(x, a=1.437e6, b=1.146, c=3.22e4):
-#    return a*(1/x**b) + c
-
-#def a_par(x, z, a1=0.0, a2=0.0, a3=3e4):  #, b4=0.0, b5=0.0, b6=1.167):
 def a_par(x, z, a1a, a1b, a1c, a2, a3a, a3b, a3c):
-
-    #return (a1a/(z**a1b)+a1c)*np.sin(x-a2)+a3
-    return (a1a/(z**a1b)+a1c)*np.sin(x-a2)+a3a/(z**a3b)+a3c
+    #return (a1a*np.exp(a1b*z)+a1c)*np.sin(x-a2)+(a3a*np.exp(a3b*z)+a3c)
+    return (a1a/z**a1b+a1c)*np.sin(x-a2)+(a3a/z**a3b)+a3c
 
 
 def b_par(x, b1=0.0, b2=0.0, b3=1.25e6):  #, b4=0.0, b5=0.0, b6=1.167):
@@ -292,18 +298,8 @@ def c_par(x, c1=0.0, c2=0.0, c3=1.25e6):  #, b4=0.0, b5=0.0, b6=1.167):
     return c1*np.sin(x-c2)+c3
 
 
-
-#def func(x, a=3e4, b=1.25e6):
-#    return a*x + b
-
-#def func(x, aa, ab, ba, bb, ca, cb):
-def func(x, b, a, c):
-
-        return a * (1 / x ** b) + c
-    #return np.array([aa*(1/x_val**ba)+ca if x_val <= 12 else ab*(1/x_val**bb)+cb for x_val in x])
-
-#def func(x, b=1.167, a=1.24e5, c=3.1e3):
-#        return a*(1/x**b) + c
+def func(x, a, b, c):
+    return a * (1 / x ** b) + c
 
 
 #def func(x, a=-0.8875e5, b=-1.439, c=1.377e7, d=2691, e=-1.618e5, f=2.646e6, g=-2.902e6):
@@ -373,7 +369,7 @@ if __name__ == "__main__":
     #in_array = read_file("design_0_no_outer_all_pix_nosmear_phifix.npy")
     #in_array = read_file("design_0p1_no_outer_all_pix_nosmear_phifix.npy")
     #in_array = read_file("design_0p1_II_no_outer_all_pix_nosmear.npy")
-    #in_array = read_file("design_0p2_no_outer_all_pix_nosmear.npy")
+    in_array = read_file("design_0p2_no_outer_all_pix_nosmear.npy")
     #in_array = read_file("design_0p3_no_outer_all_pix_nosmear.npy")
     #in_array = read_file("design_0p1_no_outer_all_pix_nosmear_charge.npy")
     #in_array = read_file("design_0_no_outer_all_pix_nosmear_chargel150_g25.npy")

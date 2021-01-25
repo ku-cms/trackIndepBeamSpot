@@ -84,7 +84,8 @@ def remake_arrays(input_arr_):
 
     # for roc selection
     # removing outermost and innermost rocs
-    remove_z = ((z_array > 1) + (z_array < -1)) * (z_array > -25) * (z_array < 25)
+    remove_z = (z_array > -25) * (z_array < 25)
+    #remove_z = ((z_array > 1) + (z_array < -1)) * (z_array > -25) * (z_array < 25)
     #remove_z = (z_array > -22) * (z_array < 22)
     #remove_z *= (z_array < 14) + (z_array > 20)
     #remove_z *= (z_array > -14) + (z_array < -20)
@@ -93,6 +94,7 @@ def remake_arrays(input_arr_):
     remove_blips = (z_array < -21) + (z_array > -20)
     remove_blips *= (z_array < -14.5) + (z_array > -13.5)
     remove_blips *= (z_array < -7.5) + (z_array > -6.5)
+    remove_blips *= (z_array < -1) + (z_array > 1)
     remove_blips *= (z_array < 5.75) + (z_array > 6.5)
     remove_blips *= (z_array < 12.5) + (z_array > 13.5)
     remove_blips *= (z_array < 19) + (z_array > 20)
@@ -114,9 +116,9 @@ def remake_arrays(input_arr_):
     #r_sph = r_sph[remove_z*remove_blips*remove_hl]
     #occ = occ[remove_z*remove_blips*remove_hl]
 
-    #z_array = z_array[remove_z*remove_blips]
-    #r_sph = r_sph[remove_z*remove_blips]
-    #occ = occ[remove_z*remove_blips]
+    z_array = z_array[remove_z*remove_blips]
+    r_sph = r_sph[remove_z*remove_blips]
+    occ = occ[remove_z*remove_blips]
     # removing rocs at the edge of the modules
     #mask = np.array([1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1], dtype=bool)
     #r_sph = r_sph[mask]
@@ -146,14 +148,20 @@ def remake_arrays(input_arr_):
     #    func_array = (func(r_sph, z_array, a, b, c, d, e, f) - occ)**2
     #    return np.sum(func_array)
 
-    chi2 = pf.Chi2Regression(func, r_sph, occ)
+    chi2 = pf.Chi2Regression(func, z_array, occ_z)
 
-    minuit = im.Minuit(chi2, a=1, b=1, c=1, d=1, e=1, f=1,
-                       error_a=0.01, error_b=0.01, error_c=1, error_d=0.01, error_e=0.01, error_f=0.01,
+    minuit = im.Minuit(chi2, a=10000, b=2, c=20000, ga=-10000, gb=-0.015, gc=1,
+                       error_a=0.01, error_b=0.01, error_c=0.1, error_ga=0.01, error_gb=0.01, error_gc=0.01,
                        fix_b=False,
-                       limit_a=(None, None), limit_b=(None, None), limit_c=(None, None), limit_d=(None, None),
-                       limit_e=(None, None), limit_f=(None, None),
+                       limit_a=(None, None), limit_b=(None, None), limit_c=(None, None), limit_ga=(None, None),
+                       limit_gb=(None, None), limit_gc=(0.00001, None),
                        errordef=1)
+    #minuit = im.Minuit(chi2, a=10000, b=2, c=20000, ga=-10000, gb=-0.015, gc=1,
+    #                   error_a=0.01, error_b=0.01, error_c=0.1, error_ga=0.01, error_gb=0.01, error_gc=0.01,
+    #                   fix_b=False,
+    #                   limit_a=(None, None), limit_b=(None, None), limit_c=(None, None), limit_ga=(None, None),
+    #                   limit_gb=(None, None), limit_gc=(0.00001, None),
+    #                   errordef=1)
     #minuit = im.Minuit(chi2, a=2300000, b=2, c=20000,
     #                         error_a=1, error_b=0.01, error_c=1,
     #                         fix_b=False,
@@ -163,7 +171,7 @@ def remake_arrays(input_arr_):
     print(minuit.get_param_states())
     print(minuit.get_fmin())
 
-    #chi2.draw(minuit, axs)
+    chi2.draw(minuit, axs)
     param_string = ''
     #for p in minuit.parameters:
     #    param_string += '{}: {} +/- {}\n'.format(p, np.format_float_scientific(minuit.values[p], precision=3),
@@ -182,11 +190,18 @@ def remake_arrays(input_arr_):
 #def func(x, a, b, c, d, e, f):
 #    return a*np.exp(-(x-b)**2/(2*c**2)) + d*(1/x**e) + f
 
-def func(x, a, b, c, d, e, f, g):
-    if x <= 16:
-        return a*(1/x**b) + c
-    else:
-        return d*x**3 + e*x**2 + f*x + g
+def func(x, a, b, c, ga, gb, gc):
+    #def func(x, a, b):
+
+    #return a*(1/(x)**(b)) + c
+    return a*(1/(x)**(b)) + c + ga * np.exp(-(x-gb)/(2*gc))
+
+
+#def func(x, a, b, c, d, e, f, g):
+#    if x <= 16:
+#        return a*(1/x**b) + c
+#    else:
+#        return d*x**3 + e*x**2 + f*x + g
         #return d*(1/x**e) + f
 #return a*(1/(x)**(b)) + c
     #return a*x**3 + b*x**2 + c*x +d
@@ -218,7 +233,8 @@ if __name__ == "__main__":
     #in_array = read_file("design_0_no_outer_all_pix_nosmear_charge.npy")
     #in_array =read_file("design_0_no_outer_all_pix_nosmear_charge10.npy")
     #in_array = read_file("design_0_no_outer_all_pix_nosmear_edge.npy")
-    in_array = read_file("design_0_no_outer_all_pix_nosmear_phifix.npy")
+    #in_array = read_file("design_0_no_outer_all_pix_nosmear_phifix.npy")
+    in_array = read_file("design_0p2_no_outer_all_pix_smear.npy")
     #in_array = read_file("design_0p1_no_outer_all_pix_nosmear_charge.npy")
     #in_array = read_file("design_0_no_outer_all_pix_nosmear_chargel250.npy")
     #in_array = read_file("design_0_no_outer_all_pix_nosmear_chargel200.npy")

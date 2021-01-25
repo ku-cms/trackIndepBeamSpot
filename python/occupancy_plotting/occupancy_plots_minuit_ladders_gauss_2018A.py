@@ -75,6 +75,8 @@ def remake_arrays(input_arr_):
     i_ladder = 0
     for roc in roc_index:
 
+        if 23 < roc < 32: continue
+        if 87 < roc < 96: continue
         occ_tmp = np.concatenate(array_by_rocs[roc, :, :, 0])
         r = np.concatenate(array_by_rocs[roc, :, :, 1])
         phi = np.concatenate(array_by_rocs[roc, :, :, 2])
@@ -155,6 +157,7 @@ def remake_arrays(input_arr_):
         #r_sph_minus[x] = r_sph_minus[x][remove_z_minus]
         #occ_plus[x] = occ_plus[x][remove_z_plus*remove_blips_plus]
         occ_minus[x] = occ_minus[x][remove_z*remove_blips]
+        z_minus[x] = z_minus[x][remove_z*remove_blips]
         #occ_minus[x] = occ_minus[x][remove_z_minus]
 
         z_condense = []
@@ -173,6 +176,7 @@ def remake_arrays(input_arr_):
         z_minus[x] = np.array(z_condense)
 
         axs[x].plot(r_sph_minus[x], occ_minus[x], 'b*', label='full z hl '+str(x))
+        #axs[x].plot(z_minus[x], occ_minus[x], 'b*', label='full z hl '+str(x))
         #axs[x, 0].plot(r_sph_minus[x], occ_minus[x], 'b*', label='minus z - hl '+str(x))
         #axs[x, 1].plot(r_sph_plus[x], occ_plus[x], 'b*', label='plus z - hl '+str(x))
         #axs[0].plot(r_sph_minus[x], occ_minus[x], 'b*', label='minus z - hl '+str(x))
@@ -180,6 +184,7 @@ def remake_arrays(input_arr_):
 
         #axs[2].plot(r_sph_minus[x], occ_minus[x], 'r*', label='occ minus')
         #axs[2].plot(r_sph_plus[x], occ_plus[x], 'b*', label='occ plus')
+        #chi2_minus = pf.Chi2Regression(func, z_minus[x], occ_minus[x])
         chi2_minus = pf.Chi2Regression(func, r_sph_minus[x], occ_minus[x])
         #chi2_plus = pf.Chi2Regression(func, r_sph_plus[x], occ_plus[x])
         #minuit_minus = im.Minuit(chi2_minus, a=0, b=1.16, c=2000,
@@ -188,9 +193,12 @@ def remake_arrays(input_arr_):
         #                         limit_a=(None, None), limit_b=(None, None), limit_c=(None, None),
         #                         errordef=1)
         minuit_minus = im.Minuit(chi2_minus, a=200000, b=-0.4, c=2000,
+                                ga=-18, gb=14, gc=0.687,
                                 error_a=1, error_b=0.01, error_c=1,
+                                error_ga=0.01, error_gb=0.01, error_gc=0.01,
                                 fix_b=False,
                                 limit_a=(None, None), limit_b=(0, 10), limit_c=(None, None),
+                                #limit_gc=(0.001, None),
                                 errordef=1)
         #minuit_minus = im.Minuit(chi2_minus, a=200000, b=0.5989, c=2000, r0=0,
         #                         error_a=1, error_b=0.01, error_c=1, error_r0=0.01,
@@ -253,10 +261,11 @@ def remake_arrays(input_arr_):
 #    return a*(1/(x-r0)**(2*b)) + c
 
 
-def func(x, a, b, c):
+def func(x, a, b, c, ga, gb, gc):
 #def func(x, a, b):
 
-    return a*(1/(x)**(b)) + c
+    #return a*(1/(x)**(b)) + c
+    return a*(1/(x)**(b)) + c + ga * np.exp(-(x-gb)/(2*gc))
     #return a*x + b
 
 
@@ -281,7 +290,12 @@ if __name__ == "__main__":
     #in_array = read_file("design_zneg10_no_outer_ge_2pix.npy")
     #in_array = read_file("design_0_nosmear_no_outer_ge_2pix.npy")
     #in_array = read_file("design_0_no_outer_all_pix_nosmear_phifix.npy")
-    in_array = read_file("design_0p3_no_outer_all_pix_nosmear.npy")
+    #in_array = read_file("design_0p3_no_outer_all_pix_nosmear.npy")
+    #in_array = read_file("design_0p3_no_outer_all_pix_smear.npy")
+    #in_array = read_file("design_0p2_no_outer_all_pix_smear.npy")
+    #in_array = read_file("design_0p2_no_outer_all_pix_PU.npy")
+    #in_array = read_file("design_0p2_no_outer_all_pix_nosmear.npy")
+    in_array = read_file("design_0p1_no_outer_all_pix_smear.npy")
     #in_array = read_file("design_0p1_II_no_outer_all_pix_nosmear.npy")
     #in_array = read_file("design_0_no_outer_all_pix_nosmear_chargel200.npy")
     #in_array = read_file("design_0p3_no_outer_all_pix_nosmear_chargel200.npy")

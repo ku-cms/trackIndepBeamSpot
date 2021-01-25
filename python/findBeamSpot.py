@@ -779,11 +779,45 @@ if __name__ == "__main__":
     mods = [-1, 1, -2, 2, -3, 3, -4, 4]
     mods_pairs = ['-4-3', '-3-2', '-2-1', '-11', '12', '23', '34']
     # in_file_name = './PixelTree_out_rereco_size4_29119.root'
-    # in_file_name = './pixelTree_out_design_12419.root'
+    # in_file_name = './output_files/design_0p2_only_true_2pix.root'
+    # in_file_name = './output_files/design_0p3_only_true_2pix.root'
+    # in_file_name = './output_files/design_0p5_only_true_2pix.root'
+    # in_file_name = './output_files/design_1p0_only_true_2pix.root'
+    # in_file_name = './output_files/design_0p2_1pix_ch50.root'
+    # in_file_name = './output_files/design_0p3_1pix_ch50.root'
+    # in_file_name = './output_files/design_0p5_1pix_ch50.root'
+    # in_file_name = './output_files/design_1p0_1pix_ch50.root'
+    # in_file_name = './output_files/design_0p2_ge_2pix_trk.root'
+    # in_file_name = './output_files/design_0p3_ge_2pix_trk.root'
+    # in_file_name = './output_files/design_0p5_ge_2pix_trk.root'
+    # in_file_name = './output_files/design_1p0_ge_2pix_trk.root'
+    # in_file_name = './output_files/design_0p2_ge_2pix_notrk.root'
+    # in_file_name = './output_files/design_0p3_ge_2pix_notrk.root'
+    # in_file_name = './output_files/design_0p5_ge_2pix_notrk.root'
+    # in_file_name = './output_files/design_1p0_ge_2pix_notrk.root'
+    # in_file_name = './output_files/design_0_ge_2pix.root'
+    # in_file_name = './output_files/design_0_ge_2pix_trk.root'
+    # in_file_name = './output_files/design_0_nosmear_ge_2pix_notrk.root'
+    # in_file_name = './output_files/design_0_nosmear_fix_ge_2pix.root'
+    in_file_name = './output_files/design_0_smear_ge_2pix.root'
+    # in_file_name = './output_files/design_0_nosmear_ge_2pix_trk.root'
+    # in_file_name = './output_files/design_0p2_ge_2pix.root'
+    # in_file_name = './output_files/design_0p3_ge_2pix.root'
+    # in_file_name = './output_files/design_0p5_ge_2pix.root'
+    # in_file_name = './output_files/design_1p0_ge_2pix.root'
+    # in_file_name = './output_files/design_1p0_0_ge_2pix.root'
+    # in_file_name = './output_files/design_1p0_0p95_ge_2pix.root'
+    # in_file_name = './output_files/design_0p1_test.root'
+    # in_file_name = './output_files/design_0p2_test.root'
+    # in_file_name = './output_files/design_0p3_test.root'
+    # in_file_name = './output_files/design_0p5_test.root'
+    # in_file_name = './output_files/design_1p0_test.root'
+    # in_file_name = './output_files/design_zneg10_test.root'
+    # in_file_name = './output_files/design_z10_test.root'
     # in_file_name = './pixelTree_out_design_allevts_13519.root'
     # in_file_name = './pixelTree_out_realistic_3000evts_1pix_with_outer_23519.root'
     # in_file_name = './pixelTree_out_design_10000evts_1pix_0p0_15719.root'
-    in_file_name = './pixelTree_out_realistic_5000evts_1pix_0p01_15719.root'
+    # in_file_name = './pixelTree_out_realistic_5000evts_1pix_0p01_15719.root'
     # in_file_name = './pixelTree_out_design_3sig_5000_12419.root'
     # in_file_name = './pixelTree_out_realistic_12419.root'
     # in_file_name = './pixelTree_out_realistic_sig3_5000_12419.root'
@@ -840,7 +874,7 @@ if __name__ == "__main__":
         hist_outer_tmp = in_file.Get(hist_outer_name)
         # hist_tmp_2 = in_file.Get(hist_name_2)
         # hist_tmp.Add(hist_tmp_2)
-        hist_tmp_clean = preprocess_hist(hist_tmp)
+        # hist_tmp_clean = preprocess_hist(hist_tmp)
         # gr_tmp = make_xy_graph(hist_tmp_clean, None)
         # gr_tmp = make_xy_graph(None, hist_tmp)
         print '################'
@@ -863,6 +897,9 @@ if __name__ == "__main__":
                 out_lines[(iline+2)+factor*14] += '{:>15.2f} +/- {:<15.2f}'.format(value, np.sqrt(value))
             out_lines[(iline+2)+factor*14] += '\n'
         out_lines[0+1+factor*14] += '\n'
+    with open('quadrant_design_0_smear_ge_2pix_with_outer.txt', 'w') as f:
+        f.writelines(out_lines)
+        f.close()
 
 
     # with open('quadrant_occupancies_realistic_3000evts_5pix_with_outer.txt', 'w') as f:
@@ -911,9 +948,6 @@ if __name__ == "__main__":
     #    out_lines[0+1+factor*4] += '\n'
 
     # with open('quadrant_design0p0_10000evts_1pix_with_outer.txt', 'w') as f:
-    with open('quadrant_realistic0p01_5000evts_1pix_with_outer.txt', 'w') as f:
-        f.writelines(out_lines)
-        f.close()
 
 
     #gr_name_1 = 'gr_r_phi_neg_-1'
