@@ -595,10 +595,11 @@ if __name__ == "__main__":
     
     directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/FNAL/SingleMuon/2018C/0001'
     file_list = get_list_of_files(directory, "*.root")
+    file_list = [file_list[0]]
     
-    #print "num files: {0}".format(len(file_list))
-    #for f in file_list:
-    #    print f
+    print "num files: {0}".format(len(file_list))
+    for f in file_list:
+        print f
     
     occ_map = make_cluster_map(file_list)  
     np.save('design_0p1_no_outer_all_pix_smear_charge l1000_size_1_50.npy', occ_map)
