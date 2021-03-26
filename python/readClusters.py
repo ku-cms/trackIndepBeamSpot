@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 import os
+import time
 import ROOT as rt
 import numpy as np
+from tools import get_list_of_files
 from pixelMapping_cfi import *
-import time
+from inputFiles_cfi import *
 from array import array
 from collections import OrderedDict
 
@@ -448,8 +450,11 @@ def read_clusters(input_files, f_name_):
 
 
 if __name__ == "__main__":
+    
     t_start = time.time()
-    from inputFiles_cfi import *
+    
+    # --------------------------------------------------------------------  
+    
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_z0_GEN_SIM/190819_222147/0000/'
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_zneg10_GEN_SIM/190819_222156/0000/'
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_z10_GEN_SIM/190819_222215/0000/'
@@ -541,11 +546,23 @@ if __name__ == "__main__":
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
     #np.save('design_0p1_no_outer_all_pix_nosmear_25k.npy', occ_map)
-    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000/'
-    file_list = get_list_of_files(directory)
-    occ_map = make_cluster_map(file_list)  
-    np.save('design_0p1_no_outer_all_pix_smear_charge l1000_size_1_50.npy', occ_map)
-    directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000/'
+    
+    # --------------------------------------------------------------------  
+    # --- testing ---
+    
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/FNAL/SingleMuon/2018C/0001'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000/'
+    #file_list = get_list_of_files(directory, "*.root")
+    #print "num files: {0}".format(len(file_list))
+    #print file_list
+    #for f in file_list:
+    #    print f
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p1_no_outer_all_pix_smear_charge l1000_size_1_50.npy', occ_map)
+    
+    # --------------------------------------------------------------------  
+    
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000/'
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
     #np.save('design_0p2_no_outer_all_pix_smear_25k.npy', occ_map)
@@ -573,6 +590,18 @@ if __name__ == "__main__":
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
     #np.save('design_neg0p08_no_outer_all_pix_nosmear_25k.npy', occ_map)
+    
+    # --------------------------------------------------------------------  
+    
+    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/FNAL/SingleMuon/2018C/0001'
+    file_list = get_list_of_files(directory, "*.root")
+    
+    #print "num files: {0}".format(len(file_list))
+    #for f in file_list:
+    #    print f
+    
+    occ_map = make_cluster_map(file_list)  
+    np.save('design_0p1_no_outer_all_pix_smear_charge l1000_size_1_50.npy', occ_map)
 
     t_stop = time.time()
     print t_stop - t_start
