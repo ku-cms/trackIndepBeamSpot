@@ -34,6 +34,7 @@ def make_map(input_files_, directory):
             if not(303000000 < detid_digi < 304000000):
                 continue  # layer 1
 
+
             row_digi = int(event.DgRow[iDg])
             col_digi = int(event.DgCol[iDg])
 

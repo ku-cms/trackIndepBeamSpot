@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import ROOT as rt
 import numpy as np
 from pixelMapping_cfi import *
@@ -7,13 +8,87 @@ import time
 from array import array
 from collections import OrderedDict
 
+def make_cluster_map(input_files_):
+    """
+    function to make a cluster occupancy map of layer 1 pixels, with 1:1 pixel, index correspondence
+    :param input_files: list of PixelTree ntuples to be processed
+    :return:
+    """
+    chain = rt.TChain('pixelTree')
+    for f in input_files_:
+        chain.Add(f)
 
-def read_clusters(input_files, directory):
+    # creating empty array to be used as map
+    occ_array = np.full((1920, 3328), None)
+
+    n_events = chain.GetEntries()
+
+    for iev, event in enumerate(chain):
+        if iev % 10 == 0:
+            print 'Event', iev, ' / ', n_events
+        #if iev > 200000: break
+        n_cl = event.ClN
+
+        for icl in xrange(n_cl):
+
+            detid_cl = event.ClDetId[icl]
+
+            # skipping detids outside of layer 1
+            if not(303000000 < detid_cl < 304000000):
+                continue  # layer 1
+
+
+            clus_size = chain.ClSize[icl]
+            clus_size_x = chain.ClSizeX[icl]
+            clus_size_y = chain.ClSizeY[icl]
+            if clus_size < 1: continue
+            if clus_size > 50: continue
+            #if clus_size < 50: continue
+            #if chain.ClTkN[icl] < 1: continue 
+
+            row_cl = int(event.ClRow[icl])
+            col_cl = int(event.ClCol[icl])
+            ladder_cl = int(event.ClLadder[icl])
+
+            # remove if not an inner ladder
+            if ladder_cl not in [-5, -3, -1, 2, 4, 6]: continue
+
+
+            charge = event.ClCharge[icl]
+            if charge > 1000: continue
+            gx_cl = event.ClGx[icl]
+            gy_cl = event.ClGy[icl]
+            gr_cl = np.sqrt(gx_cl**2 + gy_cl**2) 
+            gz_cl = event.ClGz[icl]
+            try:
+                phi_cl = np.arctan2(gy_cl, gx_cl)
+            except ZeroDivisionError:
+                gy_cl += 0.00001
+                phi_cl = np.arctan2(gy_cl, gx_cl)
+
+            # converting detids to a ladder index and module index
+            ladder_index = int(ladder_map(detid_cl))
+            module_index = int(module_map(detid_cl, ladder_index))
+
+            array_row = row_cl + (160*ladder_index)
+            array_col = col_cl + (416*module_index)
+ 
+            if not occ_array[array_row][array_col]:
+                occ_array[array_row][array_col] = [0, gr_cl, phi_cl, gz_cl]
+ 
+            edge_row, edge_col = edge_pix_map(row_cl, col_cl)
+            if edge_row or edge_col: continue 
+
+            occ_array[row_cl+(160*ladder_index)][col_cl+(416*module_index)][0] += 1
+    return occ_array
+
+
+def read_clusters(input_files, f_name_):
     tChain = rt.TChain('pixelTree')
     for f in input_files:
-        tChain.Add(directory + f)
+        tChain.Add(f)
 
-    of = rt.TFile(input_files[0].split('_')[0] + '_out_realistic_10000evts_1pix_0p01_15719.root', 'recreate')
+    of = rt.TFile('./output_files/'+f_name_+'.root', 'recreate')
 
     nEvents = tChain.GetEntries()
 
@@ -93,7 +168,7 @@ def read_clusters(input_files, directory):
     #    list_hot_pixels[i] = list(pix)
     # hot_pixels = [list(pix) for pix in hot_pixels]
     # hot_rocs = [list(roc) for roc in hot_rocs]
-    for iev in xrange(10000):
+    for iev in xrange(nEvents):
         if iev % 10 == 0:
             print('Event: ', iev, '/ ', nEvents)
         tChain.GetEntry(iev)
@@ -114,9 +189,11 @@ def read_clusters(input_files, directory):
             clus_size_y = tChain.ClSizeY[iCl]
             clus_charge = tChain.ClCharge[iCl]
             if clus_charge < 0: continue
-            # if clus_charge > 30: continue
-            if clus_size_x > 1: continue
-            if clus_size_y > 1: continue
+            #if clus_charge < 50: continue
+            # if clus_size_x != 2: continue
+            # if clus_size_y != 2: continue
+            if clus_size_y + clus_size_x < 3: continue
+            # if tChain.ClTkN[iCl] > 0: continue 
 
             clusGX = tChain.ClGx[iCl]
             clusGY = tChain.ClGy[iCl]
@@ -251,75 +328,75 @@ def read_clusters(input_files, directory):
     # clustOccIn_plus.Scale(1. / nEvents)
     # clustOccIn.Scale(1. / nEvents)
     # clustOccIn_prescale.Scale(1. / nEvents)
-    r_phi_map = []
+    # r_phi_map = []
 
-    for ibin in xrange(clustRPhi.GetNbinsX()):
-        r_values = []
-        for jbin in xrange(clustRPhi.GetNbinsY()):
-            if clustRPhi.GetBinContent(ibin,jbin) > 0.:
-                r_values.append(clustRPhi.GetYaxis().GetBinCenter(jbin))
-        if not r_values:
-            r_mean = 0
-        else:
-            r_mean = sum(r_values) / float(len(r_values))
-        r_phi_map.append(r_mean)
+    # for ibin in xrange(clustRPhi.GetNbinsX()):
+    #     r_values = []
+    #     for jbin in xrange(clustRPhi.GetNbinsY()):
+    #         if clustRPhi.GetBinContent(ibin,jbin) > 0.:
+    #             r_values.append(clustRPhi.GetYaxis().GetBinCenter(jbin))
+    #     if not r_values:
+    #         r_mean = 0
+    #     else:
+    #         r_mean = sum(r_values) / float(len(r_values))
+    #     r_phi_map.append(r_mean)
 
-    clustOccIn_plus_scaled = clustOccIn_plus.Clone("hclustOccIn_1_scaled")
-    clustOccIn_scaled = clustOccIn.Clone("hclustOccIn_scaled")
+    # clustOccIn_plus_scaled = clustOccIn_plus.Clone("hclustOccIn_1_scaled")
+    # clustOccIn_scaled = clustOccIn.Clone("hclustOccIn_scaled")
 
-    for ibin in xrange(clustOccIn.GetNbinsX()):
-        occ = clustOccIn.GetBinContent(ibin)
-        occ_plus = clustOccIn_plus.GetBinContent(ibin)
-        occ_scaled = occ * (r_phi_map[ibin]**2/2.776**2)
-        occ_plus_scaled = occ_plus * (r_phi_map[ibin]**2/2.776**2)
+    # for ibin in xrange(clustOccIn.GetNbinsX()):
+    #     occ = clustOccIn.GetBinContent(ibin)
+    #     occ_plus = clustOccIn_plus.GetBinContent(ibin)
+    #     occ_scaled = occ * (r_phi_map[ibin]**2/2.776**2)
+    #     occ_plus_scaled = occ_plus * (r_phi_map[ibin]**2/2.776**2)
 
-        if occ_scaled > 0.:
-            clustOccIn_scaled.SetBinContent(ibin, occ_scaled)
-        if occ_plus_scaled > 0.:
-            clustOccIn_plus_scaled.SetBinContent(ibin, occ_plus_scaled)
+    #     if occ_scaled > 0.:
+    #         clustOccIn_scaled.SetBinContent(ibin, occ_scaled)
+    #     if occ_plus_scaled > 0.:
+    #         clustOccIn_plus_scaled.SetBinContent(ibin, occ_plus_scaled)
 
-    for i in xrange(clustOccIn_plus.GetNbinsX()):
-        occBin = clustOccIn_scaled.GetBinContent(i)
-        phiBin = clustOccIn_scaled.GetBinCenter(i)
-        plusBin = clustOccIn_plus_scaled.GetBinContent(i)
+    # for i in xrange(clustOccIn_plus.GetNbinsX()):
+    #     occBin = clustOccIn_scaled.GetBinContent(i)
+    #     phiBin = clustOccIn_scaled.GetBinCenter(i)
+    #     plusBin = clustOccIn_plus_scaled.GetBinContent(i)
 
-        for phi1, phi2, occ in bin_edge_map:
-            if phi1 < phiBin < phi2 and occBin > occ:
-                clustOccIn_clean.SetBinContent(i, occBin)
-                clustOccIn_plus_clean.SetBinContent(i, plusBin)
-    r_vals = array('d')
-    phi_vals = array('d')
-    for phi, r in r_phi_array:
-        r_vals.append(r)
-        phi_vals.append(phi)
-    n_vals = len(r_phi_array)
-    g_r_phi = rt.TGraph(n_vals, phi_vals, r_vals)
+    #     for phi1, phi2, occ in bin_edge_map:
+    #         if phi1 < phiBin < phi2 and occBin > occ:
+    #             clustOccIn_clean.SetBinContent(i, occBin)
+    #             clustOccIn_plus_clean.SetBinContent(i, plusBin)
+    # r_vals = array('d')
+    # phi_vals = array('d')
+    # for phi, r in r_phi_array:
+    #     r_vals.append(r)
+    #     phi_vals.append(phi)
+    # n_vals = len(r_phi_array)
+    # g_r_phi = rt.TGraph(n_vals, phi_vals, r_vals)
 
-    for mod in clust_per_mod.keys():
-        # clust_per_mod[mod]['TH2F'].Scale(1. / nEvents)
-        # clust_per_mod[mod]['TH1F'].Scale(1. / nEvents)
-        r_vals = array('d')
-        phi_vals = array('d')
-        for phi, r in clust_per_mod[mod]['r_phi_array']:
-            r_vals.append(r)
-            phi_vals.append(phi)
-        n_vals = len(clust_per_mod[mod]['r_phi_array'])
-        clust_per_mod[mod]['TGraph'] = rt.TGraph(n_vals, phi_vals, r_vals)
-        if mod < 0:
-            clust_per_mod[mod]['TGraph'].SetName('gr_r_phi_neg_'+str(mod))
-        else:
-            clust_per_mod[mod]['TGraph'].SetName('gr_r_phi_'+str(mod))
-        clust_per_mod[mod]['TGraph'].Write()
-        for phi, r in clust_per_mod_outer[mod]['r_phi_array']:
-            r_vals.append(r)
-            phi_vals.append(phi)
-        n_vals = len(clust_per_mod_outer[mod]['r_phi_array'])
-        clust_per_mod_outer[mod]['TGraph'] = rt.TGraph(n_vals, phi_vals, r_vals)
-        if mod < 0:
-            clust_per_mod_outer[mod]['TGraph'].SetName('gr_r_phi_neg_'+str(mod))
-        else:
-            clust_per_mod_outer[mod]['TGraph'].SetName('gr_r_phi_'+str(mod))
-        clust_per_mod_outer[mod]['TGraph'].Write()
+    # for mod in clust_per_mod.keys():
+    #     # clust_per_mod[mod]['TH2F'].Scale(1. / nEvents)
+    #     # clust_per_mod[mod]['TH1F'].Scale(1. / nEvents)
+    #     r_vals = array('d')
+    #     phi_vals = array('d')
+    #     for phi, r in clust_per_mod[mod]['r_phi_array']:
+    #         r_vals.append(r)
+    #         phi_vals.append(phi)
+    #     n_vals = len(clust_per_mod[mod]['r_phi_array'])
+    #     clust_per_mod[mod]['TGraph'] = rt.TGraph(n_vals, phi_vals, r_vals)
+    #     if mod < 0:
+    #         clust_per_mod[mod]['TGraph'].SetName('gr_r_phi_neg_'+str(mod))
+    #     else:
+    #         clust_per_mod[mod]['TGraph'].SetName('gr_r_phi_'+str(mod))
+    #     clust_per_mod[mod]['TGraph'].Write()
+    #     for phi, r in clust_per_mod_outer[mod]['r_phi_array']:
+    #         r_vals.append(r)
+    #         phi_vals.append(phi)
+    #     n_vals = len(clust_per_mod_outer[mod]['r_phi_array'])
+    #     clust_per_mod_outer[mod]['TGraph'] = rt.TGraph(n_vals, phi_vals, r_vals)
+    #     if mod < 0:
+    #         clust_per_mod_outer[mod]['TGraph'].SetName('gr_r_phi_neg_'+str(mod))
+    #     else:
+    #         clust_per_mod_outer[mod]['TGraph'].SetName('gr_r_phi_'+str(mod))
+    #     clust_per_mod_outer[mod]['TGraph'].Write()
 
     # for pix in hot_pixels:
     #     row = pix[0]
@@ -366,24 +443,137 @@ def read_clusters(input_files, directory):
 
 
     of.Write()
-    g_r_phi.Write()
+    #g_r_phi.Write()
     of.Close()
 
 
 if __name__ == "__main__":
-    from inputFiles_cfi import *
     t_start = time.time()
-    # directory = './files/rereco/'
-    directory = './files/pixeltrees_mc/realistic/'
-    # directory = './files/pixeltrees_mc/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p01/190709_213444/0000/'
-    # directory = './files/pixeltrees_mc/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1/190709_213454/0000/'
-    # directory = './files/pixeltrees_mc/RelValTTbar_13TeV/crab_RelValTTbar_13TeVrealistic_0/190710_173122/0000/'
-    # directory = './files/pixeltrees_mc/RelValTTbar_13TeV/crab_RelValTTbar_13TeVrealistic_0p1/190710_173131/0000/'
-    # directory = './files/pixeltrees_mc/design/'
-    # directory = './files/324970/'
-    # read_clusters(input_files_design, directory)
-    read_clusters(input_files_realistic, directory)
-    # read_clusters(input_files_express, directory)
+    from inputFiles_cfi import *
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_z0_GEN_SIM/190819_222147/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_zneg10_GEN_SIM/190819_222156/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_z10_GEN_SIM/190819_222215/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_I_GEN/190819_222205/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_II_GEN/190819_222054/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVeschmitzcrab_design_0_GEN/190930_182702/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeV0p95_GEN_SIM_newquads/191021_205241/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVGEN_SIM_nosmear_100k-a36a67a47de16eaa403e9f7b1d06e8ce/191009_213009/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p5_GEN_SIM/190819_222113/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeV0_GEN_SIM_newquads/191021_205252/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0_nosmear_ge_2pix.npy', occ_map)
+    #read_clusters(file_list, 'design_0_nosmear_fix_ge_2pix')
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeV0_GEN_SIM_smear/191211_193431/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_zneg10_GEN_SIM/190819_222156/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVGEN_SIM_nosmear_100k-a36a67a47de16eaa403e9f7b1d06e8ce/191009_213009/0000/'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/submil/RelValTTbar_13TeV/crab_crab_design_0p01_GEN_SIM_RAW_RECO_submil_eschmitzcrab_design_0p01_GEN_SIM_RAW_RECO_submil/200727_143047/0000/'
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018B'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('singlemu_2018B_no_outer_all_pix_200k.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018A'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('singlemu_2018A_no_outer_all_pix.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018A'
+    #directory2 = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018B'
+    #file_list = get_list_of_files(directory)
+    #file_list2 = get_list_of_files(directory2)
+    #for f in file_list2:
+    #    file_list.append(f)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('singlemu_2018AB_no_outer_all_pix.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018C'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('singlemu_2018C_no_outer_all_pix.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018C2'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('singlemu_2018C2_no_outer_all_pix.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018D'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('singlemu_2018D_no_outer_all_pix_200k.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/singleMu/singleMu_2018D2'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('singlemu_2018D2_no_outer_all_pix_200k.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_II_GEN/190819_222054/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_neg0p1_0p08_no_outer_all_pix_smear_25k.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_I_GEN/190819_222205/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p1_0p08_no_outer_all_pix_smear_25k.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVRAW_eschmitzcrab_design_0p2/190930_182712/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p2_no_outer_all_pix_PU.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVRAW_eschmitzcrab_design_0p3/190930_182723/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p3_no_outer_all_pix_PU.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVRAW_eschmitzcrab_design_0p3/190930_182723/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p3_no_outer_all_pix_PU.npy', occ_map)
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/smeared_z10/RelValTTbar_13TeV/crab_crab_design_z10_GEN_SIM_RAW_RECO_smeared_z10_eschmitzcrab_design_z10_GEN_SIM_RAW_RECO_smeared_z10/200910_204426/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p1_z10_no_outer_all_pix_smear.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/new_nosmear/RelValTTbar_13TeV/crab_crab_RelValTTbar_13TeV_RAW_nosmear__eschmitzcrab_design_0p3_GEN_SIM_nosmear_newZ_100k/200528_201737/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p3_no_outer_all_pix_nosmear_25k.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/new_nosmear/RelValTTbar_13TeV/crab_crab_RelValTTbar_13TeV_RAW_nosmear__eschmitzcrab_design_0p2_GEN_SIM_nosmear_newZ_100k/200528_201744/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p2_no_outer_all_pix_nosmear_25k.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/new_nosmear/RelValTTbar_13TeV/crab_crab_RelValTTbar_13TeV_RAW_nosmear__eschmitzcrab_design_0p1_II_GEN_SIM_nosmear_newZ_100k/200528_201751/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p1_II_no_outer_all_pix_nosmear_25k.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_z0_GEN_SIM/190819_222147/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p1_no_outer_all_pix_nosmear_25k.npy', occ_map)
+    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000/'
+    file_list = get_list_of_files(directory)
+    occ_map = make_cluster_map(file_list)  
+    np.save('design_0p1_no_outer_all_pix_smear_charge l1000_size_1_50.npy', occ_map)
+    directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p2_no_outer_all_pix_smear_25k.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p3_GEN_SIM/190819_222127/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p3_no_outer_all_pix_smear_25k.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_z10_GEN_SIM/190819_222215/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p1_z10_no_outer_all_pix_nosmear.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/nosmear_newZ/RelValTTbar_13TeV/crab_RelValTTbar_13TeVz10_GEN_SIM_nosmear/200519_042806/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0_z10_no_outer_all_pix_nosmear.npy', occ_map)
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeV0_GEN_SIM_smear/191211_193431/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0_no_outer_all_pix_smear.npy', occ_map)
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/submil/RelValTTbar_13TeV/crab_crab_design_neg0p05_GEN_SIM_RAW_RECO_submil_eschmitzcrab_design_neg0p05_GEN_SIM_RAW_RECO_submil/200727_143039/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_neg0p05_no_outer_all_pix_nosmear.npy', occ_map)
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/submil/RelValTTbar_13TeV/crab_crab_design_neg0p08_GEN_SIM_RAW_RECO_submil_eschmitzcrab_design_neg0p08_GEN_SIM_RAW_RECO_submil/200727_143031/0000/'
+    #file_list = get_list_of_files(directory)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_neg0p08_no_outer_all_pix_nosmear_25k.npy', occ_map)
+
     t_stop = time.time()
     print t_stop - t_start
 
