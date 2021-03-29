@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import os
 import time
 import ROOT as rt
@@ -28,6 +29,7 @@ def make_cluster_map(input_files_):
     for iev, event in enumerate(chain):
         if iev % 10 == 0:
             print 'Event', iev, ' / ', n_events
+            sys.stdout.flush()
         #if iev > 200000: break
         n_cl = event.ClN
 
@@ -173,11 +175,13 @@ def read_clusters(input_files, f_name_):
     for iev in xrange(nEvents):
         if iev % 10 == 0:
             print('Event: ', iev, '/ ', nEvents)
+            sys.stdout.flush()
         tChain.GetEntry(iev)
         nClus = tChain.ClN
         nClusTot += nClus
         if iev == 0:
             print(nClus)
+            sys.stdout.flush()
         beamspot_x.Fill(tChain.BsX)
         beamspot_y.Fill(tChain.BsY)
         beamspot_width_x.Fill(tChain.Bs_widthX)
@@ -605,5 +609,5 @@ if __name__ == "__main__":
     np.save('design_0p1_no_outer_all_pix_smear_charge l1000_size_1_50.npy', occ_map)
 
     t_stop = time.time()
-    print t_stop - t_start
+    print "run time (sec): {0}".format(t_stop - t_start)
 
