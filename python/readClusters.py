@@ -25,10 +25,10 @@ def make_cluster_map(input_files_):
     occ_array = np.full((1920, 3328), None)
 
     n_events = chain.GetEntries()
-    max_events = 100
+    max_events = -1
 
     for iev, event in enumerate(chain):
-        if iev > max_events:
+        if max_events > 0 and iev > max_events:
             break
         if iev % 10 == 0:
             print 'Event', iev, ' / ', n_events
