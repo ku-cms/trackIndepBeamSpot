@@ -25,7 +25,7 @@ def make_cluster_map(input_files_):
     occ_array = np.full((1920, 3328), None)
 
     n_events = chain.GetEntries()
-    max_events = 10
+    max_events = 100
 
     for iev, event in enumerate(chain):
         if iev > max_events:
@@ -47,8 +47,8 @@ def make_cluster_map(input_files_):
             clus_size = chain.ClSize[icl]
             clus_size_x = chain.ClSizeX[icl]
             clus_size_y = chain.ClSizeY[icl]
-            if clus_size < 1: continue
-            if clus_size > 50: continue
+            #if clus_size < 1: continue
+            #if clus_size > 50: continue
             #if clus_size < 50: continue
             #if chain.ClTkN[icl] < 1: continue 
 
@@ -61,7 +61,7 @@ def make_cluster_map(input_files_):
 
 
             charge = event.ClCharge[icl]
-            if charge > 1000: continue
+            #if charge > 1000: continue
             gx_cl = event.ClGx[icl]
             gy_cl = event.ClGy[icl]
             gr_cl = np.sqrt(gx_cl**2 + gy_cl**2) 
