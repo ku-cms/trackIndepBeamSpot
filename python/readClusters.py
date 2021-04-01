@@ -5,9 +5,9 @@ import os
 import time
 import ROOT as rt
 import numpy as np
-from tools import get_list_of_files
+#from tools import get_list_of_files
 from pixelMapping_cfi import *
-from inputFiles_cfi import *
+from inputFiles_cfi import get_list_of_files
 from array import array
 from collections import OrderedDict
 
@@ -25,12 +25,14 @@ def make_cluster_map(input_files_):
     occ_array = np.full((1920, 3328), None)
 
     n_events = chain.GetEntries()
+    max_events = 10
 
     for iev, event in enumerate(chain):
+        if iev > max_events:
+            break
         if iev % 10 == 0:
             print 'Event', iev, ' / ', n_events
             sys.stdout.flush()
-        #if iev > 200000: break
         n_cl = event.ClN
 
         for icl in xrange(n_cl):
@@ -598,7 +600,7 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------  
     
     directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/FNAL/SingleMuon/2018C/0001'
-    file_list = get_list_of_files(directory, "*.root")
+    file_list = get_list_of_files(directory)
     file_list = [file_list[0]]
     
     print "num files: {0}".format(len(file_list))
@@ -606,7 +608,7 @@ if __name__ == "__main__":
         print f
     
     occ_map = make_cluster_map(file_list)  
-    np.save('design_0p1_no_outer_all_pix_smear_charge l1000_size_1_50.npy', occ_map)
+    np.save('design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50.npy', occ_map)
 
     t_stop = time.time()
     print "run time (sec): {0}".format(t_stop - t_start)
