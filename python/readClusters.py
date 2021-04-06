@@ -5,7 +5,6 @@ import os
 import time
 import ROOT as rt
 import numpy as np
-#from tools import get_list_of_files
 from pixelMapping_cfi import *
 from inputFiles_cfi import get_list_of_files
 from array import array
@@ -599,16 +598,32 @@ if __name__ == "__main__":
     
     # --------------------------------------------------------------------  
     
-    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/FNAL/SingleMuon/2018C/0001'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/FNAL/SingleMuon/2018C/0001'
+    #output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50.npy'
+    #message = 'Running over SingleMuon PixelTrees (copied from FNAL).'
+
+    # Single Muon
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
+    #output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon.npy'
+    #message = 'Running over SingleMuon PixelTrees.'
+    
+    # Zero Bias
+    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
+    output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias.npy' 
+    message = 'Running over ZeroBias PixelTrees.'
+    
     file_list = get_list_of_files(directory)
     file_list = [file_list[0]]
-    
-    print "num files: {0}".format(len(file_list))
+   
+    # --- printing --- #
+    print message
+    print "Number of files: {0}".format(len(file_list))
     for f in file_list:
         print f
     
     occ_map = make_cluster_map(file_list)  
-    np.save('design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50.npy', occ_map)
+    
+    np.save(output_file, occ_map)
 
     t_stop = time.time()
     print "run time (sec): {0}".format(t_stop - t_start)
