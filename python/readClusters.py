@@ -26,6 +26,8 @@ def make_cluster_map(input_files_):
     n_events = chain.GetEntries()
     max_events = -1
 
+    print "Number of events: {0}".format(n_events)
+
     for iev, event in enumerate(chain):
         if max_events > 0 and iev > max_events:
             break
@@ -454,9 +456,63 @@ def read_clusters(input_files, f_name_):
     of.Close()
 
 
-if __name__ == "__main__":
+def run(directory, output_file, message, num_files):
+    # --- get list of files --- #
+    file_list = get_list_of_files(directory)
+    file_list = file_list[0:num_files]
+   
+    # --- printing --- #
+    print message
+    print "Number of files: {0}".format(len(file_list))
+    for f in file_list:
+        print " - {0}".format(f)
+    
+    # --- create cluster map --- #
+    occ_map = make_cluster_map(file_list)  
+    np.save(output_file, occ_map)
+
+def runSingleMuon():
+    
+    # Single Muon
+    # 7041 events in first file, about 2.6 hours run time
+    #  1 file:   7041 events
+    # 12 files: 70667 events
+    directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
+    output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon_v2.npy'
+    message     = 'Running over SingleMuon PixelTrees.'
+    num_files   = 12
+
+    run(directory, output_file, message, num_files)
+
+def runZeroBias():
+    
+    # Zero Bias
+    # 1354 events in first file, about 0.5 hours run time
+    # 1 file:   1354 events
+    # 2 files: 69598 events
+    directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
+    output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v2.npy' 
+    message     = 'Running over ZeroBias PixelTrees.'
+    num_files   = 2
+    
+    run(directory, output_file, message, num_files)
+    
+def main():
+    # main
     
     t_start = time.time()
+    
+    #runSingleMuon()
+    runZeroBias()
+    
+    t_stop = time.time()
+    print "run time (sec): {0}".format(t_stop - t_start)
+
+if __name__ == "__main__":
+
+    main()
+    
+    #t_start = time.time()
     
     # --------------------------------------------------------------------  
     
@@ -601,30 +657,35 @@ if __name__ == "__main__":
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/FNAL/SingleMuon/2018C/0001'
     #output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50.npy'
     #message = 'Running over SingleMuon PixelTrees (copied from FNAL).'
+    #num_files = 1
 
     # Single Muon
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
-    #output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon.npy'
+    #output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon_v2.npy'
     #message = 'Running over SingleMuon PixelTrees.'
+    #num_files = 5
+    # 7041 events in first file
     
     # Zero Bias
-    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
-    output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias.npy' 
-    message = 'Running over ZeroBias PixelTrees.'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
+    #output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v2.npy' 
+    #message = 'Running over ZeroBias PixelTrees.'
+    #num_files = 26
+    # 1354 events in first file
     
-    file_list = get_list_of_files(directory)
-    file_list = [file_list[0]]
+    #file_list = get_list_of_files(directory)
+    #file_list = [file_list[0:num_files]]
    
     # --- printing --- #
-    print message
-    print "Number of files: {0}".format(len(file_list))
-    for f in file_list:
-        print f
+    #print message
+    #print "Number of files: {0}".format(len(file_list))
+    #for f in file_list:
+    #    print f
     
-    occ_map = make_cluster_map(file_list)  
-    
-    np.save(output_file, occ_map)
+    #occ_map = make_cluster_map(file_list)  
+    #np.save(output_file, occ_map)
 
-    t_stop = time.time()
-    print "run time (sec): {0}".format(t_stop - t_start)
+    #t_stop = time.time()
+    #print "run time (sec): {0}".format(t_stop - t_start)
+
 
