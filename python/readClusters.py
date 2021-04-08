@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
+import sys
 import os
+import time
 import ROOT as rt
 import numpy as np
 from pixelMapping_cfi import *
-import time
+from inputFiles_cfi import get_list_of_files
 from array import array
 from collections import OrderedDict
 
@@ -22,11 +24,16 @@ def make_cluster_map(input_files_):
     occ_array = np.full((1920, 3328), None)
 
     n_events = chain.GetEntries()
+    max_events = -1
+
+    print "Number of events: {0}".format(n_events)
 
     for iev, event in enumerate(chain):
+        if max_events > 0 and iev > max_events:
+            break
         if iev % 10 == 0:
             print 'Event', iev, ' / ', n_events
-        #if iev > 200000: break
+            sys.stdout.flush()
         n_cl = event.ClN
 
         for icl in xrange(n_cl):
@@ -41,8 +48,8 @@ def make_cluster_map(input_files_):
             clus_size = chain.ClSize[icl]
             clus_size_x = chain.ClSizeX[icl]
             clus_size_y = chain.ClSizeY[icl]
-            if clus_size < 1: continue
-            if clus_size > 50: continue
+            #if clus_size < 1: continue
+            #if clus_size > 50: continue
             #if clus_size < 50: continue
             #if chain.ClTkN[icl] < 1: continue 
 
@@ -55,7 +62,7 @@ def make_cluster_map(input_files_):
 
 
             charge = event.ClCharge[icl]
-            if charge > 1000: continue
+            #if charge > 1000: continue
             gx_cl = event.ClGx[icl]
             gy_cl = event.ClGy[icl]
             gr_cl = np.sqrt(gx_cl**2 + gy_cl**2) 
@@ -171,11 +178,13 @@ def read_clusters(input_files, f_name_):
     for iev in xrange(nEvents):
         if iev % 10 == 0:
             print('Event: ', iev, '/ ', nEvents)
+            sys.stdout.flush()
         tChain.GetEntry(iev)
         nClus = tChain.ClN
         nClusTot += nClus
         if iev == 0:
             print(nClus)
+            sys.stdout.flush()
         beamspot_x.Fill(tChain.BsX)
         beamspot_y.Fill(tChain.BsY)
         beamspot_width_x.Fill(tChain.Bs_widthX)
@@ -447,9 +456,66 @@ def read_clusters(input_files, f_name_):
     of.Close()
 
 
-if __name__ == "__main__":
+def run(directory, output_file, message, num_files):
+    # --- get list of files --- #
+    file_list = get_list_of_files(directory)
+    file_list = file_list[0:num_files]
+   
+    # --- printing --- #
+    print message
+    print "Number of files: {0}".format(len(file_list))
+    for f in file_list:
+        print " - {0}".format(f)
+    
+    # --- create cluster map --- #
+    occ_map = make_cluster_map(file_list)  
+    np.save(output_file, occ_map)
+
+def runSingleMuon():
+    
+    # Single Muon
+    # 7041 events in first file, about 2.6 hours run time
+    #  1 file:   7041 events
+    # 12 files: 70667 events
+    directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
+    output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon_v2.npy'
+    message     = 'Running over SingleMuon PixelTrees.'
+    num_files   = 12
+
+    run(directory, output_file, message, num_files)
+
+def runZeroBias():
+    
+    # Zero Bias
+    # 1354 events in first file, about 0.5 hours run time
+    # 1 file:   1354 events
+    # 2 files: 69598 events
+    directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
+    output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v2.npy' 
+    message     = 'Running over ZeroBias PixelTrees.'
+    num_files   = 2
+    
+    run(directory, output_file, message, num_files)
+    
+def main():
+    # main
+    
     t_start = time.time()
-    from inputFiles_cfi import *
+    
+    #runSingleMuon()
+    runZeroBias()
+    
+    t_stop = time.time()
+    print "run time (sec): {0}".format(t_stop - t_start)
+
+if __name__ == "__main__":
+
+    main()
+    
+    #t_start = time.time()
+    
+    # --------------------------------------------------------------------  
+    
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_z0_GEN_SIM/190819_222147/0000/'
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_zneg10_GEN_SIM/190819_222156/0000/'
     #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_z10_GEN_SIM/190819_222215/0000/'
@@ -541,11 +607,23 @@ if __name__ == "__main__":
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
     #np.save('design_0p1_no_outer_all_pix_nosmear_25k.npy', occ_map)
-    directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000/'
-    file_list = get_list_of_files(directory)
-    occ_map = make_cluster_map(file_list)  
-    np.save('design_0p1_no_outer_all_pix_smear_charge l1000_size_1_50.npy', occ_map)
-    directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000/'
+    
+    # --------------------------------------------------------------------  
+    # --- testing ---
+    
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/FNAL/SingleMuon/2018C/0001'
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000/'
+    #file_list = get_list_of_files(directory, "*.root")
+    #print "num files: {0}".format(len(file_list))
+    #print file_list
+    #for f in file_list:
+    #    print f
+    #occ_map = make_cluster_map(file_list)  
+    #np.save('design_0p1_no_outer_all_pix_smear_charge l1000_size_1_50.npy', occ_map)
+    
+    # --------------------------------------------------------------------  
+    
+    #directory = '/home/t3-ku/erichjs/store/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000/'
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
     #np.save('design_0p2_no_outer_all_pix_smear_25k.npy', occ_map)
@@ -573,7 +651,41 @@ if __name__ == "__main__":
     #file_list = get_list_of_files(directory)
     #occ_map = make_cluster_map(file_list)  
     #np.save('design_neg0p08_no_outer_all_pix_nosmear_25k.npy', occ_map)
+    
+    # --------------------------------------------------------------------  
+    
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/FNAL/SingleMuon/2018C/0001'
+    #output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50.npy'
+    #message = 'Running over SingleMuon PixelTrees (copied from FNAL).'
+    #num_files = 1
 
-    t_stop = time.time()
-    print t_stop - t_start
+    # Single Muon
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
+    #output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon_v2.npy'
+    #message = 'Running over SingleMuon PixelTrees.'
+    #num_files = 5
+    # 7041 events in first file
+    
+    # Zero Bias
+    #directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
+    #output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v2.npy' 
+    #message = 'Running over ZeroBias PixelTrees.'
+    #num_files = 26
+    # 1354 events in first file
+    
+    #file_list = get_list_of_files(directory)
+    #file_list = [file_list[0:num_files]]
+   
+    # --- printing --- #
+    #print message
+    #print "Number of files: {0}".format(len(file_list))
+    #for f in file_list:
+    #    print f
+    
+    #occ_map = make_cluster_map(file_list)  
+    #np.save(output_file, occ_map)
+
+    #t_stop = time.time()
+    #print "run time (sec): {0}".format(t_stop - t_start)
+
 
