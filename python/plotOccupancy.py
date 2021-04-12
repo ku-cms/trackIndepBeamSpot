@@ -11,6 +11,8 @@ def read_file(input_file_):
 
 
 def remake_arrays(input_arr_, plot_dir, plot_name):
+    useWeightedAve = False
+
     # need z-binning corresponding to 1 roc
     w_z_bins = 52  # # of pixels in a roc
 
@@ -49,8 +51,8 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         r = np.concatenate(array_by_rocs[roc, :, :, 1])
         phi = np.concatenate(array_by_rocs[roc, :, :, 2])
         z = np.concatenate(array_by_rocs[roc, :, :, 3])
-        print("z: {0}".format(z))
-        print("len(z): {0}".format(len(z)))
+        #print("z: {0}".format(z))
+        #print("len(z): {0}".format(len(z)))
         #z_avg = np.nanmean(z)
 
         x = r[~np.isnan(z)] * np.cos(phi[~np.isnan(z)])
@@ -60,19 +62,21 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         occ_tmp = occ_tmp[~np.isnan(z)]
         z = z[~np.isnan(z)]
 
-        occ.append(np.sum(occ_tmp))
-        x_array.append(np.average(x))
-        y_array.append(np.average(y))
-        z_array.append(np.average(z))
-        phi_array.append(np.average(phi))
-        r_array.append(np.average(r))
         
-        #occ.append(np.sum(occ_tmp))
-        #x_array.append(np.average(x, weights=occ_tmp))
-        #y_array.append(np.average(y, weights=occ_tmp))
-        #z_array.append(np.average(z, weights=occ_tmp))
-        #phi_array.append(np.average(phi, weights=occ_tmp))
-        #r_array.append(np.average(r, weights=occ_tmp))
+        if useWeightedAve:
+            occ.append(np.sum(occ_tmp))
+            x_array.append(np.average(x,        weights=occ_tmp))
+            y_array.append(np.average(y,        weights=occ_tmp))
+            z_array.append(np.average(z,        weights=occ_tmp))
+            phi_array.append(np.average(phi,    weights=occ_tmp))
+            r_array.append(np.average(r,        weights=occ_tmp))
+        else:
+            occ.append(np.sum(occ_tmp))
+            x_array.append(np.average(x))
+            y_array.append(np.average(y))
+            z_array.append(np.average(z))
+            phi_array.append(np.average(phi))
+            r_array.append(np.average(r))
 
     occ = np.array(occ)
     x_array = np.array(x_array)
