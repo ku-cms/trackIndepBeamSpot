@@ -12,6 +12,9 @@ def read_file(input_file_):
 
 def remake_arrays(input_arr_, plot_dir, plot_name):
     useWeightedAve = False
+    
+    if plot_dir[-1] != "/":
+        plot_dir += "/"
 
     # need z-binning corresponding to 1 roc
     w_z_bins = 52  # # of pixels in a roc
@@ -154,13 +157,23 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     #print(minuit.get_param_states())
     #print(minuit.get_fmin())
 
-    if plot_dir[-1] != "/":
-        plot_dir += "/"
-
     # axs.legend()
     #plt.show()
+    
     plt.savefig(plot_dir + plot_name + '.png', bbox_inches='tight')
+    
+    # select view angles for view_init(elev, azim)
+    angles = []
+    angles.append([0,     0])
+    angles.append([270,   0])
+    angles.append([0,   270])
 
+    for angle in angles:
+        full_name = "{0}{1}_{2}_{3}.png".format(plot_dir, plot_name, angle[0], angle[1])
+        # select viewing angle
+        axs.view_init(elev=angle[0], azim=angle[1])
+        plt.savefig(full_name, bbox_inches='tight')
+    
 
 def b_par(x, b1=0.0, b2=0.0, b3=1.25e6):
     return b1*np.sin(x-b2)+b3
