@@ -2,6 +2,16 @@
 
 This repository contains python scripts used for reading layer 1 pixel clusters and fitting distriubtions based on the clusters.
 
+## Setup
+
+Clone this repository:
+```
+git clone https://github.com/ku-cms/trackIndepBeamSpot.git
+```
+
+There are two main steps that this framework does: reading clusters and fitting.
+There are instructions for each of these provided below.
+
 ## Reading Clusters
 
 The script readClusters.py should be run in python 2 and requires these packages:
@@ -18,7 +28,7 @@ However, the script takes a long time to finish, especially when running over a 
 The command "nohup" can be used so that the script can continue running even if you logout of your session.
 Here we chose the log file name "readClusters_SingleMuon_v1.log."
 ```
-cd python
+cd trackIndepBeamSpot/python
 mkdir logs
 nohup python readClusters.py > logs/readClusters_SingleMuon_v1.log 2>&1 &
 ```
@@ -53,8 +63,11 @@ The script plotOccupancy.py should be run in python 3 and requires these package
 - iminuit
 
 
-Creating virtual environment for python (here we picked the name python3_env):
+Creating virtual environment for python (here we picked the name python3_env).
+You may choose any location that you will remember for the virtual environment.
+Here we choose trackIndepBeamSpot, but you may use another directory if you like.
 ```
+cd trackIndepBeamSpot
 python3 -m venv python3_env
 ```
 
@@ -83,7 +96,7 @@ deactivate
 
 The script plotOccupancy.py expects these directories to exists within the trackIndepBeamSpot directory (not in the python directory):
 ```
-cd <full_path>/trackIndepBeamSpot
+cd trackIndepBeamSpot
 mkdir data
 mkdir plots
 ```
