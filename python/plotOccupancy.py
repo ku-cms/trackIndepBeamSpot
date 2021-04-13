@@ -51,9 +51,9 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     for roc in roc_index:
 
         occ_tmp = np.concatenate(array_by_rocs[roc, :, :, 0])
-        r = np.concatenate(array_by_rocs[roc, :, :, 1])
-        phi = np.concatenate(array_by_rocs[roc, :, :, 2])
-        z = np.concatenate(array_by_rocs[roc, :, :, 3])
+        r       = np.concatenate(array_by_rocs[roc, :, :, 1])
+        phi     = np.concatenate(array_by_rocs[roc, :, :, 2])
+        z       = np.concatenate(array_by_rocs[roc, :, :, 3])
         #print("z: {0}".format(z))
         #print("len(z): {0}".format(len(z)))
         #z_avg = np.nanmean(z)
@@ -101,18 +101,18 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     # removing rocs
     remove_z = (z_array > -25) * (z_array < 25)
 
-    remove_blips = (z_array < -21) + (z_array > -20)
+    remove_blips =  (z_array < -21)   + (z_array > -20)
     remove_blips *= (z_array < -14.5) + (z_array > -13.5)
-    remove_blips *= (z_array < -7.5) + (z_array > -6.5)
-    remove_blips *= (z_array < 5.75) + (z_array > 6.5)
-    remove_blips *= (z_array < 12.5) + (z_array > 13.5)
-    remove_blips *= (z_array < 19) + (z_array > 20)
+    remove_blips *= (z_array < -7.5)  + (z_array > -6.5)
+    remove_blips *= (z_array < 5.75)  + (z_array > 6.5)
+    remove_blips *= (z_array < 12.5)  + (z_array > 13.5)
+    remove_blips *= (z_array < 19)    + (z_array > 20)
 
-    occ = occ[remove_z*remove_blips]
-    x_array = x_array[remove_z*remove_blips]
-    y_array = y_array[remove_z*remove_blips]
-    z_array = z_array[remove_z*remove_blips]
-    phi_array = phi_array[remove_z*remove_blips]
+    occ         = occ[remove_z*remove_blips]
+    x_array     = x_array[remove_z*remove_blips]
+    y_array     = y_array[remove_z*remove_blips]
+    z_array     = z_array[remove_z*remove_blips]
+    phi_array   = phi_array[remove_z*remove_blips]
 
     def nll(x0, y0, z0, n, b1, b2, b3, a1, a3, c1, c3):
         ri = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
@@ -156,6 +156,11 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     minuit.migrad()
     #print(minuit.get_param_states())
     #print(minuit.get_fmin())
+
+    # labels
+    axs.set_title("Pixel Occupancy", fontsize=20)
+    axs.set_xlabel("z",              fontsize=16)
+    axs.set_ylabel(r"$\phi$",        fontsize=16)
 
     # axs.legend()
     #plt.show()
