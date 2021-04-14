@@ -8,15 +8,17 @@ ROOT.gROOT.SetBatch(ROOT.kTRUE)
 # Tell ROOT not to be in charge of memory, fix issue of histograms being deleted when ROOT file is closed:
 ROOT.TH1.AddDirectory(False)
 
-def plot(chain, name):
-    plot_dir = "plots/"
+def plotChain(chain, name, var, cuts=""):
+    plot_dir  = "plots/"
+    if cuts:
+        plot_name = "{0}hist_{1}_{2}_{3}.png".format(plot_dir, name, var, cuts)
+    else:
+        plot_name = "{0}hist_{1}_{2}.png".format(plot_dir, name, var)
     
     c = ROOT.TCanvas("c", "c", 800, 800)
 
-    var = "ClN"
-    chain.Draw(var)
+    chain.Draw(var, cuts)
 
-    plot_name = "{0}hist_{1}_{2}.png".format(plot_dir, name, var)
     c.Update()
     c.SaveAs(plot_name)
 
@@ -27,18 +29,26 @@ def run(input_directory, num_files, name):
     chain = ROOT.TChain('pixelTree')
     for f in input_files:
         chain.Add(f)
-    plot(chain, name)
+    plotChain(chain, name, "ClN")
+    plotChain(chain, name, "ClN", "ClTkN<1")
+    plotChain(chain, name, "ClN", "ClTkN>=1")
+    plotChain(chain, name, "PvN")
+    plotChain(chain, name, "PvX")
+    plotChain(chain, name, "PvY")
+    plotChain(chain, name, "PvZ")
 
 def main():
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
     name            = "SingleMuon"
     num_files       = 12
+    #num_files       = 1
 
     run(input_directory, num_files, name)
     
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
     name            = "ZeroBias"
     num_files       = 2
+    #num_files       = 1
     
     run(input_directory, num_files, name)
 
