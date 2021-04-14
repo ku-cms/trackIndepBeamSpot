@@ -53,7 +53,14 @@ When the script is finished, you should see the run time at the end of the log f
 ps aux | grep readClusters.py
 ```
 
-The script will create a .npy file when it finished running.
+The script readClusters.py will create a .npy file when it finished running.
+
+In addition, there is a script for plotting pixel tree variables, plotHistos.py.
+In can be run like this:
+```
+python python/plotHistos.py
+```
+Depending on the number of root files loaded, the number of events, and the number of variables plotted, this script can take some time to run (e.g. 15 min).
 
 ## Fitting
 
