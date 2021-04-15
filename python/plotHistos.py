@@ -22,7 +22,7 @@ def plotChain(chain, name, var, cuts=""):
     c.Update()
     c.SaveAs(plot_name)
 
-def run(input_directory, num_files, name):
+def run(input_directory, num_files, name, isData):
     input_files = get_list_of_files(input_directory)
     input_files = input_files[0:num_files]
     
@@ -36,21 +36,37 @@ def run(input_directory, num_files, name):
     plotChain(chain, name, "PvX")
     plotChain(chain, name, "PvY")
     plotChain(chain, name, "PvZ")
+    if not isData:
+        plotChain(chain, name, "BsX")
+        plotChain(chain, name, "BsY")
+        plotChain(chain, name, "BsZ")
 
-def main():
+def runData():
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
     name            = "SingleMuon"
+    isData          = True
     num_files       = 12
     #num_files       = 1
-
-    run(input_directory, num_files, name)
+    run(input_directory, num_files, name, isData)
     
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
     name            = "ZeroBias"
+    isData          = True
     num_files       = 2
     #num_files       = 1
+    run(input_directory, num_files, name, isData)
+
+def runMC():
+    input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000'
+    name            = "TTbar"
+    isData          = False
+    num_files       = 100
+    run(input_directory, num_files, name, isData)
+
+def main():
+    #runData()
+    runMC()
     
-    run(input_directory, num_files, name)
 
 if __name__ == "__main__":
     main()
