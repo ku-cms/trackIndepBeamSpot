@@ -29,17 +29,33 @@ def run(input_directory, num_files, name, isData):
     chain = ROOT.TChain('pixelTree')
     for f in input_files:
         chain.Add(f)
-    plotChain(chain, name, "ClN")
-    plotChain(chain, name, "ClN", "ClTkN<1")
-    plotChain(chain, name, "ClN", "ClTkN>=1")
-    plotChain(chain, name, "PvN")
-    plotChain(chain, name, "PvX")
-    plotChain(chain, name, "PvY")
-    plotChain(chain, name, "PvZ")
-    if not isData:
-        plotChain(chain, name, "BsX")
-        plotChain(chain, name, "BsY")
-        plotChain(chain, name, "BsZ")
+    
+    #plotChain(chain, name, "ClN")
+    #plotChain(chain, name, "ClN", "ClTkN<1")
+    #plotChain(chain, name, "ClN", "ClTkN>=1")
+    #plotChain(chain, name, "ClN", "ClTkN>=0")
+    
+    plotChain(chain, name, "ClSize")
+    plotChain(chain, name, "ClSizeX")
+    plotChain(chain, name, "ClSizeY")
+    plotChain(chain, name, "ClCharge")
+    plotChain(chain, name, "ClChargeCorr")
+    
+    #plotChain(chain, name, "PvN")
+    #plotChain(chain, name, "PvX")
+    #plotChain(chain, name, "PvY")
+    #plotChain(chain, name, "PvZ")
+    #plotChain(chain, name, "PvX", "ClTkN<1")
+    #plotChain(chain, name, "PvX", "ClTkN>=1")
+    #plotChain(chain, name, "PvY", "ClTkN<1")
+    #plotChain(chain, name, "PvY", "ClTkN>=1")
+    #plotChain(chain, name, "PvZ", "ClTkN<1")
+    #plotChain(chain, name, "PvZ", "ClTkN>=1")
+    
+    #if not isData:
+    #    plotChain(chain, name, "BsX")
+    #    plotChain(chain, name, "BsY")
+    #    plotChain(chain, name, "BsZ")
 
 def runData():
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
@@ -64,7 +80,7 @@ def runMC():
     run(input_directory, num_files, name, isData)
 
 def main():
-    #runData()
+    runData()
     runMC()
     
 
