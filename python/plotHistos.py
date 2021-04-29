@@ -30,21 +30,21 @@ def run(input_directory, num_files, name, isData):
     for f in input_files:
         chain.Add(f)
     
-    #plotChain(chain, name, "ClN")
-    #plotChain(chain, name, "ClN", "ClTkN<1")
-    #plotChain(chain, name, "ClN", "ClTkN>=1")
-    #plotChain(chain, name, "ClN", "ClTkN>=0")
+    plotChain(chain, name, "ClN")
+    plotChain(chain, name, "ClN", "ClTkN<1")
+    plotChain(chain, name, "ClN", "ClTkN>=1")
+    plotChain(chain, name, "ClN", "ClTkN>=0")
     
-    plotChain(chain, name, "ClSize")
-    plotChain(chain, name, "ClSizeX")
-    plotChain(chain, name, "ClSizeY")
-    plotChain(chain, name, "ClCharge")
-    plotChain(chain, name, "ClChargeCorr")
+    #plotChain(chain, name, "ClSize")
+    #plotChain(chain, name, "ClSizeX")
+    #plotChain(chain, name, "ClSizeY")
+    #plotChain(chain, name, "ClCharge")
+    #plotChain(chain, name, "ClChargeCorr")
     
-    #plotChain(chain, name, "PvN")
-    #plotChain(chain, name, "PvX")
-    #plotChain(chain, name, "PvY")
-    #plotChain(chain, name, "PvZ")
+    plotChain(chain, name, "PvN")
+    plotChain(chain, name, "PvX")
+    plotChain(chain, name, "PvY")
+    plotChain(chain, name, "PvZ")
     #plotChain(chain, name, "PvX", "ClTkN<1")
     #plotChain(chain, name, "PvX", "ClTkN>=1")
     #plotChain(chain, name, "PvY", "ClTkN<1")
@@ -52,37 +52,44 @@ def run(input_directory, num_files, name, isData):
     #plotChain(chain, name, "PvZ", "ClTkN<1")
     #plotChain(chain, name, "PvZ", "ClTkN>=1")
     
-    #if not isData:
-    #    plotChain(chain, name, "BsX")
-    #    plotChain(chain, name, "BsY")
-    #    plotChain(chain, name, "BsZ")
+    if not isData:
+        plotChain(chain, name, "BsX")
+        plotChain(chain, name, "BsY")
+        plotChain(chain, name, "BsZ")
 
 def runData():
+    # Single Muon
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
     name            = "SingleMuon"
     isData          = True
     num_files       = 12
-    #num_files       = 1
     run(input_directory, num_files, name, isData)
     
+    # Zero Bias
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
     name            = "ZeroBias"
     isData          = True
     num_files       = 2
-    #num_files       = 1
     run(input_directory, num_files, name, isData)
 
 def runMC():
+    # TTbar (Z smeared)
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000'
-    name            = "TTbar"
+    name            = "TTbar_Zsmeared"
     isData          = False
     num_files       = 100
     run(input_directory, num_files, name, isData)
+    
+    # TTbar (not Z smeared)
+    input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/nosmear_newZ/RelValTTbar_13TeV/crab_RelValTTbar_13TeV0p1_neg0p08_GEN_SIM/200519_042750/0000/'
+    name            = "TTbar_NotZsmeared"
+    isData          = False
+    num_files       = 200
+    run(input_directory, num_files, name, isData)
 
 def main():
-    runData()
+    #runData()
     runMC()
-    
 
 if __name__ == "__main__":
     main()
