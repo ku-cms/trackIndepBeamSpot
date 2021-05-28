@@ -125,7 +125,6 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
 
         return np.sum(func_array)
 
-    axs.plot(z_array, phi_array, occ, 'b*')
     minuit = im.Minuit(nll, x0=0, y0=0, z0=-0.019, n=1,
                        a1=4e4, a3=1.26e5,
                        b1=0.0, b2=3, b3=1.167,
@@ -156,6 +155,26 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     minuit.migrad()
     #print(minuit.get_param_states())
     #print(minuit.get_fmin())
+    
+    # plotting
+    print("z_array = {0}".format(z_array))
+    print("phi_array = {0}".format(phi_array))
+    print("occ = {0}".format(occ))
+    #print("f = {0}".format(func(np.sqrt(z_array ** 2 + phi_array ** 2), a=1, b=1, c=1)))
+
+    x0 = 0.0
+    y0 = 0.0
+    z0 = 0.0
+    my_r = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
+    print("my_r = {0}".format(my_r))
+    
+    z_2d, phi_2d = np.meshgrid(z_array, phi_array)
+    output_2d = 50000 * func(np.sqrt(z_2d ** 2 + phi_2d ** 2), a=1, b=1, c=1)
+    
+    #axs.contour3D(z_2d, phi_2d, output_2d, 50, cmap='binary')
+    axs.plot_wireframe(z_2d, phi_2d, output_2d, color='black')
+    #axs.plot_surface(z_2d, phi_2d, output_2d, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+    axs.plot(z_array, phi_array, occ, 'b*')
 
     # labels
     axs.set_title("Pixel Occupancy", fontsize=20)
@@ -206,19 +225,19 @@ if __name__ == "__main__":
     #in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_v3.npy")
     #plot_name = "fig_v3"
     
-    in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon_v1.npy")
-    plot_name = "fig_SingleMuon_v1"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v1.npy")
-    plot_name = "fig_ZeroBias_v1"
-    remake_arrays(in_array, plot_dir, plot_name)
+    #in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon_v1.npy")
+    #plot_name = "fig_SingleMuon_v1"
+    #remake_arrays(in_array, plot_dir, plot_name)
+    #
+    #in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v1.npy")
+    #plot_name = "fig_ZeroBias_v1"
+    #remake_arrays(in_array, plot_dir, plot_name)
     
     in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon_v2.npy")
     plot_name = "fig_SingleMuon_v2"
     remake_arrays(in_array, plot_dir, plot_name)
     
-    in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v2.npy")
-    plot_name = "fig_ZeroBias_v2"
-    remake_arrays(in_array, plot_dir, plot_name)
+    #in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v2.npy")
+    #plot_name = "fig_ZeroBias_v2"
+    #remake_arrays(in_array, plot_dir, plot_name)
 
