@@ -40,12 +40,12 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     fig = plt.figure()
     axs = fig.add_subplot(111, projection='3d')
 
-    occ = []
-    x_array = []
-    y_array = []
-    z_array = []
-    phi_array = []
-    r_array = []
+    occ         = []
+    x_array     = []
+    y_array     = []
+    z_array     = []
+    phi_array   = []
+    r_array     = []
 
     # section off rocs into roc ladders (12 'ladders'), each true ladder is split in half 6 * 2 = 12
     for roc in roc_index:
@@ -81,38 +81,56 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
             phi_array.append(np.average(phi))
             r_array.append(np.average(r))
 
-    occ = np.array(occ)
-    x_array = np.array(x_array)
-    y_array = np.array(y_array)
-    z_array = np.array(z_array)
-    phi_array = np.array(phi_array)
-    r_array = np.array(r_array)
+    occ         = np.array(occ)
+    x_array     = np.array(x_array)
+    y_array     = np.array(y_array)
+    z_array     = np.array(z_array)
+    phi_array   = np.array(phi_array)
+    r_array     = np.array(r_array)
 
-    phi_sort = np.argsort(phi_array)
-    z_sort = np.argsort(z_array)
+    phi_sort    = np.argsort(phi_array)
+    z_sort      = np.argsort(z_array)
 
-    occ = occ[z_sort]
-    x_array = x_array[z_sort]
-    y_array = y_array[z_sort]
-    z_array = z_array[z_sort]
-    phi_array = phi_array[z_sort]
-    r_array = r_array[z_sort]
+    occ         = occ[z_sort]
+    x_array     = x_array[z_sort]
+    y_array     = y_array[z_sort]
+    z_array     = z_array[z_sort]
+    phi_array   = phi_array[z_sort]
+    r_array     = r_array[z_sort]
 
     # removing rocs
+    
+    # z
     remove_z = (z_array > -25) * (z_array < 25)
 
-    remove_blips =  (z_array < -21)   + (z_array > -20)
-    remove_blips *= (z_array < -14.5) + (z_array > -13.5)
-    remove_blips *= (z_array < -7.5)  + (z_array > -6.5)
-    remove_blips *= (z_array < 5.75)  + (z_array > 6.5)
-    remove_blips *= (z_array < 12.5)  + (z_array > 13.5)
-    remove_blips *= (z_array < 19)    + (z_array > 20)
+    remove_blips_z =  (z_array < -21)   + (z_array > -20)
+    remove_blips_z *= (z_array < -14.5) + (z_array > -13.5)
+    remove_blips_z *= (z_array < -7.5)  + (z_array > -6.5)
+    remove_blips_z *= (z_array < 5.75)  + (z_array > 6.5)
+    remove_blips_z *= (z_array < 12.5)  + (z_array > 13.5)
+    remove_blips_z *= (z_array < 19)    + (z_array > 20)
 
-    occ         = occ[remove_z*remove_blips]
-    x_array     = x_array[remove_z*remove_blips]
-    y_array     = y_array[remove_z*remove_blips]
-    z_array     = z_array[remove_z*remove_blips]
-    phi_array   = phi_array[remove_z*remove_blips]
+    occ         = occ[          remove_z * remove_blips_z]
+    x_array     = x_array[      remove_z * remove_blips_z]
+    y_array     = y_array[      remove_z * remove_blips_z]
+    z_array     = z_array[      remove_z * remove_blips_z]
+    phi_array   = phi_array[    remove_z * remove_blips_z]
+
+    #print("remove_z = {0}".format(remove_z))
+    #print("remove_blips_z = {0}".format(remove_blips_z))
+    
+    # phi
+    remove_phi          = (phi_array >= -np.pi) * (phi_array <= np.pi)
+    remove_blips_phi    = (phi_array < 1.0) + (phi_array > 1.5)
+    
+    occ         = occ[          remove_phi * remove_blips_phi]
+    x_array     = x_array[      remove_phi * remove_blips_phi]
+    y_array     = y_array[      remove_phi * remove_blips_phi]
+    z_array     = z_array[      remove_phi * remove_blips_phi]
+    phi_array   = phi_array[    remove_phi * remove_blips_phi]
+    
+    #print("remove_phi = {0}".format(remove_phi))
+    #print("remove_blips_phi = {0}".format(remove_blips_phi))
 
     def nll(x0, y0, z0, n, b1, b2, b3, a1, a3, c1, c3):
         ri = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
@@ -157,16 +175,16 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     #print(minuit.get_fmin())
     
     # plotting
-    print("z_array = {0}".format(z_array))
-    print("phi_array = {0}".format(phi_array))
-    print("occ = {0}".format(occ))
+    #print("z_array = {0}".format(z_array))
+    #print("phi_array = {0}".format(phi_array))
+    #print("occ = {0}".format(occ))
     #print("f = {0}".format(func(np.sqrt(z_array ** 2 + phi_array ** 2), a=1, b=1, c=1)))
 
     x0 = 0.0
     y0 = 0.0
     z0 = 0.0
     my_r = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
-    print("my_r = {0}".format(my_r))
+    #print("my_r = {0}".format(my_r))
     
     z_2d, phi_2d = np.meshgrid(z_array, phi_array)
     output_2d = func(z_2d, a=10000, b=2, c=20000)
