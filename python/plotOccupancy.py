@@ -169,11 +169,14 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     print("my_r = {0}".format(my_r))
     
     z_2d, phi_2d = np.meshgrid(z_array, phi_array)
-    output_2d = 50000 * func(np.sqrt(z_2d ** 2 + phi_2d ** 2), a=1, b=1, c=1)
+    output_2d = func(z_2d, a=10000, b=2, c=20000)
     
+    # 3D plot of fit
     #axs.contour3D(z_2d, phi_2d, output_2d, 50, cmap='binary')
-    axs.plot_wireframe(z_2d, phi_2d, output_2d, color='black')
+    #axs.plot_wireframe(z_2d, phi_2d, output_2d, color='black')
     #axs.plot_surface(z_2d, phi_2d, output_2d, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+
+    # plot of occupancy
     axs.plot(z_array, phi_array, occ, 'b*')
 
     # labels
