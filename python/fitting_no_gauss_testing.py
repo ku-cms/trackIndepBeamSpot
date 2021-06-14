@@ -128,11 +128,11 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     y_array     = y_array[      remove_phi * remove_blips_phi]
     z_array     = z_array[      remove_phi * remove_blips_phi]
     phi_array   = phi_array[    remove_phi * remove_blips_phi]
-    
 
     def nll(x0, y0, z0, n, b1, b2, b3, a1, a3, c1, c3):
         ri = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
         phi_cor = np.arctan2(y_array-y0, x_array-x0)
+        # note: a2 = b2 = c2
         a = np.float64(b_par(phi_cor, a1, b2, a3))
         b = np.float64(b_par(phi_cor, b1, b2, b3))
         c = np.float64(b_par(phi_cor, c1, b2, c3))
@@ -171,15 +171,40 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     print(minuit.get_param_states())
     print(minuit.get_fmin())
     
+    #print(" - first access") 
+    print(minuit.values)
+    #print(minuit.errors)
+    #print(minuit.covariance)
+    #print(minuit.values["x0"])
+    
+    #print(" - second access") 
+    #print(minuit.np_values())
+    #print(minuit.np_errors())
+    #print(minuit.np_covariance())
+    #print(minuit.np_values()[0])
+
+    # get values after fit
+    x0 = minuit.values["x0"]
+    y0 = minuit.values["y0"]
+    z0 = minuit.values["z0"]
+    n  = minuit.values["n"]
+    b1 = minuit.values["b1"]
+    b2 = minuit.values["b2"]
+    b3 = minuit.values["b3"]
+    a1 = minuit.values["a1"]
+    a3 = minuit.values["a3"]
+    c1 = minuit.values["c1"]
+    c3 = minuit.values["c3"]
+    
     x = np.linspace(-25, 25, 30)
     y = np.linspace(-np.pi, np.pi, 30)
-    
     # X, Y, and Z are 2D matrices
     X, Y = np.meshgrid(x, y)
-    Z = f(X, Y)
-
+    # f(x, y, a1, a3, b1, b2, b3, c1, c3)
+    Z = f(X, Y, a1, a3, b1, b2, b3, c1, c3)
+    
     axs.plot(z_array, phi_array, occ, 'b*')
-    #axs.plot_wireframe(X, Y, Z, color='black')
+    axs.plot_wireframe(X, Y, Z, color='black')
     
     # labels
     axs.set_title("Pixel Occupancy", fontsize=20)
@@ -209,15 +234,19 @@ def b_par(x, b1=0.0, b2=0.0, b3=1.25e6):
 def func(x, a, b, c):
     return a * (1 / x ** b) + c
 
-def f(x, y):
-    #return np.sin(np.sqrt(x ** 2 + y ** 2))
+def f(x, y, a1, a3, b1, b2, b3, c1, c3):
+    # note: a2 = b2 = c2
+    #return (a1*np.sin(y-b2)+a3) * (1 / np.abs(x) ** (b1*np.sin(y-b2)+b3)) + (c1*np.sin(y-b2)+c3)
+    return b_par(y, a1, b2, a3) * (1 / np.abs(x) ** b_par(y, b1, b2, b3)) + b_par(y, c1, b2, c3)
+
+def f_example(x, y):
     a1 = 0.003e6
     a3 = 0.076e6
     b1 = 0.47
-    b2= 0.95
-    b3= 1.305
-    c1= 0.8e3
-    c3= 1.0e3
+    b2 = 0.95
+    b3 = 1.305
+    c1 = 0.8e3
+    c3 = 1.0e3
     return (a1*np.sin(y-b2)+a3) * (1 / np.abs(x) ** (b1*np.sin(y-b2)+b3)) + (c1*np.sin(y-b2)+c3)
 
 if __name__ == "__main__":
@@ -230,7 +259,7 @@ if __name__ == "__main__":
     if plot_dir[-1] != "/":
         plot_dir += "/"
     
-    in_array = read_file(data_dir + "SingleMuon_AllClusters.npy")
+    #in_array = read_file(data_dir + "SingleMuon_AllClusters.npy")
     #in_array = read_file(data_dir + "SingleMuon_OffTrack.npy")
     #in_array = read_file(data_dir + "SingleMuon_OnTrack.npy")
     #in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
@@ -243,7 +272,11 @@ if __name__ == "__main__":
     #in_array = read_file(data_dir + "TTBar_OffTrack_zsmear.npy")
     #in_array = read_file(data_dir + "TTBar_OnTrack_zsmear.npy")
 
+    in_array = read_file(data_dir + "SingleMuon_AllClusters.npy")
     plot_name = "SingleMuon_AllClusters"
-
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
+    plot_name = "ZeroBias_AllClusters"
     remake_arrays(in_array, plot_dir, plot_name)
 
