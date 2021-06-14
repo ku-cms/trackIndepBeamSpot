@@ -5,6 +5,15 @@ import string
 
 alpha_low = string.ascii_lowercase
 
+def printInfo(z_array, phi_array):
+    previous = 0
+    for i in range(len(z_array)):
+        z   = z_array[i]
+        phi = phi_array[i]
+        if phi > 1.0 and phi < 1.5:
+            diff = i - previous
+            previous = i
+            print("{0} : diff = {1}, z = {2:.3f}, phi = {3:.3f}".format(i, diff, z, phi))
 
 def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
@@ -26,6 +35,10 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
 
     n_phi_bins = int(960 / w_phi_bins)  # 1440 is number of pixels around phi for all ladders, 960 for inner ladders
 
+    # n_z_bins = 64
+    # n_phi_bins = 12
+    # n_z_bins * n_phi_bins = 768
+
     inner_array = np.array([row for row in input_arr_ if not np.all(row==None)])
     cleaned_array = np.array([[x if x is not None else [0, np.nan, np.nan, np.nan] for x in row]
                               for row in inner_array])
@@ -36,6 +49,10 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     array_by_rocs = np.array([cleaned_array[j*w_phi_bins:(j+1)*w_phi_bins, i*w_z_bins:(i+1)*w_z_bins] for i in range(n_z_bins) for j in range(n_phi_bins)])
 
     roc_index = range(0, n_z_bins*n_phi_bins)
+    
+    print("n_z_bins = {0}".format(n_z_bins))
+    print("n_phi_bins = {0}".format(n_phi_bins))
+    print("n_z_bins * n_phi_bins = {0}".format(n_z_bins * n_phi_bins))
 
     fig = plt.figure()
     axs = fig.add_subplot(111, projection='3d')
@@ -80,6 +97,10 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
             z_array.append(np.average(z))
             phi_array.append(np.average(phi))
             r_array.append(np.average(r))
+    
+    # testing
+    print("testing_phi_1")
+    printInfo(z_array, phi_array)
 
     occ         = np.array(occ)
     x_array     = np.array(x_array)
@@ -97,6 +118,10 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     z_array     = z_array[z_sort]
     phi_array   = phi_array[z_sort]
     r_array     = r_array[z_sort]
+
+    # testing
+    print("testing_phi_2")
+    printInfo(z_array, phi_array)
 
     # removing rocs
     
@@ -131,6 +156,10 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     
     #print("remove_phi = {0}".format(remove_phi))
     #print("remove_blips_phi = {0}".format(remove_blips_phi))
+    
+    # testing
+    print("testing_phi_3")
+    printInfo(z_array, phi_array)
 
     def nll(x0, y0, z0, n, b1, b2, b3, a1, a3, c1, c3):
         ri = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
