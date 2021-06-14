@@ -18,9 +18,9 @@ def remake_arrays(input_arr_):
     w_phi_bins = 80
 
     n_z_bins = int(3328 / w_z_bins)  # 3328 is number of pixels in a ladder row
-
+    #print (n_z_bins)
     n_phi_bins = int(960 / w_phi_bins)  # 1440 is number of pixels around phi for all ladders, 960 for inner ladders
-
+    #print (n_phi_bins)
     inner_array = np.array([row for row in input_arr_ if not np.all(row==None)])
     cleaned_array = np.array([[x if x is not None else [0, np.nan, np.nan, np.nan] for x in row]
                               for row in inner_array])
@@ -42,15 +42,31 @@ def remake_arrays(input_arr_):
     phi_array = []
     r_array = []
 
-    # section off rocs into roc ladders (12 'ladders'), each true ladder is split in half 6 * 2 = 12
     for roc in roc_index:
+    # section off rocs into roc ladders (12 'ladders'), each true ladder is split in half 6 * 2 = 12
+        '''
+        if roc%12==0: continue
+        if roc%12==1: continue
+        if roc%12==2: continue
+        if roc%12==3: continue
+        if roc%12==4: continue
+        if roc%12==5: continue
+        if roc%12==6: continue
+        if roc%12==7: continue
+        if roc%12==8: continue
+        if roc%12==9: continue
+        if roc%12==10: continue
+        if roc%12==11: continue
+        '''
 
+        if not int((roc/12)%64) == 31: continue
+       
         occ_tmp = np.concatenate(array_by_rocs[roc, :, :, 0])
         r = np.concatenate(array_by_rocs[roc, :, :, 1])
         phi = np.concatenate(array_by_rocs[roc, :, :, 2])
         z = np.concatenate(array_by_rocs[roc, :, :, 3])
-        print(z)
-        print("length z={0}".format(len(z)))
+        #print(z)
+        #print("length z={0}".format(len(z)))
         #z_avg = np.nanmean(z)
         #print("avg z={0}".format(z_avg))
 
@@ -94,20 +110,33 @@ def remake_arrays(input_arr_):
     r_array = r_array[z_sort]
 
     # removing rocs
+    
     remove_z = (z_array > -25) * (z_array < 25)
-
     remove_blips = (z_array < -21) + (z_array > -20)
     remove_blips *= (z_array < -14.5) + (z_array > -13.5)
     remove_blips *= (z_array < -7.5) + (z_array > -6.5)
     remove_blips *= (z_array < 5.75) + (z_array > 6.5)
     remove_blips *= (z_array < 12.5) + (z_array > 13.5)
     remove_blips *= (z_array < 19) + (z_array > 20)
+    #remove_blips = (z_array > -10) * (z_array < 10)
 
     occ = occ[remove_z*remove_blips]
     x_array = x_array[remove_z*remove_blips]
     y_array = y_array[remove_z*remove_blips]
     z_array = z_array[remove_z*remove_blips]
     phi_array = phi_array[remove_z*remove_blips]
+
+    # phi
+    
+    remove_phi          = (phi_array >= -np.pi) * (phi_array <= np.pi)
+    remove_blips_phi    = (phi_array < 1.0) + (phi_array > 1.5)
+    
+    occ         = occ[          remove_phi * remove_blips_phi]
+    x_array     = x_array[      remove_phi * remove_blips_phi]
+    y_array     = y_array[      remove_phi * remove_blips_phi]
+    z_array     = z_array[      remove_phi * remove_blips_phi]
+    phi_array   = phi_array[    remove_phi * remove_blips_phi]
+    
 
     def nll(x0, y0, z0, n, b1, b2, b3, a1, a3, c1, c3):
         ri = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
@@ -120,10 +149,18 @@ def remake_arrays(input_arr_):
 
         return np.sum(func_array)
 
+    x = np.linspace(-25, 25, 30)
+    y = np.linspace(-np.pi, np.pi, 30)
+    
+    # X, Y, and Z are 2D matrices
+    X, Y = np.meshgrid(x, y)
+    Z = f(X, Y)
+
     axs.plot(z_array, phi_array, occ, 'b*')
-    minuit = im.Minuit(nll, x0=0, y0=0, z0=-0.019, n=1,
+    #axs.plot_wireframe(X, Y, Z, color='black')
+    minuit = im.Minuit(nll, x0=0, y0=0, z0=0, n=1,
                        a1=4e4, a3=1.26e5,
-                       b1=0.0, b2=3, b3=1.167,
+                       b1=0.0, b2=0.5, b3=1.167,
                        c1=1e3, c3=3.12e3,
                        error_x0=0.001, error_y0=0.001, error_z0=0.001, error_n=0.01,
                        error_b1=0.01, error_b2=0.01, error_b3=0.01,
@@ -135,12 +172,12 @@ def remake_arrays(input_arr_):
                        # fix_b2=True,
                        # fix_a3=True, fix_c3=True,
                        fix_a1=False, fix_c1=False,
-                       # fix_z0=True,
+                       #fix_z0=True,
                        limit_x0=(-1, 1), limit_y0=(-1, 1), limit_z0=(-1, 1),
                        # limit_b1=(0, 2),
                        limit_b2=(-np.pi, np.pi),
                        # limit_b2=(-1, 1),
-                       limit_b3=(1, 3),
+                       limit_b3=(0, 3),
                        # limit_a1a=(0.01, None), limit_a1b=(0.01, None), limit_a1c=(0.01, None),
                        # limit_a3a=(0.01, None), limit_a3b=(0.01, None), limit_a3c=(0.01, None),
                        # limit_a1=(0., 1e6),
@@ -164,6 +201,17 @@ def func(x, a, b, c):
 
     return a * (1 / x ** b) + c
 
+def f(x, y):
+    #return np.sin(np.sqrt(x ** 2 + y ** 2))
+    a1 = 0.003e6
+    a3 = 0.076e6
+    b1 = 0.47
+    b2= 0.95
+    b3= 1.305
+    c1= 0.8e3
+    c3= 1.0e3
+    return (a1*np.sin(y-b2)+a3) * (1 / np.abs(x) ** (b1*np.sin(y-b2)+b3)) + (c1*np.sin(y-b2)+c3)
+
 
 if __name__ == "__main__":
     #in_array = read_file("design_0_no_outer_all_pix_nosmear_phifix.npy")
@@ -174,9 +222,18 @@ if __name__ == "__main__":
     #in_array = read_file("design_0p1_II_no_outer_all_pix_nosmear.npy")
     #in_array = read_file("design_0p2_no_outer_all_pix_nosmear.npy")
     #in_array = read_file("design_0p3_no_outer_all_pix_nosmear.npy")
-    #in_array = read_file("design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_v1.npy")
-    in_array = read_file("design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v2.npy")
-
+    #in_array = read_file("SingleMuon_AllClusters.npy")
+    #in_array = read_file("SingleMuon_OffTrack.npy")
+    #in_array = read_file("SingleMuon_OnTrack.npy")
+    #in_array = read_file("ZeroBias_AllClusters.npy")
+    #in_array = read_file("ZeroBias_OffTrack.npy")
+    #in_array = read_file("ZeroBias_OnTrack.npy")
+    in_array = read_file("TTBar_AllClusters.npy")
+    #in_array = read_file("TTBar_OffTrack.npy")
+    #in_array = read_file("TTBar_OnTrack.npy")
+    #in_array = read_file("TTBar_AllClusters_zsmear.npy")
+    #in_array = read_file("TTBar_OffTrack_zsmear.npy")
+    #in_array = read_file("TTBar_OnTrack_zsmear.npy")
 
 
     remake_arrays(in_array)
