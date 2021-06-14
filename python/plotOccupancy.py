@@ -5,6 +5,15 @@ import string
 
 alpha_low = string.ascii_lowercase
 
+def printInfo(z_array, phi_array):
+    previous = 0
+    for i in range(len(z_array)):
+        z   = z_array[i]
+        phi = phi_array[i]
+        if phi > 1.0 and phi < 1.5:
+            diff = i - previous
+            previous = i
+            print("{0} : diff = {1}, z = {2:.3f}, phi = {3:.3f}".format(i, diff, z, phi))
 
 def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
@@ -26,6 +35,10 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
 
     n_phi_bins = int(960 / w_phi_bins)  # 1440 is number of pixels around phi for all ladders, 960 for inner ladders
 
+    # n_z_bins = 64
+    # n_phi_bins = 12
+    # n_z_bins * n_phi_bins = 768
+
     inner_array = np.array([row for row in input_arr_ if not np.all(row==None)])
     cleaned_array = np.array([[x if x is not None else [0, np.nan, np.nan, np.nan] for x in row]
                               for row in inner_array])
@@ -36,16 +49,20 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     array_by_rocs = np.array([cleaned_array[j*w_phi_bins:(j+1)*w_phi_bins, i*w_z_bins:(i+1)*w_z_bins] for i in range(n_z_bins) for j in range(n_phi_bins)])
 
     roc_index = range(0, n_z_bins*n_phi_bins)
+    
+    print("n_z_bins = {0}".format(n_z_bins))
+    print("n_phi_bins = {0}".format(n_phi_bins))
+    print("n_z_bins * n_phi_bins = {0}".format(n_z_bins * n_phi_bins))
 
     fig = plt.figure()
     axs = fig.add_subplot(111, projection='3d')
 
-    occ = []
-    x_array = []
-    y_array = []
-    z_array = []
-    phi_array = []
-    r_array = []
+    occ         = []
+    x_array     = []
+    y_array     = []
+    z_array     = []
+    phi_array   = []
+    r_array     = []
 
     # section off rocs into roc ladders (12 'ladders'), each true ladder is split in half 6 * 2 = 12
     for roc in roc_index:
@@ -80,39 +97,69 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
             z_array.append(np.average(z))
             phi_array.append(np.average(phi))
             r_array.append(np.average(r))
+    
+    # testing
+    print("testing_phi_1")
+    printInfo(z_array, phi_array)
 
-    occ = np.array(occ)
-    x_array = np.array(x_array)
-    y_array = np.array(y_array)
-    z_array = np.array(z_array)
-    phi_array = np.array(phi_array)
-    r_array = np.array(r_array)
+    occ         = np.array(occ)
+    x_array     = np.array(x_array)
+    y_array     = np.array(y_array)
+    z_array     = np.array(z_array)
+    phi_array   = np.array(phi_array)
+    r_array     = np.array(r_array)
 
-    phi_sort = np.argsort(phi_array)
-    z_sort = np.argsort(z_array)
+    phi_sort    = np.argsort(phi_array)
+    z_sort      = np.argsort(z_array)
 
-    occ = occ[z_sort]
-    x_array = x_array[z_sort]
-    y_array = y_array[z_sort]
-    z_array = z_array[z_sort]
-    phi_array = phi_array[z_sort]
-    r_array = r_array[z_sort]
+    occ         = occ[z_sort]
+    x_array     = x_array[z_sort]
+    y_array     = y_array[z_sort]
+    z_array     = z_array[z_sort]
+    phi_array   = phi_array[z_sort]
+    r_array     = r_array[z_sort]
+
+    # testing
+    print("testing_phi_2")
+    printInfo(z_array, phi_array)
 
     # removing rocs
+    
+    # z
     remove_z = (z_array > -25) * (z_array < 25)
 
-    remove_blips =  (z_array < -21)   + (z_array > -20)
-    remove_blips *= (z_array < -14.5) + (z_array > -13.5)
-    remove_blips *= (z_array < -7.5)  + (z_array > -6.5)
-    remove_blips *= (z_array < 5.75)  + (z_array > 6.5)
-    remove_blips *= (z_array < 12.5)  + (z_array > 13.5)
-    remove_blips *= (z_array < 19)    + (z_array > 20)
+    remove_blips_z =  (z_array < -21)   + (z_array > -20)
+    remove_blips_z *= (z_array < -14.5) + (z_array > -13.5)
+    remove_blips_z *= (z_array < -7.5)  + (z_array > -6.5)
+    remove_blips_z *= (z_array < 5.75)  + (z_array > 6.5)
+    remove_blips_z *= (z_array < 12.5)  + (z_array > 13.5)
+    remove_blips_z *= (z_array < 19)    + (z_array > 20)
 
-    occ         = occ[remove_z*remove_blips]
-    x_array     = x_array[remove_z*remove_blips]
-    y_array     = y_array[remove_z*remove_blips]
-    z_array     = z_array[remove_z*remove_blips]
-    phi_array   = phi_array[remove_z*remove_blips]
+    occ         = occ[          remove_z * remove_blips_z]
+    x_array     = x_array[      remove_z * remove_blips_z]
+    y_array     = y_array[      remove_z * remove_blips_z]
+    z_array     = z_array[      remove_z * remove_blips_z]
+    phi_array   = phi_array[    remove_z * remove_blips_z]
+
+    #print("remove_z = {0}".format(remove_z))
+    #print("remove_blips_z = {0}".format(remove_blips_z))
+    
+    # phi
+    remove_phi          = (phi_array >= -np.pi) * (phi_array <= np.pi)
+    remove_blips_phi    = (phi_array < 1.0) + (phi_array > 1.5)
+    
+    occ         = occ[          remove_phi * remove_blips_phi]
+    x_array     = x_array[      remove_phi * remove_blips_phi]
+    y_array     = y_array[      remove_phi * remove_blips_phi]
+    z_array     = z_array[      remove_phi * remove_blips_phi]
+    phi_array   = phi_array[    remove_phi * remove_blips_phi]
+    
+    #print("remove_phi = {0}".format(remove_phi))
+    #print("remove_blips_phi = {0}".format(remove_blips_phi))
+    
+    # testing
+    print("testing_phi_3")
+    printInfo(z_array, phi_array)
 
     def nll(x0, y0, z0, n, b1, b2, b3, a1, a3, c1, c3):
         ri = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
@@ -125,7 +172,6 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
 
         return np.sum(func_array)
 
-    axs.plot(z_array, phi_array, occ, 'b*')
     minuit = im.Minuit(nll, x0=0, y0=0, z0=-0.019, n=1,
                        a1=4e4, a3=1.26e5,
                        b1=0.0, b2=3, b3=1.167,
@@ -156,6 +202,29 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     minuit.migrad()
     #print(minuit.get_param_states())
     #print(minuit.get_fmin())
+    
+    # plotting
+    #print("z_array = {0}".format(z_array))
+    #print("phi_array = {0}".format(phi_array))
+    #print("occ = {0}".format(occ))
+    #print("f = {0}".format(func(np.sqrt(z_array ** 2 + phi_array ** 2), a=1, b=1, c=1)))
+
+    x0 = 0.0
+    y0 = 0.0
+    z0 = 0.0
+    my_r = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
+    #print("my_r = {0}".format(my_r))
+    
+    z_2d, phi_2d = np.meshgrid(z_array, phi_array)
+    output_2d = func(z_2d, a=10000, b=2, c=20000)
+    
+    # 3D plot of fit
+    #axs.contour3D(z_2d, phi_2d, output_2d, 50, cmap='binary')
+    #axs.plot_wireframe(z_2d, phi_2d, output_2d, color='black')
+    #axs.plot_surface(z_2d, phi_2d, output_2d, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+
+    # plot of occupancy
+    axs.plot(z_array, phi_array, occ, 'b*')
 
     # labels
     axs.set_title("Pixel Occupancy", fontsize=20)
@@ -206,19 +275,19 @@ if __name__ == "__main__":
     #in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_v3.npy")
     #plot_name = "fig_v3"
     
-    in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon_v1.npy")
-    plot_name = "fig_SingleMuon_v1"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v1.npy")
-    plot_name = "fig_ZeroBias_v1"
-    remake_arrays(in_array, plot_dir, plot_name)
+    #in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon_v1.npy")
+    #plot_name = "fig_SingleMuon_v1"
+    #remake_arrays(in_array, plot_dir, plot_name)
+    #
+    #in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v1.npy")
+    #plot_name = "fig_ZeroBias_v1"
+    #remake_arrays(in_array, plot_dir, plot_name)
     
     in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon_v2.npy")
     plot_name = "fig_SingleMuon_v2"
     remake_arrays(in_array, plot_dir, plot_name)
     
-    in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v2.npy")
-    plot_name = "fig_ZeroBias_v2"
-    remake_arrays(in_array, plot_dir, plot_name)
+    #in_array  = read_file(data_dir + "design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v2.npy")
+    #plot_name = "fig_ZeroBias_v2"
+    #remake_arrays(in_array, plot_dir, plot_name)
 
