@@ -64,13 +64,17 @@ Depending on the number of root files loaded, the number of events, and the numb
 
 ## Fitting
 
-The script plotOccupancy.py should be run in python 3 and requires these packages:
+The script plotOccupancy.py should be run in Python 3 and requires these packages:
 - numpy
 - matplotlib
 - iminuit
 
+The version of the iminuit package is important because there were large usage changes.
+Most scripts are written to use iminuit 1.4.9.
+The script "plotOccupancy.py" uses iminuit 2.4.0.  
 
-Creating virtual environment for python (here we picked the name python3_env).
+Create a virtual environment for python.
+Here we picked the name "python3_env."
 You may choose any location that you will remember for the virtual environment.
 Here we choose trackIndepBeamSpot, but you may use another directory if you like.
 ```
@@ -89,14 +93,34 @@ which python
 python --version
 ```
 
-Install packages after activating environment:
+After activating the environment, the necessary packages can be installed.
+Choose the iminuit version that you will use.
+Most scripts use iminuit 1.4.9.
+The script "plotOccupancy.py" uses iminuit 2.4.0.  
+
+<details>
+<summary>For iminuit 1.4.9:</summary>
+<br>
 ```
+pip install --upgrade pip
 pip install numpy
 pip install matplotlib
-pip install iminuit
+pip install iminuit==1.4.9
 ```
+</details>
 
-To deactivate:
+<details>
+<summary>For iminuit 2.4.0:</summary>
+<br>
+```
+pip install --upgrade pip
+pip install numpy
+pip install matplotlib
+pip install iminuit==2.4.0
+```
+</details>
+
+To deactivate the python environment:
 ```
 deactivate
 ```
