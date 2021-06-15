@@ -101,23 +101,23 @@ The script "plotOccupancy.py" uses iminuit 2.4.0.
 <details>
 <summary>For iminuit 1.4.9:</summary>
 <br>
-```
+<pre>
 pip install --upgrade pip
 pip install numpy
 pip install matplotlib
 pip install iminuit==1.4.9
-```
+</pre>
 </details>
 
 <details>
 <summary>For iminuit 2.4.0:</summary>
 <br>
-```
+<pre>
 pip install --upgrade pip
 pip install numpy
 pip install matplotlib
 pip install iminuit==2.4.0
-```
+</pre>
 </details>
 
 To deactivate the python environment:
