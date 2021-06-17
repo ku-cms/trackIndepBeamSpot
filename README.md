@@ -64,13 +64,13 @@ Depending on the number of root files loaded, the number of events, and the numb
 
 ## Fitting
 
-The script plotOccupancy.py should be run in Python 3 and requires these packages:
+The fitting scripts should be run in Python 3 and require these packages:
 - numpy
 - matplotlib
 - iminuit
 
 The version of the iminuit package is important because there were large usage changes.
-Most scripts are written to use iminuit 1.4.9.
+Most scripts (e.g. fitting_line_test.py) are written to use iminuit 1.4.9 (recommended).
 The script "plotOccupancy.py" uses iminuit 2.4.0.  
 
 Create a virtual environment for python.
@@ -95,7 +95,7 @@ python --version
 
 After activating the environment, the necessary packages can be installed.
 Choose the iminuit version that you will use.
-Most scripts use iminuit 1.4.9.
+Most scripts use iminuit 1.4.9 (recommended).
 The script "plotOccupancy.py" uses iminuit 2.4.0.  
 
 <details>
@@ -125,23 +125,33 @@ To deactivate the python environment:
 deactivate
 ```
 
-The script plotOccupancy.py expects these directories to exists within the trackIndepBeamSpot directory (not in the python directory):
+Some scripts expect these directories to exists within the trackIndepBeamSpot directory (not in the python directory):
 ```
 cd trackIndepBeamSpot
 mkdir data
 mkdir plots
 ```
 
-Then you can copy .npy files to the data directory and add the file names to plotOccupancy.py. 
+Then you can copy .npy files to the data directory and add the file names to the script that you will run. 
 
-You will need to activate the virtual environment before running plotOccupancy.py.
+You will need to activate the virtual environment before running fitting scripts.
 The activation can be done from any directory, and it will be maintained when changing directories. 
 You can also use a full path to activate.
+Replace "<full_path>" with the full path to "python3_env/bin/activate."
 
 ```
 source <full_path>/python3_env/bin/activate
+```
+
+Requires iminuit 1.4.9:
+```
+python python/fitting_line_test.py
+```
+
+Requires iminuit 2.4.0:
+```
 python python/plotOccupancy.py
 ```
 
-This script will save plots as pngs in the plots directory.
+These scripts will save plots as pngs in the plots directory.
 
