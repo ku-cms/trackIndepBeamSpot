@@ -291,10 +291,13 @@ def func_expanded(x, y, a1, a3, b1, b2, b3, c1, c3):
     a = b_par(y, a1, b2, a3)
     b = b_par(y, b1, b2, b3)
     c = b_par(y, c1, b2, c3)
-    # r = sqrt(z ** 2 + x ** 2 + y ** 2)
-    # x ** 2 + y ** 2 = 1.8 cm ** 2
-    #return a * (1 / np.abs(x) ** b) + c
-    return a * (1 / np.sqrt(x ** 2 + 1.8) ** b) + c
+    # r_2d = sqrt(x ** 2 + y ** 2)
+    # r_3d = sqrt(x ** 2 + y ** 2 + z ** 2)
+    # r_2d = 1.8 cm
+    # r_3d = sqrt(r_2d ** 2 + z ** 2)
+    r_2d = 1.8
+    r_3d = np.sqrt(r_2d ** 2 + x ** 2)
+    return func(r_3d, a, b, c)
 
 def line_expanded(x, y, z0, a1, a3, b1, b2, b3, c1, c3, ga1, ga3, gc1, gc3):
     ga = b_par(y, ga1, b2-np.pi, ga3)
