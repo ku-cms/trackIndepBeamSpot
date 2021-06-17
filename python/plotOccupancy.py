@@ -18,7 +18,6 @@ def printInfo(z_array, phi_array):
 def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
 
-
 def remake_arrays(input_arr_, plot_dir, plot_name):
     useWeightedAve = False
     
@@ -82,7 +81,6 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         occ_tmp = occ_tmp[~np.isnan(z)]
         z = z[~np.isnan(z)]
 
-        
         if useWeightedAve:
             occ.append(np.sum(occ_tmp))
             x_array.append(np.average(x,        weights=occ_tmp))
@@ -172,6 +170,7 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
 
         return np.sum(func_array)
 
+    # using iminuit 2.4.0, which does not allow error/fix/limit etc. to be specified here
     minuit = im.Minuit(nll, x0=0, y0=0, z0=-0.019, n=1,
                        a1=4e4, a3=1.26e5,
                        b1=0.0, b2=3, b3=1.167,
@@ -200,6 +199,7 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
                       )
 
     minuit.migrad()
+    # using iminuit 2.4.0, which does not have get_param_states()
     #print(minuit.get_param_states())
     #print(minuit.get_fmin())
     
@@ -231,7 +231,7 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     axs.set_xlabel("z",              fontsize=16)
     axs.set_ylabel(r"$\phi$",        fontsize=16)
 
-    # axs.legend()
+    #axs.legend()
     #plt.show()
     
     plt.savefig(plot_dir + plot_name + '.png', bbox_inches='tight')
