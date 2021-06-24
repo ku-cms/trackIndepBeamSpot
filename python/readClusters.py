@@ -14,7 +14,7 @@ def make_cluster_map(input_files_):
     """
     function to make a cluster occupancy map of layer 1 pixels, with 1:1 pixel, index correspondence
     :param input_files: list of PixelTree ntuples to be processed
-    :return:
+    :return: numpy file with cluster occupancy
     """
     chain = rt.TChain('pixelTree')
     for f in input_files_:
@@ -46,7 +46,6 @@ def make_cluster_map(input_files_):
             # skipping detids outside of layer 1
             if not(303000000 < detid_cl < 304000000):
                 continue  # layer 1
-
 
             clus_size = chain.ClSize[icl]
             clus_size_x = chain.ClSizeX[icl]
@@ -109,16 +108,40 @@ def make_cluster_map(input_files_):
             else:
                 phi_dict[ladder_index] = [phi_cl]
 
+    # print info
     #for ladder_index in info_dict:
     #    for info in info_dict[ladder_index]:
     #        print info
     
+    # print phi
     for ladder_index in phi_dict:
-        phi_min  = np.min(phi_dict[ladder_index])
-        phi_max  = np.max(phi_dict[ladder_index])
-        phi_mean = np.mean(phi_dict[ladder_index])
-        phi_std  = np.std(phi_dict[ladder_index])
+        phi_list = phi_dict[ladder_index]
+        phi_min  = np.min(phi_list)
+        phi_max  = np.max(phi_list)
+        phi_mean = np.mean(phi_list)
+        phi_std  = np.std(phi_list)
         print("ladder = {0}: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_min, phi_max, phi_mean, phi_std))
+        # split ladder 3 into phi < 0 and phi > 0, as ladder three crosses phi = -pi = pi
+        if ladder_index == 3:
+            phi_neg_list = []
+            phi_pos_list = []
+            for phi in phi_list:
+                if phi < 0.0:
+                    phi_neg_list.append(phi)
+                else:
+                    phi_pos_list.append(phi)
+            # phi < 0
+            phi_neg_min  = np.min(phi_neg_list)
+            phi_neg_max  = np.max(phi_neg_list)
+            phi_neg_mean = np.mean(phi_neg_list)
+            phi_neg_std  = np.std(phi_neg_list)
+            # phi >= 0
+            phi_pos_min  = np.min(phi_pos_list)
+            phi_pos_max  = np.max(phi_pos_list)
+            phi_pos_mean = np.mean(phi_pos_list)
+            phi_pos_std  = np.std(phi_pos_list)
+            print("ladder = {0}: require phi <  0: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_neg_min, phi_neg_max, phi_neg_mean, phi_neg_std))
+            print("ladder = {0}: require phi >= 0: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_pos_min, phi_pos_max, phi_pos_mean, phi_pos_std))
 
     return occ_array
 
