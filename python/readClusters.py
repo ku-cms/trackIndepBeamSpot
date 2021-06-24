@@ -24,9 +24,11 @@ def make_cluster_map(input_files_):
     occ_array = np.full((1920, 3328), None)
 
     n_events = chain.GetEntries()
-    max_events = -1
+    max_events = 10
 
     print "Number of events: {0}".format(n_events)
+
+    ladder_dict = {}
 
     for iev, event in enumerate(chain):
         if max_events > 0 and iev > max_events:
@@ -60,7 +62,6 @@ def make_cluster_map(input_files_):
             # remove if not an inner ladder
             if ladder_cl not in [-5, -3, -1, 2, 4, 6]: continue
 
-
             charge = event.ClCharge[icl]
             #if charge > 1000: continue
             gx_cl = event.ClGx[icl]
@@ -70,6 +71,7 @@ def make_cluster_map(input_files_):
             try:
                 phi_cl = np.arctan2(gy_cl, gx_cl)
             except ZeroDivisionError:
+                print "ERROR: ZeroDivisionError"
                 gy_cl += 0.00001
                 phi_cl = np.arctan2(gy_cl, gx_cl)
 
@@ -87,6 +89,21 @@ def make_cluster_map(input_files_):
             if edge_row or edge_col: continue 
 
             occ_array[row_cl+(160*ladder_index)][col_cl+(416*module_index)][0] += 1
+            
+            info = "Event {0}: ladder = {1}, module = {2}, cluster {3}, x = {4:.3f}, y = {5:.3f}, z = {6:.3f}, phi = {7:.3f}".format(iev, ladder_index, module_index, icl, gx_cl, gy_cl, gz_cl, phi_cl)
+            
+            #if 1.0 < phi_cl < 1.5:
+            #if True:
+            #    print info
+            if ladder_index in ladder_dict:
+                ladder_dict[ladder_index].append(info)
+            else:
+                ladder_dict[ladder_index] = [info]
+
+    for ladder_index in ladder_dict:
+        for info in ladder_dict[ladder_index]:
+            print info
+
     return occ_array
 
 
@@ -502,8 +519,8 @@ def main():
     
     t_start = time.time()
     
-    #runSingleMuon()
-    runZeroBias()
+    runSingleMuon()
+    #runZeroBias()
     
     t_stop = time.time()
     print "run time (sec): {0}".format(t_stop - t_start)
