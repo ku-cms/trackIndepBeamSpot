@@ -24,11 +24,12 @@ def make_cluster_map(input_files_):
     occ_array = np.full((1920, 3328), None)
 
     n_events = chain.GetEntries()
-    max_events = 10
+    max_events = 100
 
     print "Number of events: {0}".format(n_events)
 
-    ladder_dict = {}
+    info_dict = {}
+    phi_dict  = {}
 
     for iev, event in enumerate(chain):
         if max_events > 0 and iev > max_events:
@@ -95,17 +96,31 @@ def make_cluster_map(input_files_):
             #if 1.0 < phi_cl < 1.5:
             #if True:
             #    print info
-            if ladder_index in ladder_dict:
-                ladder_dict[ladder_index].append(info)
+            
+            # record info
+            if ladder_index in info_dict:
+                info_dict[ladder_index].append(info)
             else:
-                ladder_dict[ladder_index] = [info]
+                info_dict[ladder_index] = [info]
+            
+            # record phi
+            if ladder_index in phi_dict:
+                phi_dict[ladder_index].append(phi_cl)
+            else:
+                phi_dict[ladder_index] = [phi_cl]
 
-    for ladder_index in ladder_dict:
-        for info in ladder_dict[ladder_index]:
-            print info
+    #for ladder_index in info_dict:
+    #    for info in info_dict[ladder_index]:
+    #        print info
+    
+    for ladder_index in phi_dict:
+        phi_min  = np.min(phi_dict[ladder_index])
+        phi_max  = np.max(phi_dict[ladder_index])
+        phi_mean = np.mean(phi_dict[ladder_index])
+        phi_std  = np.std(phi_dict[ladder_index])
+        print("ladder = {0}: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_min, phi_max, phi_mean, phi_std))
 
     return occ_array
-
 
 def read_clusters(input_files, f_name_):
     tChain = rt.TChain('pixelTree')
@@ -481,8 +496,8 @@ def run(directory, output_file, message, num_files):
     # --- printing --- #
     print message
     print "Number of files: {0}".format(len(file_list))
-    for f in file_list:
-        print " - {0}".format(f)
+    #for f in file_list:
+    #    print " - {0}".format(f)
     
     # --- create cluster map --- #
     occ_map = make_cluster_map(file_list)  
