@@ -12,6 +12,7 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     useWeightedAve = False
     drawFit = False
     maskPhi = False
+    fixPhi  = True
     
     # need z-binning corresponding to 1 roc
     w_z_bins = 52  # # of pixels in a roc
@@ -78,10 +79,11 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         # - for phi < 0, find the different from -pi, then add this to +pi for the average
         # - make sure the final average is within [-pi, +pi]... if avg > pi, then it should be set to -pi < new_avg < 0
 
+        # --- apply fix to phi
         # select only roc == 3 for testing
         #if roc == 3:
         # select all roc 3 (mod 12) to fix phi = -pi = +pi issue
-        if roc % 12 == 3:
+        if fixPhi and (roc % 12 == 3):
 
             phi_neg = [val for val in phi if val <  0.0]
             phi_pos = [val for val in phi if val >= 0.0]
@@ -89,6 +91,7 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
             phi_neg_fixed = [np.pi + abs(-np.pi - val) for val in phi if val < 0.0]
             phi_fixed = phi_pos + phi_neg_fixed
             
+            # debugging
             #print("You have chosen roc={0}.".format(roc))
             #print("phi: {0}".format(phi))
             #print("number of phi: {0}".format(len(phi)))
@@ -101,6 +104,7 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
             
         else:
             phi_fixed = phi
+        
             
         if useWeightedAve:
             occ.append(np.sum(occ_tmp))
@@ -118,7 +122,7 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
             r_array.append(np.average(r))
 
         # debugging
-        print("roc {0}: z_avg = {1:.3f}, phi_avg = {2:.3f}, phi_fixed_avg = {3:.3f}".format(roc, np.average(z), np.average(phi), np.average(phi_fixed)))
+        #print("roc {0}: z_avg = {1:.3f}, phi_avg = {2:.3f}, phi_fixed_avg = {3:.3f}".format(roc, np.average(z), np.average(phi), np.average(phi_fixed)))
 
     occ = np.array(occ)
     x_array = np.array(x_array)
@@ -375,11 +379,11 @@ if __name__ == "__main__":
     #in_array = read_file(data_dir + "TTBar_OffTrack_zsmear.npy")
     #in_array = read_file(data_dir + "TTBar_OnTrack_zsmear.npy")
 
-    in_array = read_file(data_dir + "SingleMuon_AllClusters.npy")
-    plot_name = "SingleMuon_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    #in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
-    #plot_name = "ZeroBias_AllClusters"
+    #in_array = read_file(data_dir + "SingleMuon_AllClusters.npy")
+    #plot_name = "SingleMuon_AllClusters"
     #remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
+    plot_name = "ZeroBias_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
 
