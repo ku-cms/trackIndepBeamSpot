@@ -379,11 +379,23 @@ if __name__ == "__main__":
     #in_array = read_file(data_dir + "TTBar_OffTrack_zsmear.npy")
     #in_array = read_file(data_dir + "TTBar_OnTrack_zsmear.npy")
 
+    # SingleMuon
     #in_array = read_file(data_dir + "SingleMuon_AllClusters.npy")
     #plot_name = "SingleMuon_AllClusters"
     #remake_arrays(in_array, plot_dir, plot_name)
     
-    in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
-    plot_name = "ZeroBias_AllClusters"
+    # ZeroBias
+    #in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
+    #plot_name = "ZeroBias_AllClusters"
+    #remake_arrays(in_array, plot_dir, plot_name)
+    
+    # TTBar
+    in_array = read_file(data_dir + "TTBar_AllClusters.npy")
+    plot_name = "TTBar_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    # TTBar_zsmear
+    in_array = read_file(data_dir + "TTBar_AllClusters_zsmear.npy")
+    plot_name = "TTBar_AllClusters_zsmear"
     remake_arrays(in_array, plot_dir, plot_name)
 
