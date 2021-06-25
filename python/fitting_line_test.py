@@ -56,20 +56,20 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         #    continue
        
         occ_tmp = np.concatenate(array_by_rocs[roc, :, :, 0])
-        r = np.concatenate(array_by_rocs[roc, :, :, 1])
-        phi = np.concatenate(array_by_rocs[roc, :, :, 2])
-        z = np.concatenate(array_by_rocs[roc, :, :, 3])
+        r       = np.concatenate(array_by_rocs[roc, :, :, 1])
+        phi     = np.concatenate(array_by_rocs[roc, :, :, 2])
+        z       = np.concatenate(array_by_rocs[roc, :, :, 3])
         #print(z)
         #print("length z={0}".format(len(z)))
         #z_avg = np.nanmean(z)
         #print("avg z={0}".format(z_avg))
 
-        x = r[~np.isnan(z)] * np.cos(phi[~np.isnan(z)])
-        y = r[~np.isnan(z)] * np.sin(phi[~np.isnan(z)])
-        r = r[~np.isnan(z)]
-        phi = phi[~np.isnan(z)]
+        x       = r[~np.isnan(z)] * np.cos(phi[~np.isnan(z)])
+        y       = r[~np.isnan(z)] * np.sin(phi[~np.isnan(z)])
+        r       = r[~np.isnan(z)]
+        phi     = phi[~np.isnan(z)]
         occ_tmp = occ_tmp[~np.isnan(z)]
-        z = z[~np.isnan(z)]
+        z       = z[~np.isnan(z)]
 
         # WARNING:
         # roc 3 in ladder 3 (roc % 12 == 3) crosses phi = -pi = +pi
@@ -80,6 +80,7 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
 
         if roc % 12 == 3:
             print("You have chosen roc={0}.".format(roc))
+            print(phi)
             #phi_pos = []
             #phi_neg = []
             #for phi_val in phi:
