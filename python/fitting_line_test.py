@@ -78,9 +78,15 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         # for phi < 0, find the different from -pi, then add this to +pi for the average
         # make sure the final average is within [-pi, +pi]... if avg > pi, then it should be set to < 0
 
-        if roc % 12 == 3:
+        # select all roc 3 (mod 12)
+        #if roc % 12 == 3:
+        # select only roc == 3 for testing
+        if roc == 3:
             print("You have chosen roc={0}.".format(roc))
-            print(phi)
+            print("phi: {0}".format(phi))
+            print("number of phi: {0}".format(len(phi)))
+            for phi_val in phi:
+                print("roc {0}: phi_val = {1}".format(roc, phi_val))
             #phi_pos = []
             #phi_neg = []
             #for phi_val in phi:
