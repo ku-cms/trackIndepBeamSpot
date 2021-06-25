@@ -16,6 +16,7 @@ def make_cluster_map(input_files_):
     :param input_files: list of PixelTree ntuples to be processed
     :return: numpy file with cluster occupancy
     """
+    debug = False
     chain = rt.TChain('pixelTree')
     for f in input_files_:
         chain.Add(f)
@@ -24,7 +25,7 @@ def make_cluster_map(input_files_):
     occ_array = np.full((1920, 3328), None)
 
     n_events = chain.GetEntries()
-    max_events = 100
+    max_events = -1
 
     print "Number of events: {0}".format(n_events)
 
@@ -89,59 +90,61 @@ def make_cluster_map(input_files_):
             if edge_row or edge_col: continue 
 
             occ_array[row_cl+(160*ladder_index)][col_cl+(416*module_index)][0] += 1
-            
-            info = "Event {0}: ladder = {1}, module = {2}, cluster {3}, x = {4:.3f}, y = {5:.3f}, z = {6:.3f}, phi = {7:.3f}".format(iev, ladder_index, module_index, icl, gx_cl, gy_cl, gz_cl, phi_cl)
-            
-            #if 1.0 < phi_cl < 1.5:
-            #if True:
-            #    print info
-            
-            # record info
-            if ladder_index in info_dict:
-                info_dict[ladder_index].append(info)
-            else:
-                info_dict[ladder_index] = [info]
-            
-            # record phi
-            if ladder_index in phi_dict:
-                phi_dict[ladder_index].append(phi_cl)
-            else:
-                phi_dict[ladder_index] = [phi_cl]
 
-    # print info
-    #for ladder_index in info_dict:
-    #    for info in info_dict[ladder_index]:
-    #        print info
-    
-    # print phi
-    for ladder_index in phi_dict:
-        phi_list = phi_dict[ladder_index]
-        phi_min  = np.min(phi_list)
-        phi_max  = np.max(phi_list)
-        phi_mean = np.mean(phi_list)
-        phi_std  = np.std(phi_list)
-        print("ladder = {0}: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_min, phi_max, phi_mean, phi_std))
-        # split ladder 3 into phi < 0 and phi > 0, as ladder three crosses phi = -pi = pi
-        if ladder_index == 3:
-            phi_neg_list = []
-            phi_pos_list = []
-            for phi in phi_list:
-                if phi < 0.0:
-                    phi_neg_list.append(phi)
+            if debug:
+                info = "Event {0}: ladder = {1}, module = {2}, cluster {3}, x = {4:.3f}, y = {5:.3f}, z = {6:.3f}, phi = {7:.3f}".format(iev, ladder_index, module_index, icl, gx_cl, gy_cl, gz_cl, phi_cl)
+                
+                #if 1.0 < phi_cl < 1.5:
+                #if True:
+                #    print info
+                
+                # record info
+                if ladder_index in info_dict:
+                    info_dict[ladder_index].append(info)
                 else:
-                    phi_pos_list.append(phi)
-            # phi < 0
-            phi_neg_min  = np.min(phi_neg_list)
-            phi_neg_max  = np.max(phi_neg_list)
-            phi_neg_mean = np.mean(phi_neg_list)
-            phi_neg_std  = np.std(phi_neg_list)
-            # phi >= 0
-            phi_pos_min  = np.min(phi_pos_list)
-            phi_pos_max  = np.max(phi_pos_list)
-            phi_pos_mean = np.mean(phi_pos_list)
-            phi_pos_std  = np.std(phi_pos_list)
-            print("ladder = {0}: require phi <  0: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_neg_min, phi_neg_max, phi_neg_mean, phi_neg_std))
-            print("ladder = {0}: require phi >= 0: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_pos_min, phi_pos_max, phi_pos_mean, phi_pos_std))
+                    info_dict[ladder_index] = [info]
+                
+                # record phi
+                if ladder_index in phi_dict:
+                    phi_dict[ladder_index].append(phi_cl)
+                else:
+                    phi_dict[ladder_index] = [phi_cl]
+
+    if debug:
+        # print info
+        #for ladder_index in info_dict:
+        #    for info in info_dict[ladder_index]:
+        #        print info
+        
+        # print phi
+        for ladder_index in phi_dict:
+            phi_list = phi_dict[ladder_index]
+            phi_min  = np.min(phi_list)
+            phi_max  = np.max(phi_list)
+            phi_mean = np.mean(phi_list)
+            phi_std  = np.std(phi_list)
+            print("ladder = {0}: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_min, phi_max, phi_mean, phi_std))
+            # split ladder 3 into phi < 0 and phi > 0, as ladder three crosses phi = -pi = pi
+            if ladder_index == 3:
+                phi_neg_list = []
+                phi_pos_list = []
+                for phi in phi_list:
+                    if phi < 0.0:
+                        phi_neg_list.append(phi)
+                    else:
+                        phi_pos_list.append(phi)
+                # phi < 0
+                phi_neg_min  = np.min(phi_neg_list)
+                phi_neg_max  = np.max(phi_neg_list)
+                phi_neg_mean = np.mean(phi_neg_list)
+                phi_neg_std  = np.std(phi_neg_list)
+                # phi >= 0
+                phi_pos_min  = np.min(phi_pos_list)
+                phi_pos_max  = np.max(phi_pos_list)
+                phi_pos_mean = np.mean(phi_pos_list)
+                phi_pos_std  = np.std(phi_pos_list)
+                print("ladder = {0}: require phi <  0: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_neg_min, phi_neg_max, phi_neg_mean, phi_neg_std))
+                print("ladder = {0}: require phi >= 0: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_pos_min, phi_pos_max, phi_pos_mean, phi_pos_std))
 
     return occ_array
 
