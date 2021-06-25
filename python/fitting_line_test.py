@@ -82,20 +82,25 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         #if roc % 12 == 3:
         # select only roc == 3 for testing
         if roc == 3:
-            print("You have chosen roc={0}.".format(roc))
-            print("phi: {0}".format(phi))
-            print("number of phi: {0}".format(len(phi)))
 
             phi_neg = [val for val in phi if val <  0.0]
             phi_pos = [val for val in phi if val >= 0.0]
+            # for -pi < phi < 0, find absolute value of different from -pi, and add to +pi
+            phi_neg_fixed = [np.pi + abs(-np.pi - val) for val in phi if val <  0.0]
+            phi_fixed = phi_pos + phi_neg_fixed
+            
+            print("You have chosen roc={0}.".format(roc))
+            print("phi: {0}".format(phi))
+            print("number of phi: {0}".format(len(phi)))
             print("number of phi <  0: {0}".format(len(phi_neg)))
             print("number of phi >= 0: {0}".format(len(phi_pos)))
+            print("number of phi_fixed: {0}".format(len(phi_fixed)))
             print("average for phi <  0: {0}".format(np.average(phi_neg)))
             print("average for phi >= 0: {0}".format(np.average(phi_pos)))
+            print("average for phi_fixed: {0}".format(np.average(phi_fixed)))
             
             #for phi_val in phi:
             #    print("roc {0}: phi_val = {1}".format(roc, phi_val))
-            
             #phi_pos = []
             #phi_neg = []
             #for phi_val in phi:
