@@ -14,8 +14,9 @@ def make_cluster_map(input_files_):
     """
     function to make a cluster occupancy map of layer 1 pixels, with 1:1 pixel, index correspondence
     :param input_files: list of PixelTree ntuples to be processed
-    :return:
+    :return: numpy file with cluster occupancy
     """
+    debug = False
     chain = rt.TChain('pixelTree')
     for f in input_files_:
         chain.Add(f)
@@ -27,6 +28,9 @@ def make_cluster_map(input_files_):
     max_events = -1
 
     print "Number of events: {0}".format(n_events)
+
+    info_dict = {}
+    phi_dict  = {}
 
     for iev, event in enumerate(chain):
         if max_events > 0 and iev > max_events:
@@ -44,7 +48,6 @@ def make_cluster_map(input_files_):
             if not(303000000 < detid_cl < 304000000):
                 continue  # layer 1
 
-
             clus_size = chain.ClSize[icl]
             clus_size_x = chain.ClSizeX[icl]
             clus_size_y = chain.ClSizeY[icl]
@@ -60,7 +63,6 @@ def make_cluster_map(input_files_):
             # remove if not an inner ladder
             if ladder_cl not in [-5, -3, -1, 2, 4, 6]: continue
 
-
             charge = event.ClCharge[icl]
             #if charge > 1000: continue
             gx_cl = event.ClGx[icl]
@@ -70,6 +72,7 @@ def make_cluster_map(input_files_):
             try:
                 phi_cl = np.arctan2(gy_cl, gx_cl)
             except ZeroDivisionError:
+                print "ERROR: ZeroDivisionError"
                 gy_cl += 0.00001
                 phi_cl = np.arctan2(gy_cl, gx_cl)
 
@@ -87,8 +90,63 @@ def make_cluster_map(input_files_):
             if edge_row or edge_col: continue 
 
             occ_array[row_cl+(160*ladder_index)][col_cl+(416*module_index)][0] += 1
-    return occ_array
 
+            if debug:
+                info = "Event {0}: ladder = {1}, module = {2}, cluster {3}, x = {4:.3f}, y = {5:.3f}, z = {6:.3f}, phi = {7:.3f}".format(iev, ladder_index, module_index, icl, gx_cl, gy_cl, gz_cl, phi_cl)
+                
+                #if 1.0 < phi_cl < 1.5:
+                #if True:
+                #    print info
+                
+                # record info
+                if ladder_index in info_dict:
+                    info_dict[ladder_index].append(info)
+                else:
+                    info_dict[ladder_index] = [info]
+                
+                # record phi
+                if ladder_index in phi_dict:
+                    phi_dict[ladder_index].append(phi_cl)
+                else:
+                    phi_dict[ladder_index] = [phi_cl]
+
+    if debug:
+        # print info
+        #for ladder_index in info_dict:
+        #    for info in info_dict[ladder_index]:
+        #        print info
+        
+        # print phi
+        for ladder_index in phi_dict:
+            phi_list = phi_dict[ladder_index]
+            phi_min  = np.min(phi_list)
+            phi_max  = np.max(phi_list)
+            phi_mean = np.mean(phi_list)
+            phi_std  = np.std(phi_list)
+            print("ladder = {0}: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_min, phi_max, phi_mean, phi_std))
+            # split ladder 3 into phi < 0 and phi > 0, as ladder three crosses phi = -pi = pi
+            if ladder_index == 3:
+                phi_neg_list = []
+                phi_pos_list = []
+                for phi in phi_list:
+                    if phi < 0.0:
+                        phi_neg_list.append(phi)
+                    else:
+                        phi_pos_list.append(phi)
+                # phi < 0
+                phi_neg_min  = np.min(phi_neg_list)
+                phi_neg_max  = np.max(phi_neg_list)
+                phi_neg_mean = np.mean(phi_neg_list)
+                phi_neg_std  = np.std(phi_neg_list)
+                # phi >= 0
+                phi_pos_min  = np.min(phi_pos_list)
+                phi_pos_max  = np.max(phi_pos_list)
+                phi_pos_mean = np.mean(phi_pos_list)
+                phi_pos_std  = np.std(phi_pos_list)
+                print("ladder = {0}: require phi <  0: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_neg_min, phi_neg_max, phi_neg_mean, phi_neg_std))
+                print("ladder = {0}: require phi >= 0: phi range = [{1:.3f}, {2:.3f}], phi_mean = {3:.3f} +/- {4:.3f}".format(ladder_index, phi_pos_min, phi_pos_max, phi_pos_mean, phi_pos_std))
+
+    return occ_array
 
 def read_clusters(input_files, f_name_):
     tChain = rt.TChain('pixelTree')
@@ -464,8 +522,8 @@ def run(directory, output_file, message, num_files):
     # --- printing --- #
     print message
     print "Number of files: {0}".format(len(file_list))
-    for f in file_list:
-        print " - {0}".format(f)
+    #for f in file_list:
+    #    print " - {0}".format(f)
     
     # --- create cluster map --- #
     occ_map = make_cluster_map(file_list)  
@@ -502,8 +560,8 @@ def main():
     
     t_start = time.time()
     
-    #runSingleMuon()
-    runZeroBias()
+    runSingleMuon()
+    #runZeroBias()
     
     t_stop = time.time()
     print "run time (sec): {0}".format(t_stop - t_start)
