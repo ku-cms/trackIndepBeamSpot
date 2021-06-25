@@ -60,10 +60,6 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         r       = np.concatenate(array_by_rocs[roc, :, :, 1])
         phi     = np.concatenate(array_by_rocs[roc, :, :, 2])
         z       = np.concatenate(array_by_rocs[roc, :, :, 3])
-        #print(z)
-        #print("length z={0}".format(len(z)))
-        #z_avg = np.nanmean(z)
-        #print("avg z={0}".format(z_avg))
 
         x       = r[~np.isnan(z)] * np.cos(phi[~np.isnan(z)])
         y       = r[~np.isnan(z)] * np.sin(phi[~np.isnan(z)])
@@ -328,7 +324,6 @@ def line(x, ga, gb, gc):
 
 def func_expanded(x, y, a1, a3, b1, b2, b3, c1, c3):
     # note: a2 = b2 = c2
-    # abs(x) used when using z for x when plotting; if using r, r >= 0 by definition
     a = b_par(y, a1, b2, a3)
     b = b_par(y, b1, b2, b3)
     c = b_par(y, c1, b2, c3)
