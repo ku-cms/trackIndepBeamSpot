@@ -11,7 +11,7 @@ def read_file(input_file_):
 def remake_arrays(input_arr_, plot_dir, plot_name):
     useWeightedAve = False
     drawFit = False
-    maskPhi = True
+    maskPhi = False
     
     # need z-binning corresponding to 1 roc
     w_z_bins = 52  # # of pixels in a roc
@@ -48,8 +48,8 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     for roc in roc_index:
         
         # select in phi (0-11)
-        #if not roc % 12 == 0:
-        #    continue
+        if not roc % 12 == 3:
+            continue
 
         # select in z (0-63 after dividing by 12)
         #if not int((roc/12)%64) == 31:
@@ -71,6 +71,24 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         occ_tmp = occ_tmp[~np.isnan(z)]
         z = z[~np.isnan(z)]
 
+        # WARNING:
+        # roc 3 in ladder 3 (roc % 12 == 3) crosses phi = -pi = +pi
+        # do not take a normal average
+        # split into phi < 0 and phi >= 0
+        # for phi < 0, find the different from -pi, then add this to +pi for the average
+        # make sure the final average is within [-pi, +pi]... if avg > pi, then it should be set to < 0
+
+        if roc % 12 == 3:
+            print("You have chosen roc={0}.".format(roc))
+            #phi_pos = []
+            #phi_neg = []
+            #for phi_val in phi:
+            #    if phi_val < 0.0:
+            #        phi_neg.append(phi_neg)
+            #    else:
+            #        phi_pos.append(phi_pos)
+            #print("roc {0}: phi_pos_avg = {1}, phi_neg_avg = {2}".format(roc, np.average(phi_pos), np.average(phi_neg)))
+            
         if useWeightedAve:
             occ.append(np.sum(occ_tmp))
             x_array.append(np.average(x,        weights=occ_tmp))
@@ -85,6 +103,9 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
             z_array.append(np.average(z))
             phi_array.append(np.average(phi))
             r_array.append(np.average(r))
+
+        # debugging
+        print("roc {0}: z_avg = {1:.3f}, phi_avg = {2:.3f}".format(roc, np.average(z), np.average(phi)))
 
     occ = np.array(occ)
     x_array = np.array(x_array)
