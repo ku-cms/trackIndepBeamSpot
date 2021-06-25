@@ -85,8 +85,17 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
             print("You have chosen roc={0}.".format(roc))
             print("phi: {0}".format(phi))
             print("number of phi: {0}".format(len(phi)))
-            for phi_val in phi:
-                print("roc {0}: phi_val = {1}".format(roc, phi_val))
+
+            phi_neg = [val for val in phi if val <  0.0]
+            phi_pos = [val for val in phi if val >= 0.0]
+            print("number of phi <  0: {0}".format(len(phi_neg)))
+            print("number of phi >= 0: {0}".format(len(phi_pos)))
+            print("average for phi <  0: {0}".format(np.average(phi_neg)))
+            print("average for phi >= 0: {0}".format(np.average(phi_pos)))
+            
+            #for phi_val in phi:
+            #    print("roc {0}: phi_val = {1}".format(roc, phi_val))
+            
             #phi_pos = []
             #phi_neg = []
             #for phi_val in phi:
