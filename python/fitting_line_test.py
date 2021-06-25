@@ -48,8 +48,8 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     for roc in roc_index:
         
         # select in phi (0-11)
-        if not roc % 12 == 3:
-            continue
+        #if not roc % 12 == 3:
+        #    continue
 
         # select in z (0-63 after dividing by 12)
         #if not int((roc/12)%64) == 31:
@@ -71,62 +71,54 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         occ_tmp = occ_tmp[~np.isnan(z)]
         z       = z[~np.isnan(z)]
 
-        # WARNING:
-        # roc 3 in ladder 3 (roc % 12 == 3) crosses phi = -pi = +pi
-        # do not take a normal average
-        # split into phi < 0 and phi >= 0
-        # for phi < 0, find the different from -pi, then add this to +pi for the average
-        # make sure the final average is within [-pi, +pi]... if avg > pi, then it should be set to < 0
+        # WARNING: phi = -pi = pi issue for roc % 12 == 3
+        # - roc 3 in ladder 3 (roc % 12 == 3) crosses phi = -pi = +pi
+        # - do not take a normal average
+        # - split into phi < 0 and phi >= 0
+        # - for phi < 0, find the different from -pi, then add this to +pi for the average
+        # - make sure the final average is within [-pi, +pi]... if avg > pi, then it should be set to -pi < new_avg < 0
 
-        # select all roc 3 (mod 12)
-        #if roc % 12 == 3:
         # select only roc == 3 for testing
-        if roc == 3:
+        #if roc == 3:
+        # select all roc 3 (mod 12) to fix phi = -pi = +pi issue
+        if roc % 12 == 3:
 
             phi_neg = [val for val in phi if val <  0.0]
             phi_pos = [val for val in phi if val >= 0.0]
             # for -pi < phi < 0, find absolute value of different from -pi, and add to +pi
-            phi_neg_fixed = [np.pi + abs(-np.pi - val) for val in phi if val <  0.0]
+            phi_neg_fixed = [np.pi + abs(-np.pi - val) for val in phi if val < 0.0]
             phi_fixed = phi_pos + phi_neg_fixed
             
-            print("You have chosen roc={0}.".format(roc))
-            print("phi: {0}".format(phi))
-            print("number of phi: {0}".format(len(phi)))
-            print("number of phi <  0: {0}".format(len(phi_neg)))
-            print("number of phi >= 0: {0}".format(len(phi_pos)))
-            print("number of phi_fixed: {0}".format(len(phi_fixed)))
-            print("average for phi <  0: {0}".format(np.average(phi_neg)))
-            print("average for phi >= 0: {0}".format(np.average(phi_pos)))
-            print("average for phi_fixed: {0}".format(np.average(phi_fixed)))
+            #print("You have chosen roc={0}.".format(roc))
+            #print("phi: {0}".format(phi))
+            #print("number of phi: {0}".format(len(phi)))
+            #print("number of phi <  0: {0}".format(len(phi_neg)))
+            #print("number of phi >= 0: {0}".format(len(phi_pos)))
+            #print("number of phi_fixed: {0}".format(len(phi_fixed)))
+            #print("average for phi <  0: {0}".format(np.average(phi_neg)))
+            #print("average for phi >= 0: {0}".format(np.average(phi_pos)))
+            #print("average for phi_fixed: {0}".format(np.average(phi_fixed)))
             
-            #for phi_val in phi:
-            #    print("roc {0}: phi_val = {1}".format(roc, phi_val))
-            #phi_pos = []
-            #phi_neg = []
-            #for phi_val in phi:
-            #    if phi_val < 0.0:
-            #        phi_neg.append(phi_neg)
-            #    else:
-            #        phi_pos.append(phi_pos)
-            #print("roc {0}: phi_pos_avg = {1}, phi_neg_avg = {2}".format(roc, np.average(phi_pos), np.average(phi_neg)))
+        else:
+            phi_fixed = phi
             
         if useWeightedAve:
             occ.append(np.sum(occ_tmp))
-            x_array.append(np.average(x,        weights=occ_tmp))
-            y_array.append(np.average(y,        weights=occ_tmp))
-            z_array.append(np.average(z,        weights=occ_tmp))
-            phi_array.append(np.average(phi,    weights=occ_tmp))
-            r_array.append(np.average(r,        weights=occ_tmp))
+            x_array.append(np.average(x,            weights=occ_tmp))
+            y_array.append(np.average(y,            weights=occ_tmp))
+            z_array.append(np.average(z,            weights=occ_tmp))
+            phi_array.append(np.average(phi_fixed,  weights=occ_tmp))
+            r_array.append(np.average(r,            weights=occ_tmp))
         else:
             occ.append(np.sum(occ_tmp))
             x_array.append(np.average(x))
             y_array.append(np.average(y))
             z_array.append(np.average(z))
-            phi_array.append(np.average(phi))
+            phi_array.append(np.average(phi_fixed))
             r_array.append(np.average(r))
 
         # debugging
-        print("roc {0}: z_avg = {1:.3f}, phi_avg = {2:.3f}".format(roc, np.average(z), np.average(phi)))
+        print("roc {0}: z_avg = {1:.3f}, phi_avg = {2:.3f}, phi_fixed_avg = {3:.3f}".format(roc, np.average(z), np.average(phi), np.average(phi_fixed)))
 
     occ = np.array(occ)
     x_array = np.array(x_array)
