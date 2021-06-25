@@ -10,6 +10,8 @@ def read_file(input_file_):
 
 def remake_arrays(input_arr_, plot_dir, plot_name):
     useWeightedAve = False
+    drawFit = False
+    maskPhi = True
     
     # need z-binning corresponding to 1 roc
     w_z_bins = 52  # # of pixels in a roc
@@ -121,16 +123,16 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     z_array = z_array[remove_z*remove_blips]
     phi_array = phi_array[remove_z*remove_blips]
 
-    # phi
-    
-    remove_phi          = (phi_array >= -np.pi) * (phi_array <= np.pi)
-    remove_blips_phi    = (phi_array < 1.0) + (phi_array > 1.5)
-    
-    occ         = occ[          remove_phi * remove_blips_phi]
-    x_array     = x_array[      remove_phi * remove_blips_phi]
-    y_array     = y_array[      remove_phi * remove_blips_phi]
-    z_array     = z_array[      remove_phi * remove_blips_phi]
-    phi_array   = phi_array[    remove_phi * remove_blips_phi]
+    # remove slice in phi
+    if maskPhi:
+        remove_phi          = (phi_array >= -np.pi) * (phi_array <= np.pi)
+        remove_blips_phi    = (phi_array < 1.0) + (phi_array > 1.5)
+        
+        occ         = occ[          remove_phi * remove_blips_phi]
+        x_array     = x_array[      remove_phi * remove_blips_phi]
+        y_array     = y_array[      remove_phi * remove_blips_phi]
+        z_array     = z_array[      remove_phi * remove_blips_phi]
+        phi_array   = phi_array[    remove_phi * remove_blips_phi]
 
     def nll(x0, y0, z0, n, b1, b2, b3, a1, a3, c1, c3, ga1, ga3, gc1, gc3):
         ri = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
@@ -249,7 +251,8 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     Z = func_expanded(X, Y, a1, a3, b1, b2, b3, c1, c3) + line_expanded(X, Y, z0, a1, a3, b1, b2, b3, c1, c3, ga1, ga3, gc1, gc3)
     
     axs.plot(z_array, phi_array, occ, 'b*')
-    axs.plot_wireframe(X, Y, Z, color='black')
+    if drawFit:
+        axs.plot_wireframe(X, Y, Z, color='black')
     
     # labels
     axs.set_title("Pixel Occupancy", fontsize=20)
@@ -342,7 +345,7 @@ if __name__ == "__main__":
     plot_name = "SingleMuon_AllClusters"
     remake_arrays(in_array, plot_dir, plot_name)
     
-    in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
-    plot_name = "ZeroBias_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
+    #in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
+    #plot_name = "ZeroBias_AllClusters"
+    #remake_arrays(in_array, plot_dir, plot_name)
 
