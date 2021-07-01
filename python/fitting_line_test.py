@@ -138,11 +138,19 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     r_array = r_array[z_sort]
 
     # removing rocs
+
+    # logic:
+    # "*" are "and"
+    # "+" are "or"
+    # "True" are kept
+    # "False" are removed
     
     # limit -25 < z < 25
-    #remove_z = (z_array > -25) * (z_array < 25)
+    remove_z = (z_array > -25) * (z_array < 25)
     # limit -10 < z < 10
-    remove_z = (z_array > -10) * (z_array < 10)
+    #remove_z = (z_array > -10) * (z_array < 10)
+    # limit -5 < z < 5
+    #remove_z = (z_array > -5) * (z_array < 5)
     
     remove_blips =  (z_array < -21) + (z_array > -20)
     remove_blips *= (z_array < -14.5) + (z_array > -13.5)
@@ -150,6 +158,10 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
     remove_blips *= (z_array < 5.75) + (z_array > 6.5)
     remove_blips *= (z_array < 12.5) + (z_array > 13.5)
     remove_blips *= (z_array < 19) + (z_array > 20)
+    # remove -10 < z < 10
+    #remove_blips *= (z_array > 10) + (z_array < -10)
+    # remove -5 < z < 5
+    #remove_blips *= (z_array > 5) + (z_array < -5)
 
     occ = occ[remove_z*remove_blips]
     x_array = x_array[remove_z*remove_blips]
@@ -375,22 +387,46 @@ if __name__ == "__main__":
     #in_array = read_file(data_dir + "TTBar_OnTrack_zsmear.npy")
 
     # SingleMuon
-    #in_array = read_file(data_dir + "SingleMuon_AllClusters.npy")
-    #plot_name = "SingleMuon_AllClusters"
-    #remake_arrays(in_array, plot_dir, plot_name)
-    
-    # ZeroBias
-    #in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
-    #plot_name = "ZeroBias_AllClusters"
-    #remake_arrays(in_array, plot_dir, plot_name)
-    
-    # TTBar
-    in_array = read_file(data_dir + "TTBar_AllClusters.npy")
-    plot_name = "TTBar_AllClusters"
+    in_array = read_file(data_dir + "SingleMuon_AllClusters.npy")
+    plot_name = "SingleMuon_AllClusters"
     remake_arrays(in_array, plot_dir, plot_name)
     
-    # TTBar_zsmear
+    in_array = read_file(data_dir + "SingleMuon_OnTrack.npy")
+    plot_name = "SingleMuon_OnTrack"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "SingleMuon_OffTrack.npy")
+    plot_name = "SingleMuon_OffTrack"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    # ZeroBias
+    in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
+    plot_name = "ZeroBias_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "ZeroBias_OnTrack.npy")
+    plot_name = "ZeroBias_OnTrack"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "ZeroBias_OffTrack.npy")
+    plot_name = "ZeroBias_OffTrack"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    # TTBar
+    #in_array = read_file(data_dir + "TTBar_AllClusters.npy")
+    #plot_name = "TTBar_AllClusters"
+    #remake_arrays(in_array, plot_dir, plot_name)
+    
+    # TTBar zsmear
     in_array = read_file(data_dir + "TTBar_AllClusters_zsmear.npy")
     plot_name = "TTBar_AllClusters_zsmear"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "TTBar_OnTrack_zsmear.npy")
+    plot_name = "TTBar_OnTrack_zsmear"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "TTBar_OffTrack_zsmear.npy")
+    plot_name = "TTBar_OffTrack_zsmear"
     remake_arrays(in_array, plot_dir, plot_name)
 
