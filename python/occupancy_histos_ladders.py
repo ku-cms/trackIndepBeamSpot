@@ -455,10 +455,14 @@ if __name__ == "__main__":
     makeDir(output_dir)
     
     in_array    = read_file("data/TTBar_AllClusters_zsmear.npy")
-    output_name = "{0}/TTBar_AllClusters_zsmear_histos.root".format(output_dir)
+    output_name = "{0}/TTBar_AllClusters_zsmear_histos_v1.root".format(output_dir)
     remake_arrays(in_array, output_name)
     
     in_array    = read_file("data/SingleMuon_AllClusters.npy")
-    output_name = "{0}/SingleMuon_AllClusters_histos.root".format(output_dir)
+    output_name = "{0}/SingleMuon_AllClusters_histos_v1.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    
+    in_array    = read_file("data/ZeroBias_AllClusters.npy")
+    output_name = "{0}/ZeroBias_AllClusters_histos_v1.root".format(output_dir)
     remake_arrays(in_array, output_name)
 
