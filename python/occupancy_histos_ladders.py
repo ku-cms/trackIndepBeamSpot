@@ -188,9 +188,7 @@ def remake_arrays(input_arr_):
     r_err_array = r_err_array[z_sort]
 
     # removing rocs
-    remove_z =  (z_array > -12.5) * (z_array < 12.5)
-    remove_z += (z_array < -12.5) + (z_array > 12.5)
-    remove_z *= (z_array > -25 ) * (z_array < 25)
+    remove_z = (z_array > -25 ) * (z_array < 25)
     remove_blips = (z_array < -21) + (z_array > -20)
     remove_blips *= (z_array < -14.5) + (z_array > -13.5)
     remove_blips *= (z_array < -7.5) + (z_array > -6.5)
@@ -244,7 +242,7 @@ def remake_arrays(input_arr_):
     phi_err_array   = phi_err_array[    remove_z*remove_blips]
     
     # remove phi: should be after removing z
-    remove_phi = (phi_array > 3.0)
+    remove_phi = (phi_array > -np.pi) * (phi_array < np.pi)
     
     occ             = occ[              remove_phi]
     x_array         = x_array[          remove_phi]
@@ -505,7 +503,7 @@ if __name__ == "__main__":
     #in_array = read_file("design_0p2_no_outer_all_pix_nosmear_chargel200.npy")
     #in_array = read_file("design_0p3_no_outer_all_pix_nosmear_chargel200.npy")
     
-    #in_array = read_file("data/TTBar_AllClusters_zsmear.npy")
-    in_array = read_file("data/SingleMuon_AllClusters.npy")
+    in_array = read_file("data/TTBar_AllClusters_zsmear.npy")
+    #in_array = read_file("data/SingleMuon_AllClusters.npy")
     remake_arrays(in_array)
 
