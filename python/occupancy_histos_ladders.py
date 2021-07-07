@@ -1,26 +1,23 @@
 import numpy as np
-#import probfit as pf
-#import matplotlib.pyplot as plt
-#from mpl_toolkits.mplot3d import Axes3D
 import scipy.optimize as so
 import scipy.stats as ss
 import ROOT as rt
 import root_numpy as rnp
-
-#import iminuit as im
-#from pprint import pprint
 import string
 import pandas as pd
+import os
 
-# design_0_nosmear_ge_2pix.npy
 alpha_low = string.ascii_lowercase
 
+# creates directory if it does not exist
+def makeDir(dir_name):
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
 
 def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
 
-
-def remake_arrays(input_arr_):
+def remake_arrays(input_arr_, file_out_name):
 
     w_r_bins = 0.01
 
@@ -43,14 +40,7 @@ def remake_arrays(input_arr_):
     # separate pixels into groups corresponding to rocs in phi and z
     array_by_rocs = np.array([cleaned_array[j*w_phi_bins:(j+1)*w_phi_bins, i*w_z_bins:(i+1)*w_z_bins] for i in range(n_z_bins) for j in range(n_phi_bins)])
 
-    #roc_index = [0, 1]
     roc_index = range(0, n_z_bins*n_phi_bins)
-
-    # fig, axs = plt.subplots(8, 8, sharex=False, sharey=False, figsize=(160, 160), tight_layout=True) #all rocs and modules
-    # fig, axs = plt.subplots(12, 2, sharex=True, sharey=True, figsize=(20, 20), tight_layout=False) # fraction of rocs and modules
-    # fig, axs = plt.subplots(1, sharex=True, sharey=True, figsize=(20, 20), tight_layout=True) # fraction of rocs and modules
-    #fig = plt.figure() # fraction of rocs and modules
-    #axs = fig.add_subplot(111, projection='3d') # fraction of rocs and modules
 
     # minus - 0-383
     # plus - 384-767
@@ -382,13 +372,10 @@ def remake_arrays(input_arr_):
         r_condense_hl = []
         r_err_condense_hl = []
         occ_r_condense_hl = []
-        print("length of r_new_hl: {0}".format(len(r_new_hl)))
+        #print("length of r_new_hl: {0}".format(len(r_new_hl)))
         for i, r in enumerate(r_new_hl):
             if i % 2 == 0:
-                #r_condense_hl.append((r + r_new_hl[i+1]) / 2)
-                #r_err_condense_hl.append(np.sqrt(r_err_new_hl[i]**2 + r_new_hl[i+1]**2))
-                #occ_r_condense_hl.append(np.mean([occ_r_hl[i], occ_r_hl[i+1]]))
-                print("i = {0}, r = {1}".format(i, r))
+                #print("i = {0}, r = {1}".format(i, r))
                 # check i + 1 is still valid for the list
                 if i + 1 < len(r_new_hl):
                     r_condense_hl.append(np.mean([r_new_hl[i], r_new_hl[i+1]]))
@@ -449,18 +436,7 @@ def remake_arrays(input_arr_):
     rnp.fill_graph(gr_r3d, np.swapaxes([r_condense_comb, occ_r_condense_comb], 0, 1))
     gr_r3d.SetName("gr_r_occ_pm_comb")
 
-    #file_out = rt.TFile("output_0_charge_l200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_0p1_neg0p08_charge_l200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_neg0p1_0p2_charge_l200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_0p2_0p19_charge_l200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_neg0p3_neg0p32_charge_l200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_0_charge_ge200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_0p1_neg0p08_charge_ge200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_neg0p1_0p2_charge_ge200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_0p2_0p19_charge_ge200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_neg0p3_neg0p32_charge_ge200_nosmear.root", "RECREATE")
-    
-    file_out = rt.TFile("test.root", "RECREATE")
+    file_out = rt.TFile(file_out_name, "RECREATE")
 
     gr_phi.Write()
     gr_z.Write()
@@ -474,36 +450,15 @@ def remake_arrays(input_arr_):
 
 
 if __name__ == "__main__":
-    #in_array = read_file("design_0_nosmear_ge_2pix.npy")
-    #in_array = read_file("design_0_no_outer_ge_2pix_smear.npy")
-    #in_array = read_file("design_1p0_no_outer_ge_2pix_smear.npy")
-    #in_array = read_file("design_0p1_0p08_no_outer_ge_2pix_smear.npy")
-    #in_array = read_file("design_0p1_neg0p08_no_outer_ge_2pix_smear.npy")
-    #in_array = read_file("design_z10_no_outer_ge_2pix.npy")
-    #in_array = read_file("design_zneg10_no_outer_ge_2pix.npy")
-    #in_array = read_file("design_0_nosmear_no_outer_ge_2pix.npy")
-    #in_array = read_file("design_0_no_outer_ge_2pix_nosmear_phifix.npy")
-    #in_array = read_file("design_z10_0_no_outer_ge_2pix_nosmear_phifix.npy")
-    #in_array = read_file("design_0p1_no_outer_ge_2pix_nosmear_phifix.npy")
-    #in_array = read_file("design_0_no_outer_ge_2pix_smear_phifix.npy")
-    #in_array = read_file("design_0p1_no_outer_ge_2pix_smear_phifix.npy")
-    #in_array = read_file("design_0_no_outer_all_pix_nosmear_phifix.npy")
-    #in_array = read_file("design_0p1_no_outer_all_pix_nosmear_phifix.npy")
-    #inrarray = read_file("design_0p2_no_outer_all_pix_nosmear.npy")
-    #in_array = read_file("design_0p3_no_outer_all_pix_nosmear.npy")
-    #in_array = read_file("design_0p1_II_no_outer_all_pix_nosmear.npy")
-    #in_array = read_file("design_0_no_outer_all_pix_nosmear_chargege200.npy")
-    #in_array = read_file("design_0p1_no_outer_all_pix_nosmear_chargege200.npy")
-    #in_array = read_file("design_0p1_II_no_outer_all_pix_nosmear_chargege200.npy")
-    #in_array = read_file("design_0p2_no_outer_all_pix_nosmear_chargege200.npy")
-    #in_array = read_file("design_0p3_no_outer_all_pix_nosmear_chargege200.npy")
-    #in_array = read_file("design_0_no_outer_all_pix_nosmear_chargel200.npy")
-    #in_array = read_file("design_0p1_no_outer_all_pix_nosmear_chargel200.npy")
-    #in_array = read_file("design_0p1_II_no_outer_all_pix_nosmear_chargel200.npy")
-    #in_array = read_file("design_0p2_no_outer_all_pix_nosmear_chargel200.npy")
-    #in_array = read_file("design_0p3_no_outer_all_pix_nosmear_chargel200.npy")
+    output_dir = "output"
     
-    in_array = read_file("data/TTBar_AllClusters_zsmear.npy")
-    #in_array = read_file("data/SingleMuon_AllClusters.npy")
-    remake_arrays(in_array)
+    makeDir(output_dir)
+    
+    in_array    = read_file("data/TTBar_AllClusters_zsmear.npy")
+    output_name = "{0}/TTBar_AllClusters_zsmear_histos.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    
+    in_array    = read_file("data/SingleMuon_AllClusters.npy")
+    output_name = "{0}/SingleMuon_AllClusters_histos.root".format(output_dir)
+    remake_arrays(in_array, output_name)
 
