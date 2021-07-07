@@ -18,7 +18,9 @@ def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
 
 def remake_arrays(input_arr_, file_out_name):
-
+    useWeightedAve = False
+    fixPhi         = True
+    
     w_r_bins = 0.01
 
     # need z-binning corresponding to 1 roc
@@ -90,64 +92,84 @@ def remake_arrays(input_arr_, file_out_name):
     for roc in roc_index:
 
         occ_tmp = np.concatenate(array_by_rocs[roc, :, :, 0])
-        r = np.concatenate(array_by_rocs[roc, :, :, 1])
-        phi = np.concatenate(array_by_rocs[roc, :, :, 2])
-        z = np.concatenate(array_by_rocs[roc, :, :, 3])
-        z_avg = np.nanmean(z)
+        r       = np.concatenate(array_by_rocs[roc, :, :, 1])
+        phi     = np.concatenate(array_by_rocs[roc, :, :, 2])
+        z       = np.concatenate(array_by_rocs[roc, :, :, 3])
 
-        x = r[~np.isnan(z)] * np.cos(phi[~np.isnan(z)])
-        y = r[~np.isnan(z)] * np.sin(phi[~np.isnan(z)])
-        r = r[~np.isnan(z)]
-        phi = phi[~np.isnan(z)]
+        x       = r[~np.isnan(z)] * np.cos(phi[~np.isnan(z)])
+        y       = r[~np.isnan(z)] * np.sin(phi[~np.isnan(z)])
+        r       = r[~np.isnan(z)]
+        phi     = phi[~np.isnan(z)]
         occ_tmp = occ_tmp[~np.isnan(z)]
-        z = z[~np.isnan(z)]
+        z       = z[~np.isnan(z)]
 
         r = np.sqrt(x**2 + y**2 + z**2)
 
+        # WARNING: phi = -pi = pi issue for roc % 12 == 3
+        # - roc 3 in ladder 3 (roc % 12 == 3) crosses phi = -pi = +pi
+        # - do not take a normal average
+        # - split into phi < 0 and phi >= 0
+        # - for phi < 0, find the different from -pi, then add this to +pi for the average
+        # - make sure the final average is within [-pi, +pi]... if avg > pi, then it should be set to -pi < new_avg < 0
+        if fixPhi and (roc % 12 == 3):
+            phi_neg = [val for val in phi if val <  0.0]
+            phi_pos = [val for val in phi if val >= 0.0]
+            # for -pi < phi < 0, find absolute value of different from -pi, and add to +pi
+            phi_neg_fixed = [np.pi + abs(-np.pi - val) for val in phi if val < 0.0]
+            phi_fixed = phi_pos + phi_neg_fixed
+            #print("roc {0}: z_avg = {1:.3f}, phi_avg = {2:.3f}, phi_fixed_avg = {3:.3f}".format(roc, np.average(z), np.average(phi), np.average(phi_fixed)))
+        else:
+            phi_fixed = phi
+
+        #print("roc {0}: z_avg = {1:.3f}, phi_avg = {2:.3f}, phi_fixed_avg = {3:.3f}".format(roc, np.average(z), np.average(phi), np.average(phi_fixed)))
+        
         occ.append(np.sum(occ_tmp))
         
-        #x_array.append(np.average(x, weights=occ_tmp))
-        #y_array.append(np.average(y, weights=occ_tmp))
-        #z_array.append(np.average(z, weights=occ_tmp))
-        #z_err_array.append(np.std(z))
-        #phi_array.append(np.average(phi, weights=occ_tmp))
-        #phi_err_array.append(np.average(phi, weights=occ_tmp))
-        #r_array.append(np.average(r, weights=occ_tmp))
-        #r_err_array.append(np.std(r))
+        if useWeightedAve:
+            # use weights
+            x_array.append(np.average(x,            weights=occ_tmp))
+            y_array.append(np.average(y,            weights=occ_tmp))
+            z_array.append(np.average(z,            weights=occ_tmp))
+            z_err_array.append(np.std(z))
+            phi_array.append(np.average(phi_fixed,  weights=occ_tmp))
+            phi_err_array.append(np.std(phi_fixed,  weights=occ_tmp))
+            r_array.append(np.average(r,            weights=occ_tmp))
+            r_err_array.append(np.std(r))
 
-        #occ_hl[i_ladder].append(np.sum(occ_tmp))
-        #r_hl[i_ladder].append(np.average(r, weights=occ_tmp))
-        #r_err_hl[i_ladder].append(np.std(r))
-        #phi_hl[i_ladder].append(np.average(phi, weights=occ_tmp))
-        #z_hl[i_ladder].append(np.average(z, weights=occ_tmp))
-        #z_err_hl[i_ladder].append(np.std(z))
+            occ_hl[i_ladder].append(np.sum(occ_tmp))
+            r_hl[i_ladder].append(np.average(r,             weights=occ_tmp))
+            r_err_hl[i_ladder].append(np.std(r))
+            phi_hl[i_ladder].append(np.average(phi_fixed,   weights=occ_tmp))
+            z_hl[i_ladder].append(np.average(z,             weights=occ_tmp))
+            z_err_hl[i_ladder].append(np.std(z))
 
-        #occ_ring[i_ring].append(np.sum(occ_tmp))
-        #r_ring[i_ring].append(np.average(r, weights=occ_tmp))
-        #phi_ring[i_ring].append(np.average(phi, weights=occ_tmp))
-        #z_ring[i_ring].append(np.average(z, weights=occ_tmp))
+            occ_ring[i_ring].append(np.sum(occ_tmp))
+            r_ring[i_ring].append(np.average(r,             weights=occ_tmp))
+            phi_ring[i_ring].append(np.average(phi_fixed,   weights=occ_tmp))
+            z_ring[i_ring].append(np.average(z,             weights=occ_tmp))
         
-        # remove weights
-        x_array.append(np.average(x))
-        y_array.append(np.average(y))
-        z_array.append(np.average(z))
-        z_err_array.append(np.std(z))
-        phi_array.append(np.average(phi))
-        phi_err_array.append(np.average(phi))
-        r_array.append(np.average(r))
-        r_err_array.append(np.std(r))
+        else:
+            # do not use weights
+            x_array.append(np.average(x))
+            y_array.append(np.average(y))
+            z_array.append(np.average(z))
+            z_err_array.append(np.std(z))
+            phi_array.append(np.average(phi_fixed))
+            phi_err_array.append(np.std(phi_fixed))
+            r_array.append(np.average(r))
+            r_err_array.append(np.std(r))
 
-        occ_hl[i_ladder].append(np.sum(occ_tmp))
-        r_hl[i_ladder].append(np.average(r))
-        r_err_hl[i_ladder].append(np.std(r))
-        phi_hl[i_ladder].append(np.average(phi))
-        z_hl[i_ladder].append(np.average(z))
-        z_err_hl[i_ladder].append(np.std(z))
+            occ_hl[i_ladder].append(np.sum(occ_tmp))
+            r_hl[i_ladder].append(np.average(r))
+            r_err_hl[i_ladder].append(np.std(r))
+            phi_hl[i_ladder].append(np.average(phi_fixed))
+            z_hl[i_ladder].append(np.average(z))
+            z_err_hl[i_ladder].append(np.std(z))
 
-        occ_ring[i_ring].append(np.sum(occ_tmp))
-        r_ring[i_ring].append(np.average(r))
-        phi_ring[i_ring].append(np.average(phi))
-        z_ring[i_ring].append(np.average(z))
+            occ_ring[i_ring].append(np.sum(occ_tmp))
+            r_ring[i_ring].append(np.average(r))
+            phi_ring[i_ring].append(np.average(phi_fixed))
+            z_ring[i_ring].append(np.average(z))
         
         i_ladder += 1
         if i_ladder == n_ladders:
@@ -178,8 +200,8 @@ def remake_arrays(input_arr_, file_out_name):
     r_err_array = r_err_array[z_sort]
 
     # removing rocs
-    remove_z = (z_array > -25 ) * (z_array < 25)
-    remove_blips = (z_array < -21) + (z_array > -20)
+    remove_z     =  (z_array > -25 ) * (z_array < 25)
+    remove_blips =  (z_array < -21) + (z_array > -20)
     remove_blips *= (z_array < -14.5) + (z_array > -13.5)
     remove_blips *= (z_array < -7.5) + (z_array > -6.5)
     remove_blips *= (z_array < 5.75) + (z_array > 6.5)
@@ -455,14 +477,14 @@ if __name__ == "__main__":
     makeDir(output_dir)
     
     in_array    = read_file("data/TTBar_AllClusters_zsmear.npy")
-    output_name = "{0}/TTBar_AllClusters_zsmear_histos_v1.root".format(output_dir)
+    output_name = "{0}/TTBar_AllClusters_zsmear_histos_v2.root".format(output_dir)
     remake_arrays(in_array, output_name)
     
     in_array    = read_file("data/SingleMuon_AllClusters.npy")
-    output_name = "{0}/SingleMuon_AllClusters_histos_v1.root".format(output_dir)
+    output_name = "{0}/SingleMuon_AllClusters_histos_v2.root".format(output_dir)
     remake_arrays(in_array, output_name)
     
     in_array    = read_file("data/ZeroBias_AllClusters.npy")
-    output_name = "{0}/ZeroBias_AllClusters_histos_v1.root".format(output_dir)
+    output_name = "{0}/ZeroBias_AllClusters_histos_v2.root".format(output_dir)
     remake_arrays(in_array, output_name)
 
