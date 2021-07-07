@@ -384,13 +384,25 @@ def remake_arrays(input_arr_):
         r_condense_hl = []
         r_err_condense_hl = []
         occ_r_condense_hl = []
-        # for ir, r in enumerate(r_new_hl):
-        #     if ir % 2 == 0:
-        #         r_condense_hl.append((r+r_new_hl[ir+1])/2)
-        #         r_err_condense_hl.append(np.sqrt(r_err_new_hl[ir]**2+r_new_hl[ir+1]**2))
-        #         occ_r_condense_hl.append(np.mean([occ_r_hl[ir], occ_r_hl[ir+1]]))
-        #     else:
-        #         continue
+        print("length of r_new_hl: {0}".format(len(r_new_hl)))
+        for i, r in enumerate(r_new_hl):
+            if i % 2 == 0:
+                #r_condense_hl.append((r + r_new_hl[i+1]) / 2)
+                #r_err_condense_hl.append(np.sqrt(r_err_new_hl[i]**2 + r_new_hl[i+1]**2))
+                #occ_r_condense_hl.append(np.mean([occ_r_hl[i], occ_r_hl[i+1]]))
+                print("i = {0}, r = {1}".format(i, r))
+                # check i + 1 is still valid for the list
+                if i + 1 < len(r_new_hl):
+                    r_condense_hl.append(np.mean([r_new_hl[i], r_new_hl[i+1]]))
+                    r_err_condense_hl.append(np.sqrt(r_err_new_hl[i]**2 + r_new_hl[i+1]**2))
+                    occ_r_condense_hl.append(np.mean([occ_r_hl[i], occ_r_hl[i+1]]))
+                # if i + 1 is not valid, don't use i + 1
+                else:
+                    r_condense_hl.append(r_new_hl[i])
+                    r_err_condense_hl.append(r_err_new_hl[i])
+                    occ_r_condense_hl.append(occ_r_hl[i])
+            else:
+                continue
 
         z_new_hl = z_new_hl[z_sort]
         z_err_new_hl = z_err_new_hl[z_sort]
