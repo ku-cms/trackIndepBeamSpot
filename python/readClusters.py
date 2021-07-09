@@ -54,7 +54,10 @@ def make_cluster_map(input_files_):
             #if clus_size < 1: continue
             #if clus_size > 50: continue
             #if clus_size < 50: continue
+
+            # cut on number of tracks per cluster
             #if chain.ClTkN[icl] < 1: continue 
+            if chain.ClTkN[icl] >= 1: continue 
 
             row_cl    = int(event.ClRow[icl])
             col_cl    = int(event.ClCol[icl])
@@ -552,7 +555,9 @@ def runMinBias():
     # 1 file:   41084 events
     # 2 files:  82206 events
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/MinimumBias2/crab_PixelTree_MinBias_2018C_RAW_v2/210707_165008/0000'
-    output_file = 'MinBias_2018C_AllClusters.npy' 
+    #output_file = 'MinBias_2018C_AllClusters.npy' 
+    #output_file = 'MinBias_2018C_OnTrack.npy' 
+    output_file = 'MinBias_2018C_OffTrack.npy' 
     message     = 'Running over MinBias PixelTrees.'
     num_files   = 2
     
