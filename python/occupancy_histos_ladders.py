@@ -1,27 +1,26 @@
 import numpy as np
-#import probfit as pf
-#import matplotlib.pyplot as plt
-#from mpl_toolkits.mplot3d import Axes3D
 import scipy.optimize as so
 import scipy.stats as ss
 import ROOT as rt
 import root_numpy as rnp
-
-#import iminuit as im
-#from pprint import pprint
 import string
 import pandas as pd
+import os
 
-# design_0_nosmear_ge_2pix.npy
 alpha_low = string.ascii_lowercase
 
+# creates directory if it does not exist
+def makeDir(dir_name):
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
 
 def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
 
-
-def remake_arrays(input_arr_):
-
+def remake_arrays(input_arr_, file_out_name):
+    useWeightedAve = False
+    fixPhi         = True
+    
     w_r_bins = 0.01
 
     # need z-binning corresponding to 1 roc
@@ -43,14 +42,7 @@ def remake_arrays(input_arr_):
     # separate pixels into groups corresponding to rocs in phi and z
     array_by_rocs = np.array([cleaned_array[j*w_phi_bins:(j+1)*w_phi_bins, i*w_z_bins:(i+1)*w_z_bins] for i in range(n_z_bins) for j in range(n_phi_bins)])
 
-    #roc_index = [0, 1]
     roc_index = range(0, n_z_bins*n_phi_bins)
-
-    # fig, axs = plt.subplots(8, 8, sharex=False, sharey=False, figsize=(160, 160), tight_layout=True) #all rocs and modules
-    # fig, axs = plt.subplots(12, 2, sharex=True, sharey=True, figsize=(20, 20), tight_layout=False) # fraction of rocs and modules
-    # fig, axs = plt.subplots(1, sharex=True, sharey=True, figsize=(20, 20), tight_layout=True) # fraction of rocs and modules
-    #fig = plt.figure() # fraction of rocs and modules
-    #axs = fig.add_subplot(111, projection='3d') # fraction of rocs and modules
 
     # minus - 0-383
     # plus - 384-767
@@ -100,42 +92,84 @@ def remake_arrays(input_arr_):
     for roc in roc_index:
 
         occ_tmp = np.concatenate(array_by_rocs[roc, :, :, 0])
-        r = np.concatenate(array_by_rocs[roc, :, :, 1])
-        phi = np.concatenate(array_by_rocs[roc, :, :, 2])
-        z = np.concatenate(array_by_rocs[roc, :, :, 3])
-        z_avg = np.nanmean(z)
+        r       = np.concatenate(array_by_rocs[roc, :, :, 1])
+        phi     = np.concatenate(array_by_rocs[roc, :, :, 2])
+        z       = np.concatenate(array_by_rocs[roc, :, :, 3])
 
-        x = r[~np.isnan(z)] * np.cos(phi[~np.isnan(z)])
-        y = r[~np.isnan(z)] * np.sin(phi[~np.isnan(z)])
-        r = r[~np.isnan(z)]
-        phi = phi[~np.isnan(z)]
+        x       = r[~np.isnan(z)] * np.cos(phi[~np.isnan(z)])
+        y       = r[~np.isnan(z)] * np.sin(phi[~np.isnan(z)])
+        r       = r[~np.isnan(z)]
+        phi     = phi[~np.isnan(z)]
         occ_tmp = occ_tmp[~np.isnan(z)]
-        z = z[~np.isnan(z)]
+        z       = z[~np.isnan(z)]
 
         r = np.sqrt(x**2 + y**2 + z**2)
 
+        # WARNING: phi = -pi = pi issue for roc % 12 == 3
+        # - roc 3 in ladder 3 (roc % 12 == 3) crosses phi = -pi = +pi
+        # - do not take a normal average
+        # - split into phi < 0 and phi >= 0
+        # - for phi < 0, find the different from -pi, then add this to +pi for the average
+        # - make sure the final average is within [-pi, +pi]... if avg > pi, then it should be set to -pi < new_avg < 0
+        if fixPhi and (roc % 12 == 3):
+            phi_neg = [val for val in phi if val <  0.0]
+            phi_pos = [val for val in phi if val >= 0.0]
+            # for -pi < phi < 0, find absolute value of different from -pi, and add to +pi
+            phi_neg_fixed = [np.pi + abs(-np.pi - val) for val in phi if val < 0.0]
+            phi_fixed = phi_pos + phi_neg_fixed
+            #print("roc {0}: z_avg = {1:.3f}, phi_avg = {2:.3f}, phi_fixed_avg = {3:.3f}".format(roc, np.average(z), np.average(phi), np.average(phi_fixed)))
+        else:
+            phi_fixed = phi
+
+        #print("roc {0}: z_avg = {1:.3f}, phi_avg = {2:.3f}, phi_fixed_avg = {3:.3f}".format(roc, np.average(z), np.average(phi), np.average(phi_fixed)))
+        
         occ.append(np.sum(occ_tmp))
-        x_array.append(np.average(x, weights=occ_tmp))
-        y_array.append(np.average(y, weights=occ_tmp))
-        z_array.append(np.average(z, weights=occ_tmp))
-        z_err_array.append(np.std(z))
-        phi_array.append(np.average(phi, weights=occ_tmp))
-        phi_err_array.append(np.average(phi, weights=occ_tmp))
-        r_array.append(np.average(r, weights=occ_tmp))
-        r_err_array.append(np.std(r))
+        
+        if useWeightedAve:
+            # use weights
+            x_array.append(np.average(x,            weights=occ_tmp))
+            y_array.append(np.average(y,            weights=occ_tmp))
+            z_array.append(np.average(z,            weights=occ_tmp))
+            z_err_array.append(np.std(z))
+            phi_array.append(np.average(phi_fixed,  weights=occ_tmp))
+            phi_err_array.append(np.std(phi_fixed,  weights=occ_tmp))
+            r_array.append(np.average(r,            weights=occ_tmp))
+            r_err_array.append(np.std(r))
 
-        occ_hl[i_ladder].append(np.sum(occ_tmp))
-        r_hl[i_ladder].append(np.average(r, weights=occ_tmp))
-        r_err_hl[i_ladder].append(np.std(r))
-        phi_hl[i_ladder].append(np.average(phi, weights=occ_tmp))
-        z_hl[i_ladder].append(np.average(z, weights=occ_tmp))
-        z_err_hl[i_ladder].append(np.std(z))
+            occ_hl[i_ladder].append(np.sum(occ_tmp))
+            r_hl[i_ladder].append(np.average(r,             weights=occ_tmp))
+            r_err_hl[i_ladder].append(np.std(r))
+            phi_hl[i_ladder].append(np.average(phi_fixed,   weights=occ_tmp))
+            z_hl[i_ladder].append(np.average(z,             weights=occ_tmp))
+            z_err_hl[i_ladder].append(np.std(z))
 
-        occ_ring[i_ring].append(np.sum(occ_tmp))
-        r_ring[i_ring].append(np.average(r, weights=occ_tmp))
-        phi_ring[i_ring].append(np.average(phi, weights=occ_tmp))
-        z_ring[i_ring].append(np.average(z, weights=occ_tmp))
+            occ_ring[i_ring].append(np.sum(occ_tmp))
+            r_ring[i_ring].append(np.average(r,             weights=occ_tmp))
+            phi_ring[i_ring].append(np.average(phi_fixed,   weights=occ_tmp))
+            z_ring[i_ring].append(np.average(z,             weights=occ_tmp))
+        
+        else:
+            # do not use weights
+            x_array.append(np.average(x))
+            y_array.append(np.average(y))
+            z_array.append(np.average(z))
+            z_err_array.append(np.std(z))
+            phi_array.append(np.average(phi_fixed))
+            phi_err_array.append(np.std(phi_fixed))
+            r_array.append(np.average(r))
+            r_err_array.append(np.std(r))
 
+            occ_hl[i_ladder].append(np.sum(occ_tmp))
+            r_hl[i_ladder].append(np.average(r))
+            r_err_hl[i_ladder].append(np.std(r))
+            phi_hl[i_ladder].append(np.average(phi_fixed))
+            z_hl[i_ladder].append(np.average(z))
+            z_err_hl[i_ladder].append(np.std(z))
+
+            occ_ring[i_ring].append(np.sum(occ_tmp))
+            r_ring[i_ring].append(np.average(r))
+            phi_ring[i_ring].append(np.average(phi_fixed))
+            z_ring[i_ring].append(np.average(z))
         
         i_ladder += 1
         if i_ladder == n_ladders:
@@ -166,29 +200,27 @@ def remake_arrays(input_arr_):
     r_err_array = r_err_array[z_sort]
 
     # removing rocs
-    remove_z = (z_array > -12.5) * (z_array < 12.5)
-    remove_z += (z_array < -12.5) + (z_array > 12.5)
-    remove_z *= (z_array > -25 )*(z_array < 25)
-    remove_blips = (z_array < -21) + (z_array > -20)
+    remove_z     =  (z_array > -25 ) * (z_array < 25)
+    remove_blips =  (z_array < -21) + (z_array > -20)
     remove_blips *= (z_array < -14.5) + (z_array > -13.5)
     remove_blips *= (z_array < -7.5) + (z_array > -6.5)
     remove_blips *= (z_array < 5.75) + (z_array > 6.5)
     remove_blips *= (z_array < 12.5) + (z_array > 13.5)
     remove_blips *= (z_array < 19) + (z_array > 20)
 
-    remove_hl = (phi_array < -2.3) + (phi_array > -2)
+    remove_hl =  (phi_array < -2.3) + (phi_array > -2)
     remove_hl *= (phi_array < -1.3) + (phi_array > -1)
     remove_hl *= (phi_array < -0.25) + (phi_array > 0)
     remove_hl *= (phi_array < 0.8) + (phi_array > 1.1)
     remove_hl *= (phi_array < 1.8) + (phi_array > 2.2)
     remove_hl *= (phi_array < 2.4) + (phi_array > 2.7)
 
-    remove_hl_low = (phi_array > -2.3) * (phi_array < -2)
-    remove_hl_low += (phi_array > -1.3) * (phi_array < -1)
-    remove_hl_low += (phi_array > -0.25) * (phi_array < 0)
-    remove_hl_low += (phi_array > 0.8) * (phi_array < 1.1)
-    remove_hl_low += (phi_array > 1.8) * (phi_array < 2.2)
-    remove_hl_low += (phi_array > 2.4) * (phi_array < 2.7)
+    remove_hl_low =  (phi_array > -2.3) * (phi_array < -2)
+    remove_hl_low *= (phi_array > -1.3) * (phi_array < -1)
+    remove_hl_low *= (phi_array > -0.25) * (phi_array < 0)
+    remove_hl_low *= (phi_array > 0.8) * (phi_array < 1.1)
+    remove_hl_low *= (phi_array > 1.8) * (phi_array < 2.2)
+    remove_hl_low *= (phi_array > 2.4) * (phi_array < 2.7)
 
     #occ = occ[remove_z*remove_blips*remove_hl_low]
     #x_array = x_array[remove_z*remove_blips*remove_hl_low]
@@ -209,19 +241,34 @@ def remake_arrays(input_arr_):
     #z_array = z_array[remove_z*remove_blips]
     #phi_array = phi_array[remove_z*remove_blips]
     #r_array = r_array[remove_z*remove_blips]
-    occ = occ[remove_z*remove_blips]
-    x_array = x_array[remove_z*remove_blips]
-    y_array = y_array[remove_z*remove_blips]
-    z_array = z_array[remove_z*remove_blips]
-    phi_array = phi_array[remove_z*remove_blips]
-    r_array = r_array[remove_z*remove_blips]
-    r_err_array = r_err_array[remove_z*remove_blips]
-    z_err_array = z_err_array[remove_z*remove_blips]
-    phi_err_array = phi_err_array[remove_z*remove_blips]
+    
+    # remove z
+    occ             = occ[              remove_z*remove_blips]
+    x_array         = x_array[          remove_z*remove_blips]
+    y_array         = y_array[          remove_z*remove_blips]
+    z_array         = z_array[          remove_z*remove_blips]
+    phi_array       = phi_array[        remove_z*remove_blips]
+    r_array         = r_array[          remove_z*remove_blips]
+    r_err_array     = r_err_array[      remove_z*remove_blips]
+    z_err_array     = z_err_array[      remove_z*remove_blips]
+    phi_err_array   = phi_err_array[    remove_z*remove_blips]
+    
+    # remove phi: should be after removing z
+    remove_phi = (phi_array > -np.pi) * (phi_array < np.pi)
+    
+    occ             = occ[              remove_phi]
+    x_array         = x_array[          remove_phi]
+    y_array         = y_array[          remove_phi]
+    z_array         = z_array[          remove_phi]
+    phi_array       = phi_array[        remove_phi]
+    r_array         = r_array[          remove_phi]
+    r_err_array     = r_err_array[      remove_phi]
+    z_err_array     = z_err_array[      remove_phi]
+    phi_err_array   = phi_err_array[    remove_phi]
 
     phi_sort = np.argsort(phi_array)
-    z_sort = np.argsort(z_array)
-    r_sort = np.argsort(r_array)
+    z_sort   = np.argsort(z_array)
+    r_sort   = np.argsort(r_array)
 
     occ_r = occ[r_sort]
     x_r_array = x_array[r_sort]
@@ -347,11 +394,20 @@ def remake_arrays(input_arr_):
         r_condense_hl = []
         r_err_condense_hl = []
         occ_r_condense_hl = []
-        for ir, r in enumerate(r_new_hl):
-            if ir % 2 == 0:
-                r_condense_hl.append((r+r_new_hl[ir+1])/2)
-                r_err_condense_hl.append(np.sqrt(r_err_new_hl[ir]**2+r_new_hl[ir+1]**2))
-                occ_r_condense_hl.append(np.mean([occ_r_hl[ir], occ_r_hl[ir+1]]))
+        #print("length of r_new_hl: {0}".format(len(r_new_hl)))
+        for i, r in enumerate(r_new_hl):
+            if i % 2 == 0:
+                #print("i = {0}, r = {1}".format(i, r))
+                # check i + 1 is still valid for the list
+                if i + 1 < len(r_new_hl):
+                    r_condense_hl.append(np.mean([r_new_hl[i], r_new_hl[i+1]]))
+                    r_err_condense_hl.append(np.sqrt(r_err_new_hl[i]**2 + r_new_hl[i+1]**2))
+                    occ_r_condense_hl.append(np.mean([occ_r_hl[i], occ_r_hl[i+1]]))
+                # if i + 1 is not valid, don't use i + 1
+                else:
+                    r_condense_hl.append(r_new_hl[i])
+                    r_err_condense_hl.append(r_err_new_hl[i])
+                    occ_r_condense_hl.append(occ_r_hl[i])
             else:
                 continue
 
@@ -402,16 +458,7 @@ def remake_arrays(input_arr_):
     rnp.fill_graph(gr_r3d, np.swapaxes([r_condense_comb, occ_r_condense_comb], 0, 1))
     gr_r3d.SetName("gr_r_occ_pm_comb")
 
-    #file_out = rt.TFile("output_0_charge_l200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_0p1_neg0p08_charge_l200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_neg0p1_0p2_charge_l200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_0p2_0p19_charge_l200_nosmear.root", "RECREATE")
-    file_out = rt.TFile("output_neg0p3_neg0p32_charge_l200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_0_charge_ge200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_0p1_neg0p08_charge_ge200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_neg0p1_0p2_charge_ge200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_0p2_0p19_charge_ge200_nosmear.root", "RECREATE")
-    #file_out = rt.TFile("output_neg0p3_neg0p32_charge_ge200_nosmear.root", "RECREATE")
+    file_out = rt.TFile(file_out_name, "RECREATE")
 
     gr_phi.Write()
     gr_z.Write()
@@ -425,32 +472,19 @@ def remake_arrays(input_arr_):
 
 
 if __name__ == "__main__":
-    #in_array = read_file("design_0_nosmear_ge_2pix.npy")
-    #in_array = read_file("design_0_no_outer_ge_2pix_smear.npy")
-    #in_array = read_file("design_1p0_no_outer_ge_2pix_smear.npy")
-    #in_array = read_file("design_0p1_0p08_no_outer_ge_2pix_smear.npy")
-    #in_array = read_file("design_0p1_neg0p08_no_outer_ge_2pix_smear.npy")
-    #in_array = read_file("design_z10_no_outer_ge_2pix.npy")
-    #in_array = read_file("design_zneg10_no_outer_ge_2pix.npy")
-    #in_array = read_file("design_0_nosmear_no_outer_ge_2pix.npy")
-    #in_array = read_file("design_0_no_outer_ge_2pix_nosmear_phifix.npy")
-    #in_array = read_file("design_z10_0_no_outer_ge_2pix_nosmear_phifix.npy")
-    #in_array = read_file("design_0p1_no_outer_ge_2pix_nosmear_phifix.npy")
-    #in_array = read_file("design_0_no_outer_ge_2pix_smear_phifix.npy")
-    #in_array = read_file("design_0p1_no_outer_ge_2pix_smear_phifix.npy")
-    #in_array = read_file("design_0_no_outer_all_pix_nosmear_phifix.npy")
-    #in_array = read_file("design_0p1_no_outer_all_pix_nosmear_phifix.npy")
-    #inrarray = read_file("design_0p2_no_outer_all_pix_nosmear.npy")
-    #in_array = read_file("design_0p3_no_outer_all_pix_nosmear.npy")
-    #in_array = read_file("design_0p1_II_no_outer_all_pix_nosmear.npy")
-    #in_array = read_file("design_0_no_outer_all_pix_nosmear_chargege200.npy")
-    #in_array = read_file("design_0p1_no_outer_all_pix_nosmear_chargege200.npy")
-    #in_array = read_file("design_0p1_II_no_outer_all_pix_nosmear_chargege200.npy")
-    #in_array = read_file("design_0p2_no_outer_all_pix_nosmear_chargege200.npy")
-    #in_array = read_file("design_0p3_no_outer_all_pix_nosmear_chargege200.npy")
-    #in_array = read_file("design_0_no_outer_all_pix_nosmear_chargel200.npy")
-    #in_array = read_file("design_0p1_no_outer_all_pix_nosmear_chargel200.npy")
-    #in_array = read_file("design_0p1_II_no_outer_all_pix_nosmear_chargel200.npy")
-    #in_array = read_file("design_0p2_no_outer_all_pix_nosmear_chargel200.npy")
-    in_array = read_file("design_0p3_no_outer_all_pix_nosmear_chargel200.npy")
-    remake_arrays(in_array)
+    output_dir = "output"
+    
+    makeDir(output_dir)
+    
+    in_array    = read_file("data/TTBar_AllClusters_zsmear.npy")
+    output_name = "{0}/TTBar_AllClusters_zsmear_histos_v2.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    
+    in_array    = read_file("data/SingleMuon_AllClusters.npy")
+    output_name = "{0}/SingleMuon_AllClusters_histos_v2.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    
+    in_array    = read_file("data/ZeroBias_AllClusters.npy")
+    output_name = "{0}/ZeroBias_AllClusters_histos_v2.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
