@@ -14,12 +14,13 @@ There are instructions for each of these provided below.
 
 ## Reading Clusters
 
-The script readClusters.py should be run in python 2 and requires these packages:
+The script readClusters.py should be run in python 2 and requires these packages (use cmsenv):
 - numpy
 - pyROOT
 
 You can run readClusters.py like this:
 ```
+cmsenv
 cd python
 python readClusters.py
 ```
@@ -61,6 +62,12 @@ In can be run like this:
 python python/plotHistos.py
 ```
 Depending on the number of root files loaded, the number of events, and the number of variables plotted, this script can take some time to run (e.g. 15 min).
+
+In addition, occupancy histograms can be created and saved to ROOT files using occupancy_histos_ladders.py.
+```
+cmsenv
+python3 python/occupancy_histos_ladders.py 
+```
 
 ## Fitting
 
