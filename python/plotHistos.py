@@ -71,6 +71,13 @@ def runData():
     isData          = True
     num_files       = 2
     run(input_directory, num_files, name, isData)
+    
+    # Min Bias
+    input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/MinimumBias2/crab_PixelTree_MinBias_2018C_RAW_v2/210707_165008/0000'
+    name            = "MinBias"
+    isData          = True
+    num_files       = 2
+    run(input_directory, num_files, name, isData)
 
 def runMC():
     # TTbar (Z smeared)
@@ -88,8 +95,8 @@ def runMC():
     run(input_directory, num_files, name, isData)
 
 def main():
-    #runData()
-    runMC()
+    runData()
+    #runMC()
 
 if __name__ == "__main__":
     main()
