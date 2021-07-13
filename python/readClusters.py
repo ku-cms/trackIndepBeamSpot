@@ -56,8 +56,12 @@ def make_cluster_map(input_files_):
             #if clus_size < 50: continue
 
             # cut on number of tracks per cluster
+            
+            # select on track clusters
             #if chain.ClTkN[icl] < 1: continue 
-            if chain.ClTkN[icl] >= 1: continue 
+            
+            # select off track clusters
+            #if chain.ClTkN[icl] >= 1: continue 
 
             row_cl    = int(event.ClRow[icl])
             col_cl    = int(event.ClCol[icl])
@@ -562,6 +566,16 @@ def runMinBias():
     num_files   = 2
     
     run(directory, output_file, message, num_files)
+
+def runTTBar():
+    
+    # TTBar with pileup
+    directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVRAW_eschmitzcrab_design_0p2/190930_182712/0000'
+    output_file = 'TTBar_pileup_0p2_AllClusters' 
+    message     = 'Running over TTBar PixelTrees.'
+    num_files   = 99
+    
+    run(directory, output_file, message, num_files)
     
 def main():
     # main
@@ -570,7 +584,8 @@ def main():
     
     #runSingleMuon()
     #runZeroBias()
-    runMinBias()
+    #runMinBias()
+    runTTBar()
     
     t_stop = time.time()
     print "run time (sec): {0}".format(t_stop - t_start)
