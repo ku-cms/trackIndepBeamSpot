@@ -412,21 +412,34 @@ if __name__ == "__main__":
     plot_name = "ZeroBias_OffTrack"
     remake_arrays(in_array, plot_dir, plot_name)
     
+    # MinBias
+    in_array = read_file(data_dir + "MinBias_2018C_AllClusters.npy")
+    plot_name = "MinBias_2018C_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "MinBias_2018C_OnTrack.npy")
+    plot_name = "MinBias_2018C_OnTrack"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "MinBias_2018C_OffTrack.npy")
+    plot_name = "MinBias_2018C_OffTrack"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
     # TTBar
-    #in_array = read_file(data_dir + "TTBar_AllClusters.npy")
-    #plot_name = "TTBar_AllClusters"
-    #remake_arrays(in_array, plot_dir, plot_name)
+    # in_array = read_file(data_dir + "TTBar_AllClusters.npy")
+    # plot_name = "TTBar_AllClusters"
+    # remake_arrays(in_array, plot_dir, plot_name)
     
     # TTBar zsmear
-    in_array = read_file(data_dir + "TTBar_AllClusters_zsmear.npy")
-    plot_name = "TTBar_AllClusters_zsmear"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "TTBar_OnTrack_zsmear.npy")
-    plot_name = "TTBar_OnTrack_zsmear"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "TTBar_OffTrack_zsmear.npy")
-    plot_name = "TTBar_OffTrack_zsmear"
-    remake_arrays(in_array, plot_dir, plot_name)
+    # in_array = read_file(data_dir + "TTBar_AllClusters_zsmear.npy")
+    # plot_name = "TTBar_AllClusters_zsmear"
+    # remake_arrays(in_array, plot_dir, plot_name)
+    # 
+    # in_array = read_file(data_dir + "TTBar_OnTrack_zsmear.npy")
+    # plot_name = "TTBar_OnTrack_zsmear"
+    # remake_arrays(in_array, plot_dir, plot_name)
+    # 
+    # in_array = read_file(data_dir + "TTBar_OffTrack_zsmear.npy")
+    # plot_name = "TTBar_OffTrack_zsmear"
+    # remake_arrays(in_array, plot_dir, plot_name)
 
