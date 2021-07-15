@@ -567,13 +567,23 @@ def runMinBias():
     
     run(directory, output_file, message, num_files)
 
-def runTTBar():
+def runTTBarPU():
     
     # TTBar with pileup
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVRAW_eschmitzcrab_design_0p2/190930_182712/0000'
     output_file = 'TTBar_pileup_0p2_AllClusters' 
-    message     = 'Running over TTBar PixelTrees.'
+    message     = 'Running over TTBar PU PixelTrees.'
     num_files   = 99
+    
+    run(directory, output_file, message, num_files)
+
+def runTTBar():
+    
+    # TTBar without pileup
+    directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000'
+    output_file = 'TTBar_0p2_AllClusters' 
+    message     = 'Running over TTBar PixelTrees.'
+    num_files   = 98
     
     run(directory, output_file, message, num_files)
     
@@ -585,6 +595,7 @@ def main():
     #runSingleMuon()
     #runZeroBias()
     #runMinBias()
+    #runTTBarPU()
     runTTBar()
     
     t_stop = time.time()
