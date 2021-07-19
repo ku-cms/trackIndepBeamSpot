@@ -109,8 +109,8 @@ def runMC():
     run(input_directory, num_files, name, isData)
 
 def main():
-    runData()
-    #runMC()
+    #runData()
+    runMC()
 
 if __name__ == "__main__":
     main()
