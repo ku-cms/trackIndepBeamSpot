@@ -93,6 +93,20 @@ def runMC():
     isData          = False
     num_files       = 200
     run(input_directory, num_files, name, isData)
+    
+    # TTbar with pileup (x = 0.2)
+    input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVRAW_eschmitzcrab_design_0p2/190930_182712/0000'
+    name            = "TTbar_Pileup_0p2"
+    isData          = False
+    num_files       = 100
+    run(input_directory, num_files, name, isData)
+
+    # TTbar without pileup (x = 0.2)
+    input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000'
+    name            = "TTbar_NoPileup_0p2"
+    isData          = False
+    num_files       = 100
+    run(input_directory, num_files, name, isData)
 
 def main():
     runData()

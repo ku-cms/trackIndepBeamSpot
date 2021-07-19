@@ -553,7 +553,19 @@ def runZeroBias():
     
     run(directory, output_file, message, num_files)
 
-def runMinBias():
+def runMinBias2017B():
+    
+    # Min Bias
+    directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/MinimumBias/crab_PixelTree_MinBias_2017B_RAW_v3/210715_152921/0000'
+    output_file = 'MinBias_2017B_AllClusters.npy' 
+    #output_file = 'MinBias_2017B_OnTrack.npy' 
+    #output_file = 'MinBias_2017B_OffTrack.npy' 
+    message     = 'Running over MinBias PixelTrees.'
+    num_files   = 30
+    
+    run(directory, output_file, message, num_files)
+
+def runMinBias2018C():
     
     # Min Bias
     # 1 file:   41084 events
@@ -571,7 +583,9 @@ def runTTBarPU():
     
     # TTBar with pileup
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVRAW_eschmitzcrab_design_0p2/190930_182712/0000'
-    output_file = 'TTBar_pileup_0p2_AllClusters' 
+    #output_file = 'TTBar_pileup_0p2_AllClusters.py' 
+    #output_file = 'TTBar_pileup_0p2_OnTrack.py' 
+    output_file = 'TTBar_pileup_0p2_OffTrack.py' 
     message     = 'Running over TTBar PU PixelTrees.'
     num_files   = 99
     
@@ -581,7 +595,9 @@ def runTTBar():
     
     # TTBar without pileup
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000'
-    output_file = 'TTBar_0p2_AllClusters' 
+    #output_file = 'TTBar_0p2_AllClusters.py' 
+    #output_file = 'TTBar_0p2_OnTrack.py' 
+    output_file = 'TTBar_0p2_OffTrack.py' 
     message     = 'Running over TTBar PixelTrees.'
     num_files   = 98
     
@@ -594,9 +610,10 @@ def main():
     
     #runSingleMuon()
     #runZeroBias()
-    #runMinBias()
+    runMinBias2017B()
+    #runMinBias2018C()
     #runTTBarPU()
-    runTTBar()
+    #runTTBar()
     
     t_stop = time.time()
     print "run time (sec): {0}".format(t_stop - t_start)
