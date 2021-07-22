@@ -36,8 +36,8 @@ def remake_arrays(input_arr_, file_out_name):
     inner_array = np.array([row for row in input_arr_ if not np.all(row==None)])
     cleaned_array = np.array([[x if x is not None else [0, np.nan, np.nan, np.nan] for x in row]
                               for row in inner_array])
-    r_min = np.nanmin(cleaned_array[:, :, 1])
-    r_max = np.nanmax(cleaned_array[:, :, 1])
+    #r_min = np.nanmin(cleaned_array[:, :, 1])
+    #r_max = np.nanmax(cleaned_array[:, :, 1])
 
     # separate pixels into groups corresponding to rocs in phi and z
     array_by_rocs = np.array([cleaned_array[j*w_phi_bins:(j+1)*w_phi_bins, i*w_z_bins:(i+1)*w_z_bins] for i in range(n_z_bins) for j in range(n_phi_bins)])
@@ -339,9 +339,14 @@ def remake_arrays(input_arr_, file_out_name):
     occ_r_condense_comb = []
     for ir, r in enumerate(r_condense):
         if ir % 2 == 0:
-            r_condense_comb.append((r+r_condense[ir+1])/2)
-            r_err_condense_comb.append(np.sqrt(r_err_condense[ir]**2+r_err_condense[ir+1]**2))
-            occ_r_condense_comb.append(np.mean([occ_r_condense[ir], occ_r_condense[ir+1]]))
+            if ir+1 < len(r_condense):
+                r_condense_comb.append((r+r_condense[ir+1])/2)
+                r_err_condense_comb.append(np.sqrt(r_err_condense[ir]**2+r_err_condense[ir+1]**2))
+                occ_r_condense_comb.append(np.sum([occ_r_condense[ir]+occ_r_condense[ir+1]]))
+            else:
+                r_condense_comb.append(r)
+                r_err_condense_comb.append(r_err_condense[ir])
+                occ_r_condense_comb.append(occ_r_condense[ir])
         else:
             continue
     ########### end condensing for projections ################
@@ -402,7 +407,7 @@ def remake_arrays(input_arr_, file_out_name):
                 if i + 1 < len(r_new_hl):
                     r_condense_hl.append(np.mean([r_new_hl[i], r_new_hl[i+1]]))
                     r_err_condense_hl.append(np.sqrt(r_err_new_hl[i]**2 + r_new_hl[i+1]**2))
-                    occ_r_condense_hl.append(np.mean([occ_r_hl[i], occ_r_hl[i+1]]))
+                    occ_r_condense_hl.append(np.sum([occ_r_hl[i]+occ_r_hl[i+1]]))
                 # if i + 1 is not valid, don't use i + 1
                 else:
                     r_condense_hl.append(r_new_hl[i])
@@ -475,16 +480,100 @@ if __name__ == "__main__":
     output_dir = "output"
     
     makeDir(output_dir)
-    
+    '''
     in_array    = read_file("data/TTBar_AllClusters_zsmear.npy")
-    output_name = "{0}/TTBar_AllClusters_zsmear_histos_v2.root".format(output_dir)
+    output_name = "{0}/TTBar_AllClusters_zsmear.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/TTBar_OnTrack_zsmear.npy")
+    output_name = "{0}/TTBar_OnTrack_zsmear.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/TTBar_OffTrack_zsmear.npy")
+    output_name = "{0}/TTBar_OffTrack_zsmear.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    
+    in_array    = read_file("data/TTBar_AllClusters.npy")
+    output_name = "{0}/TTBar_AllClusters.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/TTBar_OnTrack.npy")
+    output_name = "{0}/TTBar_OnTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/TTBar_OffTrack.npy")
+    output_name = "{0}/TTBar_OffTrack.root".format(output_dir)
     remake_arrays(in_array, output_name)
     
     in_array    = read_file("data/SingleMuon_AllClusters.npy")
-    output_name = "{0}/SingleMuon_AllClusters_histos_v2.root".format(output_dir)
+    output_name = "{0}/SingleMuon_AllClusters.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    
+    in_array    = read_file("data/SingleMuon_OnTrack.npy")
+    output_name = "{0}/SingleMuon_OnTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/SingleMuon_OffTrack.npy")
+    output_name = "{0}/SingleMuon_OffTrack.root".format(output_dir)
     remake_arrays(in_array, output_name)
     
     in_array    = read_file("data/ZeroBias_AllClusters.npy")
-    output_name = "{0}/ZeroBias_AllClusters_histos_v2.root".format(output_dir)
+    output_name = "{0}/ZeroBias_AllClusters.root".format(output_dir)
     remake_arrays(in_array, output_name)
 
+    in_array    = read_file("data/ZeroBias_OnTrack.npy")
+    output_name = "{0}/ZeroBias_OnTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/ZeroBias_OffTrack.npy")
+    output_name = "{0}/ZeroBias_OffTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    
+    in_array    = read_file("data/TTBar_0p2_AllClusters.npy")
+    output_name = "{0}/TTBar_0p2_AllClusters.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/TTBar_0p2_OnTrack.py.npy")
+    output_name = "{0}/TTBar_0p2_OnTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/TTBar_0p2_OffTrack.py.npy")
+    output_name = "{0}/TTBar_0p2_OffTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/TTBar_pileup_0p2_AllClusters.npy")
+    output_name = "{0}/TTBar_pileup_0p2_AllClusters.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/TTBar_pileup_0p2_OnTrack.py.npy")
+    output_name = "{0}/TTBar_pileup_0p2_OnTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/TTBar_pileup_0p2_OffTrack.py.npy")
+    output_name = "{0}/TTBar_pileup_0p2_OffTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+   
+    in_array    = read_file("data/MinBias_2017B_AllClusters.npy")
+    output_name = "{0}/MinBias_2017B_AllClusters.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    
+    in_array    = read_file("data/MinBias_2017B_OnTrack.npy")
+    output_name = "{0}/MinBias_2017B_OnTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/MinBias_2017B_OffTrack.npy")
+    output_name = "{0}/MinBias_2017B_OffTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    '''
+    in_array    = read_file("data/MinBias_2018C_AllClusters.npy")
+    output_name = "{0}/MinBias_2018C_AllClusters.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/MinBias_2018C_OffTrack.npy")
+    output_name = "{0}/MinBias_2018C_OffTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+
+    in_array    = read_file("data/MinBias_2018C_OnTrack.npy")
+    output_name = "{0}/MinBias_2018C_OnTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    

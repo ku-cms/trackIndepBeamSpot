@@ -144,7 +144,7 @@ def remake_arrays(input_arr_):
         r = np.concatenate(array_by_rocs[roc, :, :, 1])
         phi = np.concatenate(array_by_rocs[roc, :, :, 2])
         z = np.concatenate(array_by_rocs[roc, :, :, 3])
-        z_avg = np.nanmean(z)
+        #z_avg = np.nanmean(z)
 
         x = r[~np.isnan(z)] * np.cos(phi[~np.isnan(z)])
         y = r[~np.isnan(z)] * np.sin(phi[~np.isnan(z)])
@@ -319,7 +319,7 @@ def gauss(x, ga, gb, gc):
 
 
 if __name__ == "__main__":
-    in_array = read_file("design_0_no_outer_all_pix_smear.npy")
+    #in_array = read_file("design_0_no_outer_all_pix_smear.npy")
     #in_array = read_file("design_0p1_no_outer_all_pix_smear.npy")
     #in_array = read_file("design_0p1_0p08_no_outer_all_pix_smear.npy")
     #in_array = read_file("design_neg0p1_0p08_no_outer_all_pix_smear.npy")
@@ -359,4 +359,11 @@ if __name__ == "__main__":
     #in_array = read_file("design_0p1_no_outer_all_pix_smear_25k.npy")
     #in_array = read_file("design_0p2_no_outer_all_pix_smear_25k.npy")
     #in_array = read_file("design_0p3_no_outer_all_pix_smear_25k.npy")
+
+    in_array = read_file("SingleMuon_AllClusters.npy")
+    #in_array = read_file("SingleMuon_OffTrack.npy")
+    #in_array = read_file("SingleMuon_OnTrack.npy")
+    #in_array = read_file("ZeroBias_AllClusters.npy")
+    #in_array = read_file("ZeroBias_OffTrack.npy")
+    #in_array = read_file("ZeroBias_OnTrack.npy")
     remake_arrays(in_array)
