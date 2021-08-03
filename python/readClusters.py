@@ -51,7 +51,9 @@ def make_cluster_map(input_files_):
             clus_size = chain.ClSize[icl]
             clus_size_x = chain.ClSizeX[icl]
             clus_size_y = chain.ClSizeY[icl]
-            #if clus_size < 1: continue
+            
+            # cut on cluster size
+            if clus_size < 2: continue
             #if clus_size > 50: continue
             #if clus_size < 50: continue
 
@@ -531,12 +533,13 @@ def runSingleMuon():
     
     # Single Muon
     # 7041 events in first file, about 2.6 hours run time
-    #  1 file:   7041 events
-    # 12 files: 70667 events
+    #  1 file:    7041 events
+    # 12 files:  70667 events
+    # 20 files: 115126 events
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
-    output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_SingleMuon_v2.npy'
+    output_file = 'SingleMuon_ClusterSize2_AllClusters.npy'
     message     = 'Running over SingleMuon PixelTrees.'
-    num_files   = 12
+    num_files   = 20
 
     run(directory, output_file, message, num_files)
 
@@ -544,12 +547,13 @@ def runZeroBias():
     
     # Zero Bias
     # 1354 events in first file, about 0.5 hours run time
-    # 1 file:   1354 events
-    # 2 files: 69598 events
+    # 1 file:    1354 events
+    # 2 files:  69598 events
+    # 3 files: 137809 events
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
-    output_file = 'design_0p1_no_outer_all_pix_smear_charge_l1000_size_1_50_ZeroBias_v2.npy' 
+    output_file = 'ZeroBias_ClusterSize2_AllClusters.npy' 
     message     = 'Running over ZeroBias PixelTrees.'
-    num_files   = 2
+    num_files   = 3
     
     run(directory, output_file, message, num_files)
 
@@ -570,12 +574,14 @@ def runMinBias2018C():
     # Min Bias
     # 1 file:   41084 events
     # 2 files:  82206 events
+    # 3 files: 123718 events
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/MinimumBias2/crab_PixelTree_MinBias_2018C_RAW_v2/210707_165008/0000'
+    output_file = 'MinBias_2018C_ClusterSize2_AllClusters.npy' 
     #output_file = 'MinBias_2018C_AllClusters.npy' 
     #output_file = 'MinBias_2018C_OnTrack.npy' 
-    output_file = 'MinBias_2018C_OffTrack.npy' 
+    #output_file = 'MinBias_2018C_OffTrack.npy' 
     message     = 'Running over MinBias PixelTrees.'
-    num_files   = 2
+    num_files   = 3
     
     run(directory, output_file, message, num_files)
 
@@ -583,9 +589,10 @@ def runTTBarPU():
     
     # TTBar with pileup
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVRAW_eschmitzcrab_design_0p2/190930_182712/0000'
-    #output_file = 'TTBar_pileup_0p2_AllClusters.py' 
-    #output_file = 'TTBar_pileup_0p2_OnTrack.py' 
-    output_file = 'TTBar_pileup_0p2_OffTrack.py' 
+    output_file = 'TTBar_pileup_0p2_ClusterSize2_AllClusters.npy' 
+    #output_file = 'TTBar_pileup_0p2_AllClusters.npy' 
+    #output_file = 'TTBar_pileup_0p2_OnTrack.npy' 
+    #output_file = 'TTBar_pileup_0p2_OffTrack.npy' 
     message     = 'Running over TTBar PU PixelTrees.'
     num_files   = 99
     
@@ -595,9 +602,10 @@ def runTTBar():
     
     # TTBar without pileup
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p2_GEN_SIM/190819_222136/0000'
-    #output_file = 'TTBar_0p2_AllClusters.py' 
-    #output_file = 'TTBar_0p2_OnTrack.py' 
-    output_file = 'TTBar_0p2_OffTrack.py' 
+    output_file = 'TTBar_0p2_ClusterSize2_AllClusters.npy' 
+    #output_file = 'TTBar_0p2_AllClusters.npy' 
+    #output_file = 'TTBar_0p2_OnTrack.npy' 
+    #output_file = 'TTBar_0p2_OffTrack.npy' 
     message     = 'Running over TTBar PixelTrees.'
     num_files   = 98
     
@@ -610,10 +618,10 @@ def main():
     
     #runSingleMuon()
     #runZeroBias()
-    runMinBias2017B()
+    #runMinBias2017B()
     #runMinBias2018C()
     #runTTBarPU()
-    #runTTBar()
+    runTTBar()
     
     t_stop = time.time()
     print "run time (sec): {0}".format(t_stop - t_start)
