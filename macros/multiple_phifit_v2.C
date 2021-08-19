@@ -1,6 +1,6 @@
 // fit 64 phi ring TGraphs
 
-void multiple_phifit() {
+void multiple_phifit_v2() {
   
   gStyle->SetOptFit(111);
   gStyle->SetStatW(0.1);                
@@ -31,12 +31,14 @@ void multiple_phifit() {
     g[i]->Fit(f, "R");
     g[i]->SetTitle(Form("%s gr_phi_occ_ring_%d", h.c_str(), i));
     g[i]->SetMarkerStyle(20);
+    //g[i]->GetYaxis()->SetRangeUser(0.0,  20000.0);
+    g[i]->GetYaxis()->SetRangeUser(0.0, 100000.0);
    
     c[i]->cd();
     g[i]->Draw("AP");
 
     amp[i] = f->GetParameter(0);
-    s[i] = f->GetParameter(1);
+    s[i]   = f->GetParameter(1);
     avg[i] = f->GetParameter(2);
   }
 
