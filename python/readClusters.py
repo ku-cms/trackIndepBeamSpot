@@ -529,6 +529,12 @@ def run(directory, output_file, message, num_files):
     occ_map = make_cluster_map(file_list)  
     np.save(output_file, occ_map)
 
+def runSingleMuon2017B():
+    directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2017B_RAW_v1/210810_160009/0000' 
+    output_file = 'SingleMuon_2017B_AllClusters.npy'
+    message     = 'Running over SingleMuon PixelTrees.'
+    run(directory, output_file, message, num_files)
+
 def runSingleMuon():
     
     # Single Muon
@@ -621,7 +627,9 @@ def main():
     #runMinBias2017B()
     #runMinBias2018C()
     #runTTBarPU()
-    runTTBar()
+    #runTTBar()
+
+    runSingleMuon2017B()
     
     t_stop = time.time()
     print "run time (sec): {0}".format(t_stop - t_start)

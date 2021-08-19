@@ -365,6 +365,10 @@ def f_example(x, y):
 
 def runSingleMuon(data_dir, plot_dir):
     # SingleMuon
+    in_array = read_file(data_dir + "SingleMuon_ClusterSize2_AllClusters.npy")
+    plot_name = "SingleMuon_ClusterSize2_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+
     in_array = read_file(data_dir + "SingleMuon_AllClusters.npy")
     plot_name = "SingleMuon_AllClusters"
     remake_arrays(in_array, plot_dir, plot_name)
@@ -379,6 +383,10 @@ def runSingleMuon(data_dir, plot_dir):
 
 def runZeroBias(data_dir, plot_dir):
     # ZeroBias
+    in_array = read_file(data_dir + "ZeroBias_ClusterSize2_AllClusters.npy")
+    plot_name = "ZeroBias_ClusterSize2_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
     in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
     plot_name = "ZeroBias_AllClusters"
     remake_arrays(in_array, plot_dir, plot_name)
@@ -407,6 +415,10 @@ def runMinBias2017B(data_dir, plot_dir):
 
 def runMinBias2018C(data_dir, plot_dir):
     # MinBias 2018C
+    in_array = read_file(data_dir + "MinBias_2018C_ClusterSize2_AllClusters.npy")
+    plot_name = "MinBias_2018C_ClusterSize2_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
     in_array = read_file(data_dir + "MinBias_2018C_AllClusters.npy")
     plot_name = "MinBias_2018C_AllClusters"
     remake_arrays(in_array, plot_dir, plot_name)
@@ -421,6 +433,14 @@ def runMinBias2018C(data_dir, plot_dir):
 
 def runTTBar(data_dir, plot_dir):
     # TTBar
+    in_array = read_file(data_dir + "TTBar_pileup_0p2_ClusterSize2_AllClusters.npy")
+    plot_name = "TTBar_pileup_0p2_ClusterSize2_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "TTBar_0p2_ClusterSize2_AllClusters.npy")
+    plot_name = "TTBar_0p2_ClusterSize2_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
     in_array = read_file(data_dir + "TTBar_AllClusters.npy")
     plot_name = "TTBar_AllClusters"
     remake_arrays(in_array, plot_dir, plot_name)
@@ -459,6 +479,6 @@ if __name__ == "__main__":
     #runSingleMuon(data_dir, plot_dir)
     #runZeroBias(data_dir, plot_dir)
     #runMinBias2017B(data_dir, plot_dir)
-    runMinBias2018C(data_dir, plot_dir)
-    #runTTBar(data_dir, plot_dir)
+    #runMinBias2018C(data_dir, plot_dir)
+    runTTBar(data_dir, plot_dir)
 
