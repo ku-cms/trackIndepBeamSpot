@@ -428,20 +428,36 @@ def remake_arrays(input_arr_, file_out_name):
         rnp.fill_graph(gr_z_hl[hl], np.swapaxes([z_new_hl, occ_z_hl], 0, 1))
         gr_z_hl[hl].SetName("gr_z_occ_hl_" + str(hl))
 
-    gr_phi_ring = []
+    # WARNING: this is the wrong way to remove NANs for 2D matrix:
+    # because the final array is flattened into 1D after using the mask
     #z_ring     = np.array(z_ring)
     #z_ring     = z_ring[~np.isnan(z_ring)]
+
+    # remove NANs
+    for i in range(len(z_ring)):
+        z_i = np.array(z_ring[i])
+        mask = ~np.isnan(z_i)
+        z_i_new = z_i[mask]
+        z_ring[i] = z_i_new
+    
+    gr_phi_ring = []
     z_avg_ring = np.array([np.mean(z) for z in z_ring])
     avg_z_sort = np.argsort(z_avg_ring)
+    
+    print("length z_ring: {0}".format(len(z_ring)))
+    print("length z_avg_ring: {0}".format(len(z_avg_ring)))
+    print("length avg_z_sort: {0}".format(len(avg_z_sort)))
+    for i in range(len(z_ring)):
+        print("length of z[{0}]: {1}".format(i, len(z_ring[i])))
+    #print("z_ring: {0}".format(z_ring))
+    #print("z_avg_ring: {0}".format(z_avg_ring))
+    #print("avg_z_sort: {0}".format(avg_z_sort))
     
     occ_ring = np.array(occ_ring)
     phi_ring = np.array(phi_ring)
     phi_ring = phi_ring[avg_z_sort]
     occ_ring = occ_ring[avg_z_sort]
     z_avg_ring_sorted = z_avg_ring[avg_z_sort]
-
-    print("z_avg_ring: {0}".format(z_avg_ring))
-    print("avg_z_sort: {0}".format(avg_z_sort))
 
     for ring in range(n_rings):
         print("ring {0}: z = {1}".format(ring, z_avg_ring_sorted[ring]))
@@ -489,12 +505,19 @@ if __name__ == "__main__":
     
     makeDir(output_dir)
     
+    #in_array    = read_file("data/TTBar_AllClusters_zsmear.npy")
+    #output_name = "{0}/TTBar_AllClusters_zsmear.root".format(output_dir)
+    #remake_arrays(in_array, output_name)
+    
+    in_array    = read_file("data/SingleMuon_AllClusters.npy")
+    output_name = "{0}/SingleMuon_AllClusters.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    
+    '''
     in_array    = read_file("data/TTBar_AllClusters_zsmear.npy")
     output_name = "{0}/TTBar_AllClusters_zsmear.root".format(output_dir)
     remake_arrays(in_array, output_name)
     
-    '''
-
     in_array    = read_file("data/TTBar_OnTrack_zsmear.npy")
     output_name = "{0}/TTBar_OnTrack_zsmear.root".format(output_dir)
     remake_arrays(in_array, output_name)
@@ -574,17 +597,17 @@ if __name__ == "__main__":
     in_array    = read_file("data/MinBias_2017B_OffTrack.npy")
     output_name = "{0}/MinBias_2017B_OffTrack.root".format(output_dir)
     remake_arrays(in_array, output_name)
-    '''
     
-    #in_array    = read_file("data/MinBias_2018C_AllClusters.npy")
-    #output_name = "{0}/MinBias_2018C_AllClusters.root".format(output_dir)
-    #remake_arrays(in_array, output_name)
+    in_array    = read_file("data/MinBias_2018C_AllClusters.npy")
+    output_name = "{0}/MinBias_2018C_AllClusters.root".format(output_dir)
+    remake_arrays(in_array, output_name)
 
-    #in_array    = read_file("data/MinBias_2018C_OffTrack.npy")
-    #output_name = "{0}/MinBias_2018C_OffTrack.root".format(output_dir)
-    #remake_arrays(in_array, output_name)
+    in_array    = read_file("data/MinBias_2018C_OffTrack.npy")
+    output_name = "{0}/MinBias_2018C_OffTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
 
-    #in_array    = read_file("data/MinBias_2018C_OnTrack.npy")
-    #output_name = "{0}/MinBias_2018C_OnTrack.root".format(output_dir)
-    #remake_arrays(in_array, output_name)
+    in_array    = read_file("data/MinBias_2018C_OnTrack.npy")
+    output_name = "{0}/MinBias_2018C_OnTrack.root".format(output_dir)
+    remake_arrays(in_array, output_name)
+    '''
     
