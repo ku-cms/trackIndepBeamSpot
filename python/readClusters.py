@@ -53,7 +53,7 @@ def make_cluster_map(input_files_):
             clus_size_y = chain.ClSizeY[icl]
             
             # cut on cluster size
-            #if clus_size < 2: continue
+            if clus_size < 2: continue
             #if clus_size > 50: continue
             #if clus_size < 50: continue
 
@@ -530,9 +530,13 @@ def run(directory, output_file, message, num_files):
     np.save(output_file, occ_map)
 
 def runSingleMuon2017B():
+    # Single Muon 2017B
+    # 20 files: 125008 events
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2017B_RAW_v1/210810_160009/0000' 
-    output_file = 'SingleMuon_2017B_AllClusters.npy'
-    message     = 'Running over SingleMuon PixelTrees.'
+    #output_file = 'SingleMuon_2017B_MoreEvents_AllClusters.npy'
+    output_file = 'SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters.npy'
+    message     = 'Running over SingleMuon 2017B PixelTrees.'
+    num_files   = 20
     run(directory, output_file, message, num_files)
 
 def runSingleMuon2018C():
@@ -569,7 +573,7 @@ def runMinBias2017B():
     
     # Min Bias
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/MinimumBias/crab_PixelTree_MinBias_2017B_RAW_v3/210715_152921/0000'
-    output_file = 'MinBias_2017B_AllClusters.npy' 
+    output_file = 'MinBias_2017B_MoreEvents_AllClusters.npy' 
     #output_file = 'MinBias_2017B_OnTrack.npy' 
     #output_file = 'MinBias_2017B_OffTrack.npy' 
     message     = 'Running over MinBias PixelTrees.'
@@ -627,12 +631,12 @@ def main():
     
     #runSingleMuon2018C()
     #runZeroBias2018C()
-    runMinBias2018C()
+    #runMinBias2018C()
     #runTTBarPU()
     #runTTBar()
 
     #runMinBias2017B()
-    #runSingleMuon2017B()
+    runSingleMuon2017B()
     
     t_stop = time.time()
     print "run time (sec): {0}".format(t_stop - t_start)
