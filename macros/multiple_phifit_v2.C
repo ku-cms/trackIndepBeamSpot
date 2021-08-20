@@ -6,7 +6,6 @@ void multiple_phifit_v2() {
   gStyle->SetStatW(0.1);                
   gStyle->SetStatH(0.1);
   gStyle->SetStatY(0.99);
-  gStyle->SetStatY(0.99);
   gStyle->SetTitleFontSize(0.04);
 
   //string h  = "TTBar_pileup_0p2_AllClusters";

@@ -8,16 +8,26 @@
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "TAxis.h"
+#include "TStyle.h"
 
-void fit(std::string input_file, std::string input_dir, std::string plot_dir)
+void fit(std::string input_file, std::string input_dir, std::string plot_dir, double y_min, double y_max)
 {
     std::cout << "Fitting for input file: " << input_file << std::endl;
+    
+    gStyle->SetOptFit(111);
+    gStyle->SetStatW(0.1);                
+    gStyle->SetStatH(0.1);
+    gStyle->SetStatY(0.99);
+    gStyle->SetTitleFontSize(0.04);
+
+    double pi = 3.14159265;
+    
     TFile *a = new TFile(Form("%s/%s.root", input_dir.c_str(), input_file.c_str()), "READ");
-    TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -3.14159265, 3.14159265);
+    TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -1 * pi, pi);
     f->SetParNames("amp", "shift", "avg");
     f->SetParameters(1000, 0, 1.0e4);
     f->SetParLimits(0, 0, 1e8);
-    f->SetParLimits(1, -3.14159265, 3.14159265);
+    f->SetParLimits(1, -1 * pi, pi);
     
     double amp[64], s[64], avg[64];
     TGraph  *g[64];
@@ -31,8 +41,7 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir)
         g[i]->Fit(f, "R");
         g[i]->SetTitle(Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i));
         g[i]->SetMarkerStyle(20);
-        //g[i]->GetYaxis()->SetRangeUser(0.0,  20000.0);
-        g[i]->GetYaxis()->SetRangeUser(0.0, 100000.0);
+        g[i]->GetYaxis()->SetRangeUser(y_min, y_max);
    
         c[i]->cd();
         g[i]->Draw("AP");
@@ -64,14 +73,21 @@ void loop()
 {
     std::string input_dir = "output";
     std::string plot_dir  = "phi_fit_plots";
+    
     std::vector<std::string> input_files;
+    std::vector<double> y_min_vals;
+    std::vector<double> y_max_vals;
+    
     input_files.push_back("TTBar_AllClusters_zsmear");
     input_files.push_back("SingleMuon_AllClusters");
-    //input_files.push_back("output/TTBar_AllClusters_zsmear.root");
-    //input_files.push_back("output/SingleMuon_AllClusters.root");
+    y_min_vals.push_back(0.0); 
+    y_min_vals.push_back(0.0); 
+    y_max_vals.push_back(20000.0);
+    y_max_vals.push_back(100000.0);
+
     for (int i = 0; i < input_files.size(); ++i)
     {
-        fit(input_files[i], input_dir, plot_dir);
+        fit(input_files[i], input_dir, plot_dir, y_min_vals[i], y_max_vals[i]);
     }
 }
 
