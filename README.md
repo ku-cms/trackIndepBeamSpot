@@ -69,7 +69,20 @@ cmsenv
 python3 python/occupancy_histos_ladders.py 
 ```
 
-## Fitting
+## Fitting with ROOT
+
+Fitting with ROOT macro:
+```
+root multiple_phifit_v2.C
+```
+
+Fitting with ROOT in C++:
+```
+g++ src/phi_fit.cpp -o bin/phi_fit `root-config --cflags --glibs --ldflags` --std=c++2a
+./bin/phi_fit
+```
+
+## Fitting with iminuit
 
 The fitting scripts should be run in Python 3 and require these packages:
 - numpy
