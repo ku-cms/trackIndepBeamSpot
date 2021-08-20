@@ -15,11 +15,11 @@ void multiple_phifit() {
 
   TFile *a = new TFile(Form("%s.root", h.c_str()), "READ");
 
-  TF1 *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -3.1415926, 3.1415926);
+  TF1 *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -3.14159265, 3.14159265);
   f->SetParNames("amp", "shift", "avg");
   f->SetParameters(1000, 0, 1.0e4);
   f->SetParLimits(0, 0, 1e8);
-  f->SetParLimits(1, -3.1415926, 3.1415926);
+  f->SetParLimits(1, -3.14159265, 3.14159265);
   
   double amp[64], s[64], avg[64];
   TGraph *g[64];
