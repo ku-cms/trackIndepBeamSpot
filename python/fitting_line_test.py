@@ -363,10 +363,24 @@ def f_example(x, y):
     c3 = 1.0e3
     return (a1*np.sin(y-b2)+a3) * (1 / np.abs(x) ** (b1*np.sin(y-b2)+b3)) + (c1*np.sin(y-b2)+c3)
 
-def runSingleMuon(data_dir, plot_dir):
-    # SingleMuon
-    in_array = read_file(data_dir + "SingleMuon_ClusterSize2_AllClusters.npy")
-    plot_name = "SingleMuon_ClusterSize2_AllClusters"
+def runSingleMuon2017B(data_dir, plot_dir):
+    # SingleMuon 2017B
+    in_array = read_file(data_dir + "SingleMuon_2017B_MoreEvents_AllClusters.npy")
+    plot_name = "SingleMuon_2017B_MoreEvents_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+
+    in_array = read_file(data_dir + "SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters.npy")
+    plot_name = "SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+
+def runSingleMuon2018C(data_dir, plot_dir):
+    # SingleMuon 2018C
+    in_array = read_file(data_dir + "SingleMuon_MoreEvents_AllClusters.npy")
+    plot_name = "SingleMuon_MoreEvents_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+
+    in_array = read_file(data_dir + "SingleMuon_MoreEvents_ClusterSize2_AllClusters.npy")
+    plot_name = "SingleMuon_MoreEvents_ClusterSize2_AllClusters"
     remake_arrays(in_array, plot_dir, plot_name)
 
     in_array = read_file(data_dir + "SingleMuon_AllClusters.npy")
@@ -383,8 +397,12 @@ def runSingleMuon(data_dir, plot_dir):
 
 def runZeroBias(data_dir, plot_dir):
     # ZeroBias
-    in_array = read_file(data_dir + "ZeroBias_ClusterSize2_AllClusters.npy")
-    plot_name = "ZeroBias_ClusterSize2_AllClusters"
+    in_array = read_file(data_dir + "ZeroBias_MoreEvents_AllClusters.npy")
+    plot_name = "ZeroBias_MoreEvents_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "ZeroBias_MoreEvents_ClusterSize2_AllClusters.npy")
+    plot_name = "ZeroBias_MoreEvents_ClusterSize2_AllClusters"
     remake_arrays(in_array, plot_dir, plot_name)
     
     in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
@@ -415,8 +433,12 @@ def runMinBias2017B(data_dir, plot_dir):
 
 def runMinBias2018C(data_dir, plot_dir):
     # MinBias 2018C
-    in_array = read_file(data_dir + "MinBias_2018C_ClusterSize2_AllClusters.npy")
-    plot_name = "MinBias_2018C_ClusterSize2_AllClusters"
+    in_array = read_file(data_dir + "MinBias_2018C_MoreEvents_AllClusters.npy")
+    plot_name = "MinBias_2018C_MoreEvents_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "MinBias_2018C_MoreEvents_ClusterSize2_AllClusters.npy")
+    plot_name = "MinBias_2018C_MoreEvents_ClusterSize2_AllClusters"
     remake_arrays(in_array, plot_dir, plot_name)
     
     in_array = read_file(data_dir + "MinBias_2018C_AllClusters.npy")
@@ -433,6 +455,14 @@ def runMinBias2018C(data_dir, plot_dir):
 
 def runTTBar(data_dir, plot_dir):
     # TTBar
+    in_array = read_file(data_dir + "TTBar_pileup_0p2_AllClusters.npy")
+    plot_name = "TTBar_pileup_0p2_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
+    in_array = read_file(data_dir + "TTBar_0p2_AllClusters.npy")
+    plot_name = "TTBar_0p2_AllClusters"
+    remake_arrays(in_array, plot_dir, plot_name)
+    
     in_array = read_file(data_dir + "TTBar_pileup_0p2_ClusterSize2_AllClusters.npy")
     plot_name = "TTBar_pileup_0p2_ClusterSize2_AllClusters"
     remake_arrays(in_array, plot_dir, plot_name)
@@ -476,8 +506,9 @@ if __name__ == "__main__":
     if plot_dir[-1] != "/":
         plot_dir += "/"
     
-    #runSingleMuon(data_dir, plot_dir)
     #runZeroBias(data_dir, plot_dir)
+    #runSingleMuon2017B(data_dir, plot_dir)
+    #runSingleMuon2018C(data_dir, plot_dir)
     #runMinBias2017B(data_dir, plot_dir)
     #runMinBias2018C(data_dir, plot_dir)
     runTTBar(data_dir, plot_dir)
