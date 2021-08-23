@@ -363,138 +363,82 @@ def f_example(x, y):
     c3 = 1.0e3
     return (a1*np.sin(y-b2)+a3) * (1 / np.abs(x) ** (b1*np.sin(y-b2)+b3)) + (c1*np.sin(y-b2)+c3)
 
+def runSet(data_dir, plot_dir, name):
+    in_array = read_file(data_dir + name + ".npy")
+    remake_arrays(in_array, plot_dir, name)
+
 def runSingleMuon2017B(data_dir, plot_dir):
     # SingleMuon 2017B
-    in_array = read_file(data_dir + "SingleMuon_2017B_MoreEvents_AllClusters.npy")
-    plot_name = "SingleMuon_2017B_MoreEvents_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-
-    in_array = read_file(data_dir + "SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters.npy")
-    plot_name = "SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
+    names = [
+        "SingleMuon_2017B_MoreEvents_AllClusters",
+        "SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters",
+    ]
+    for name in names:
+        runSet(data_dir, plot_dir, name)
 
 def runSingleMuon2018C(data_dir, plot_dir):
     # SingleMuon 2018C
-    in_array = read_file(data_dir + "SingleMuon_MoreEvents_AllClusters.npy")
-    plot_name = "SingleMuon_MoreEvents_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-
-    in_array = read_file(data_dir + "SingleMuon_MoreEvents_ClusterSize2_AllClusters.npy")
-    plot_name = "SingleMuon_MoreEvents_ClusterSize2_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-
-    in_array = read_file(data_dir + "SingleMuon_AllClusters.npy")
-    plot_name = "SingleMuon_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "SingleMuon_OnTrack.npy")
-    plot_name = "SingleMuon_OnTrack"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "SingleMuon_OffTrack.npy")
-    plot_name = "SingleMuon_OffTrack"
-    remake_arrays(in_array, plot_dir, plot_name)
+    names = [
+        "SingleMuon_MoreEvents_AllClusters",
+        "SingleMuon_MoreEvents_ClusterSize2_AllClusters",
+        "SingleMuon_AllClusters",
+        "SingleMuon_OnTrack",
+        "SingleMuon_OffTrack",
+    ]
+    for name in names:
+        runSet(data_dir, plot_dir, name)
 
 def runZeroBias(data_dir, plot_dir):
     # ZeroBias
-    in_array = read_file(data_dir + "ZeroBias_MoreEvents_AllClusters.npy")
-    plot_name = "ZeroBias_MoreEvents_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "ZeroBias_MoreEvents_ClusterSize2_AllClusters.npy")
-    plot_name = "ZeroBias_MoreEvents_ClusterSize2_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "ZeroBias_AllClusters.npy")
-    plot_name = "ZeroBias_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "ZeroBias_OnTrack.npy")
-    plot_name = "ZeroBias_OnTrack"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "ZeroBias_OffTrack.npy")
-    plot_name = "ZeroBias_OffTrack"
-    remake_arrays(in_array, plot_dir, plot_name)
+    names = [
+        "ZeroBias_MoreEvents_AllClusters",
+        "ZeroBias_MoreEvents_ClusterSize2_AllClusters",
+        "ZeroBias_AllClusters",
+        "ZeroBias_OnTrack",
+        "ZeroBias_OffTrack",
+    ]
+    for name in names:
+        runSet(data_dir, plot_dir, name)
 
 def runMinBias2017B(data_dir, plot_dir):
     # MinBias 2017B
-    in_array = read_file(data_dir + "MinBias_2017B_AllClusters.npy")
-    plot_name = "MinBias_2017B_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "MinBias_2017B_OnTrack.npy")
-    plot_name = "MinBias_2017B_OnTrack"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "MinBias_2017B_OffTrack.npy")
-    plot_name = "MinBias_2017B_OffTrack"
-    remake_arrays(in_array, plot_dir, plot_name)
+    # WARNING: MinBias 2017B does not have good data. Errors can occur.
+    names = [
+        "MinBias_2017B_AllClusters",
+        "MinBias_2017B_OnTrack",
+        "MinBias_2017B_OffTrack",
+    ]
+    for name in names:
+        runSet(data_dir, plot_dir, name)
 
 def runMinBias2018C(data_dir, plot_dir):
     # MinBias 2018C
-    in_array = read_file(data_dir + "MinBias_2018C_MoreEvents_AllClusters.npy")
-    plot_name = "MinBias_2018C_MoreEvents_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
+    names = [
+        "MinBias_2018C_MoreEvents_AllClusters",
+        "MinBias_2018C_MoreEvents_ClusterSize2_AllClusters",
+        "MinBias_2018C_AllClusters",
+        "MinBias_2018C_OnTrack",
+        "MinBias_2018C_OffTrack",
+    ]
+    for name in names:
+        runSet(data_dir, plot_dir, name)
     
-    in_array = read_file(data_dir + "MinBias_2018C_MoreEvents_ClusterSize2_AllClusters.npy")
-    plot_name = "MinBias_2018C_MoreEvents_ClusterSize2_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "MinBias_2018C_AllClusters.npy")
-    plot_name = "MinBias_2018C_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "MinBias_2018C_OnTrack.npy")
-    plot_name = "MinBias_2018C_OnTrack"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "MinBias_2018C_OffTrack.npy")
-    plot_name = "MinBias_2018C_OffTrack"
-    remake_arrays(in_array, plot_dir, plot_name)
-
 def runTTBar(data_dir, plot_dir):
     # TTBar
-    in_array = read_file(data_dir + "TTBar_pileup_0p2_AllClusters.npy")
-    plot_name = "TTBar_pileup_0p2_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "TTBar_0p2_AllClusters.npy")
-    plot_name = "TTBar_0p2_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "TTBar_pileup_0p2_ClusterSize2_AllClusters.npy")
-    plot_name = "TTBar_pileup_0p2_ClusterSize2_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "TTBar_0p2_ClusterSize2_AllClusters.npy")
-    plot_name = "TTBar_0p2_ClusterSize2_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "TTBar_AllClusters.npy")
-    plot_name = "TTBar_AllClusters"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "TTBar_OnTrack.npy")
-    plot_name = "TTBar_OnTrack"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "TTBar_OffTrack.npy")
-    plot_name = "TTBar_OffTrack"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    # TTBar zsmear
-    in_array = read_file(data_dir + "TTBar_AllClusters_zsmear.npy")
-    plot_name = "TTBar_AllClusters_zsmear"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "TTBar_OnTrack_zsmear.npy")
-    plot_name = "TTBar_OnTrack_zsmear"
-    remake_arrays(in_array, plot_dir, plot_name)
-    
-    in_array = read_file(data_dir + "TTBar_OffTrack_zsmear.npy")
-    plot_name = "TTBar_OffTrack_zsmear"
-    remake_arrays(in_array, plot_dir, plot_name)
+    names = [
+        "TTBar_0p2_AllClusters",
+        "TTBar_0p2_ClusterSize2_AllClusters",
+        "TTBar_pileup_0p2_AllClusters",
+        "TTBar_pileup_0p2_ClusterSize2_AllClusters",
+        "TTBar_AllClusters",
+        "TTBar_OnTrack",
+        "TTBar_OffTrack",
+        "TTBar_AllClusters_zsmear",
+        "TTBar_OnTrack_zsmear",
+        "TTBar_OffTrack_zsmear",
+    ]
+    for name in names:
+        runSet(data_dir, plot_dir, name)
 
 if __name__ == "__main__":
     data_dir  = "data/"
