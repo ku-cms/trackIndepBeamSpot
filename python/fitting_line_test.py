@@ -245,8 +245,8 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
                        error_gc1=0.1,   error_gc3=0.1,
                        
                        fix_n  = True,
-                       fix_x0 = True,
-                       fix_y0 = True,
+                       fix_x0 = False,
+                       fix_y0 = False,
                        fix_z0 = True,
                        
                        limit_x0=(-1, 1), limit_y0=(-1, 1), limit_z0=(-2, 2),
@@ -391,11 +391,13 @@ def runSingleMuon2018C(data_dir, plot_dir):
 def runZeroBias(data_dir, plot_dir):
     # ZeroBias
     names = [
-        "ZeroBias_MoreEvents_AllClusters",
-        "ZeroBias_MoreEvents_ClusterSize2_AllClusters",
-        "ZeroBias_AllClusters",
-        "ZeroBias_OnTrack",
-        "ZeroBias_OffTrack",
+        "ZeroBias_MoreEvents2_AllClusters",
+        "ZeroBias_MoreEvents2_ClusterSize2_AllClusters",
+        #"ZeroBias_MoreEvents_AllClusters",
+        #"ZeroBias_MoreEvents_ClusterSize2_AllClusters",
+        #"ZeroBias_AllClusters",
+        #"ZeroBias_OnTrack",
+        #"ZeroBias_OffTrack",
     ]
     for name in names:
         runSet(data_dir, plot_dir, name)
@@ -414,11 +416,13 @@ def runMinBias2017B(data_dir, plot_dir):
 def runMinBias2018C(data_dir, plot_dir):
     # MinBias 2018C
     names = [
-        "MinBias_2018C_MoreEvents_AllClusters",
-        "MinBias_2018C_MoreEvents_ClusterSize2_AllClusters",
-        "MinBias_2018C_AllClusters",
-        "MinBias_2018C_OnTrack",
-        "MinBias_2018C_OffTrack",
+        "MinBias_2018C_MoreEvents2_AllClusters",
+        "MinBias_2018C_MoreEvents2_ClusterSize2_AllClusters",
+        #"MinBias_2018C_MoreEvents_AllClusters",
+        #"MinBias_2018C_MoreEvents_ClusterSize2_AllClusters",
+        #"MinBias_2018C_AllClusters",
+        #"MinBias_2018C_OnTrack",
+        #"MinBias_2018C_OffTrack",
     ]
     for name in names:
         runSet(data_dir, plot_dir, name)
@@ -450,10 +454,10 @@ if __name__ == "__main__":
     if plot_dir[-1] != "/":
         plot_dir += "/"
     
-    #runZeroBias(data_dir, plot_dir)
+    runZeroBias(data_dir, plot_dir)
     #runSingleMuon2017B(data_dir, plot_dir)
     #runSingleMuon2018C(data_dir, plot_dir)
     #runMinBias2017B(data_dir, plot_dir)
     #runMinBias2018C(data_dir, plot_dir)
-    runTTBar(data_dir, plot_dir)
+    #runTTBar(data_dir, plot_dir)
 
