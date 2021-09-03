@@ -31,10 +31,14 @@ def run(input_directory, num_files, name, isData):
         chain.Add(f)
     
     
-    plotChain(chain, name, "PvN", "ClN>=2000")
-    plotChain(chain, name, "PvN", "ClN<2000")
-    plotChain(chain, name, "ClN", "ClN>=2000")
-    plotChain(chain, name, "ClN", "ClN<2000")
+    #plotChain(chain, name, "PvN", "ClN>=2000")
+    #plotChain(chain, name, "PvN", "ClN<2000")
+    #
+    #plotChain(chain, name, "ClN", "ClN>=2000")
+    #plotChain(chain, name, "ClN", "ClN<2000")
+    
+    plotChain(chain, name, "ClSize", "ClN>=2000")
+    plotChain(chain, name, "ClSize", "ClN>=2000 && ClSize>=2")
     
     #plotChain(chain, name, "ClN")
     #plotChain(chain, name, "ClN", "ClTkN<1")
@@ -71,6 +75,13 @@ def runData2017B():
     # num_files       = 30
     # run(input_directory, num_files, name, isData)
     
+    # Zero Bias 2017B
+    input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2017B_RAW_v2/210824_165140/0000'
+    name            = "ZeroBias_2017B_MoreEvents"
+    isData          = True
+    num_files       = 15
+    run(input_directory, num_files, name, isData)
+    
     # Single Muon 2017B
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2017B_RAW_v1/210810_160009/0000'
     name            = "SingleMuon_2017B_MoreEvents"
@@ -78,12 +89,6 @@ def runData2017B():
     num_files       = 20
     run(input_directory, num_files, name, isData)
 
-    # Zero Bias 2017B
-    input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2017B_RAW_v2/210824_165140/0000'
-    name            = "ZeroBias_2017B_MoreEvents"
-    isData          = True
-    num_files       = 15
-    run(input_directory, num_files, name, isData)
 
 def runData2018C():
     # # Single Muon
