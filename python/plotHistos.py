@@ -30,10 +30,16 @@ def run(input_directory, num_files, name, isData):
     for f in input_files:
         chain.Add(f)
     
-    plotChain(chain, name, "ClN")
-    plotChain(chain, name, "ClN", "ClTkN<1")
-    plotChain(chain, name, "ClN", "ClTkN>=1")
-    plotChain(chain, name, "ClN", "ClTkN>=0")
+    
+    plotChain(chain, name, "PvN", "ClN>=2000")
+    plotChain(chain, name, "PvN", "ClN<2000")
+    plotChain(chain, name, "ClN", "ClN>=2000")
+    plotChain(chain, name, "ClN", "ClN<2000")
+    
+    #plotChain(chain, name, "ClN")
+    #plotChain(chain, name, "ClN", "ClTkN<1")
+    #plotChain(chain, name, "ClN", "ClTkN>=1")
+    #plotChain(chain, name, "ClN", "ClTkN>=0")
     
     #plotChain(chain, name, "ClSize")
     #plotChain(chain, name, "ClSizeX")
@@ -41,10 +47,10 @@ def run(input_directory, num_files, name, isData):
     #plotChain(chain, name, "ClCharge")
     #plotChain(chain, name, "ClChargeCorr")
     
-    plotChain(chain, name, "PvN")
-    plotChain(chain, name, "PvX")
-    plotChain(chain, name, "PvY")
-    plotChain(chain, name, "PvZ")
+    #plotChain(chain, name, "PvN")
+    #plotChain(chain, name, "PvX")
+    #plotChain(chain, name, "PvY")
+    #plotChain(chain, name, "PvZ")
     #plotChain(chain, name, "PvX", "ClTkN<1")
     #plotChain(chain, name, "PvX", "ClTkN>=1")
     #plotChain(chain, name, "PvY", "ClTkN<1")
@@ -145,8 +151,8 @@ def runMC():
     run(input_directory, num_files, name, isData)
 
 def main():
-    #runData2017B()
-    runData2018C()
+    runData2017B()
+    #runData2018C()
     #runMC()
 
 if __name__ == "__main__":
