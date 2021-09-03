@@ -10,7 +10,7 @@ from inputFiles_cfi import get_list_of_files
 from array import array
 from collections import OrderedDict
 
-def make_cluster_map(input_files_, doClusterSizeCut):
+def make_cluster_map(input_files_, doClusterSizeCut, doNumberClustersCut):
     """
     function to make a cluster occupancy map of layer 1 pixels, with 1:1 pixel, index correspondence
     :param input_files: list of PixelTree ntuples to be processed
@@ -38,7 +38,13 @@ def make_cluster_map(input_files_, doClusterSizeCut):
         if iev % 10 == 0:
             print 'Event', iev, ' / ', n_events
             sys.stdout.flush()
+        
         n_cl = event.ClN
+        # cut on number of clusters per event
+        if doNumberClustersCut:
+            if n_cl < 2000:
+                continue
+        #print("event: {0}, number of clusters: {1}".format(iev, n_cl))
 
         for icl in xrange(n_cl):
 
@@ -514,7 +520,7 @@ def read_clusters(input_files, f_name_):
     of.Close()
 
 
-def run(directory, output_file, message, num_files, doClusterSizeCut):
+def run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut):
     # --- get list of files --- #
     file_list = get_list_of_files(directory)
     file_list = file_list[0:num_files]
@@ -526,7 +532,7 @@ def run(directory, output_file, message, num_files, doClusterSizeCut):
     #    print " - {0}".format(f)
     
     # --- create cluster map --- #
-    occ_map = make_cluster_map(file_list, doClusterSizeCut)
+    occ_map = make_cluster_map(file_list, doClusterSizeCut, doNumberClustersCut)
     np.save(output_file, occ_map)
 
 def runSingleMuon2017B():
@@ -538,25 +544,35 @@ def runSingleMuon2017B():
     message     = 'Running over SingleMuon 2017B PixelTrees.'
     num_files   = 20
     doClusterSizeCut = False
+    doNumberClustersCut = False
     
-    run(directory, output_file, message, num_files, doClusterSizeCut)
+    run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
 
 def runZeroBias2017B():
     
     # Zero Bias 2017B
+    #   8 files:   68332 events
     #  15 files:  136644 events
     # 150 files: 1277957 events 
     directory   = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2017B_RAW_v2/210824_165140/0000'
+    
     #output_file = 'ZeroBias_2017B_MoreEvents_AllClusters.npy' 
     #output_file = 'ZeroBias_2017B_MoreEvents_ClusterSize2_AllClusters.npy' 
     #output_file = 'ZeroBias_2017B_MoreEvents2_AllClusters.npy' 
-    output_file = 'ZeroBias_2017B_MoreEvents2_ClusterSize2_AllClusters.npy' 
-    message     = 'Running over ZeroBias 2017B PixelTrees.'
-    #num_files   = 15
-    num_files   = 150
-    doClusterSizeCut = True
+    #output_file = 'ZeroBias_2017B_MoreEvents2_ClusterSize2_AllClusters.npy' 
     
-    run(directory, output_file, message, num_files, doClusterSizeCut)
+    #output_file = 'ZeroBias_2017B_AllClusters.npy' 
+    #output_file = 'ZeroBias_2017B_ClusterSize2_AllClusters.npy' 
+    output_file = 'ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters.npy' 
+    
+    message     = 'Running over ZeroBias 2017B PixelTrees.'
+    num_files   = 8
+    #num_files   = 15
+    #num_files   = 150
+    doClusterSizeCut = True
+    doNumberClustersCut = True
+    
+    run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
 
 def runSingleMuon2018C():
     
@@ -571,8 +587,9 @@ def runSingleMuon2018C():
     message     = 'Running over SingleMuon PixelTrees.'
     num_files   = 20
     doClusterSizeCut = False
+    doNumberClustersCut = False
 
-    run(directory, output_file, message, num_files, doClusterSizeCut)
+    run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
 
 def runZeroBias2018C():
     
@@ -588,8 +605,9 @@ def runZeroBias2018C():
     message     = 'Running over ZeroBias PixelTrees.'
     num_files   = 20
     doClusterSizeCut = True
+    doNumberClustersCut = False
     
-    run(directory, output_file, message, num_files, doClusterSizeCut)
+    run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
 
 def runMinBias2017B():
     
@@ -601,8 +619,9 @@ def runMinBias2017B():
     message     = 'Running over MinBias PixelTrees.'
     num_files   = 30
     doClusterSizeCut = False
+    doNumberClustersCut = False
     
-    run(directory, output_file, message, num_files, doClusterSizeCut)
+    run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
 
 def runMinBias2018C():
     
@@ -620,8 +639,9 @@ def runMinBias2018C():
     message     = 'Running over MinBias PixelTrees.'
     num_files   = 30
     doClusterSizeCut = True
+    doNumberClustersCut = False
     
-    run(directory, output_file, message, num_files, doClusterSizeCut)
+    run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
 
 def runTTBarPU():
     
@@ -634,8 +654,9 @@ def runTTBarPU():
     message     = 'Running over TTBar PU PixelTrees.'
     num_files   = 99
     doClusterSizeCut = False
+    doNumberClustersCut = False
     
-    run(directory, output_file, message, num_files, doClusterSizeCut)
+    run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
 
 def runTTBar():
     
@@ -648,8 +669,9 @@ def runTTBar():
     message     = 'Running over TTBar PixelTrees.'
     num_files   = 98
     doClusterSizeCut = False
+    doNumberClustersCut = False
     
-    run(directory, output_file, message, num_files, doClusterSizeCut)
+    run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
     
 def main():
     # main
