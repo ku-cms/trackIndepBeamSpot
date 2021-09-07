@@ -180,6 +180,15 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         z_array     = z_array[      remove_phi * remove_blips_phi]
         phi_array   = phi_array[    remove_phi * remove_blips_phi]
 
+    # remove low occupancy clusters
+    min_occupancy = 30000 
+    occupancy_cut = occ > min_occupancy
+    occ         = occ[       occupancy_cut ]
+    x_array     = x_array[   occupancy_cut ]
+    y_array     = y_array[   occupancy_cut ]
+    z_array     = z_array[   occupancy_cut ]
+    phi_array   = phi_array[ occupancy_cut ]
+
     def nll(x0, y0, z0, n, b1, b2, b3, a1, a3, c1, c3, ga1, ga3, gc1, gc3):
         ri = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
         phi_cor = np.arctan2(y_array-y0, x_array-x0)
@@ -367,11 +376,21 @@ def runSet(data_dir, plot_dir, name):
     in_array = read_file(data_dir + name + ".npy")
     remake_arrays(in_array, plot_dir, name)
 
+def runZeroBias2017B(data_dir, plot_dir):
+    # ZeroBias 2017B
+    names = [
+        "ZeroBias_2017B_AllClusters",
+        "ZeroBias_2017B_ClusterSize2_AllClusters",
+        "ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters",
+    ]
+    for name in names:
+        runSet(data_dir, plot_dir, name)
+
 def runSingleMuon2017B(data_dir, plot_dir):
     # SingleMuon 2017B
     names = [
         "SingleMuon_2017B_MoreEvents_AllClusters",
-        "SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters",
+        #"SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters",
     ]
     for name in names:
         runSet(data_dir, plot_dir, name)
@@ -380,10 +399,10 @@ def runSingleMuon2018C(data_dir, plot_dir):
     # SingleMuon 2018C
     names = [
         "SingleMuon_MoreEvents_AllClusters",
-        "SingleMuon_MoreEvents_ClusterSize2_AllClusters",
-        "SingleMuon_AllClusters",
-        "SingleMuon_OnTrack",
-        "SingleMuon_OffTrack",
+        #"SingleMuon_MoreEvents_ClusterSize2_AllClusters",
+        #"SingleMuon_AllClusters",
+        #"SingleMuon_OnTrack",
+        #"SingleMuon_OffTrack",
     ]
     for name in names:
         runSet(data_dir, plot_dir, name)
@@ -454,9 +473,10 @@ if __name__ == "__main__":
     if plot_dir[-1] != "/":
         plot_dir += "/"
     
-    runZeroBias(data_dir, plot_dir)
+    #runZeroBias2017B(data_dir, plot_dir)
     #runSingleMuon2017B(data_dir, plot_dir)
-    #runSingleMuon2018C(data_dir, plot_dir)
+    #runZeroBias(data_dir, plot_dir)
+    runSingleMuon2018C(data_dir, plot_dir)
     #runMinBias2017B(data_dir, plot_dir)
     #runMinBias2018C(data_dir, plot_dir)
     #runTTBar(data_dir, plot_dir)
