@@ -20,6 +20,7 @@ def read_file(input_file_):
 def remake_arrays(input_arr_, file_out_name):
     useWeightedAve = False
     fixPhi         = True
+    doMinOccCut    = True
     
     w_r_bins = 0.01
 
@@ -266,6 +267,20 @@ def remake_arrays(input_arr_, file_out_name):
     z_err_array     = z_err_array[      remove_phi]
     phi_err_array   = phi_err_array[    remove_phi]
 
+    # remove low occupancy clusters
+    if doMinOccCut:
+        min_occupancy = 20000 
+        occupancy_cut = occ >= min_occupancy
+        occ             = occ[            occupancy_cut ]
+        x_array         = x_array[        occupancy_cut ]
+        y_array         = y_array[        occupancy_cut ]
+        z_array         = z_array[        occupancy_cut ]
+        phi_array       = phi_array[      occupancy_cut ]
+        r_array         = r_array[        occupancy_cut ]
+        r_err_array     = r_err_array[    occupancy_cut ]
+        z_err_array     = z_err_array[    occupancy_cut ]
+        phi_err_array   = phi_err_array[  occupancy_cut ]
+
     phi_sort = np.argsort(phi_array)
     z_sort   = np.argsort(z_array)
     r_sort   = np.argsort(r_array)
@@ -504,110 +519,46 @@ if __name__ == "__main__":
     output_dir = "output"
     
     makeDir(output_dir)
-    
-    #in_array    = read_file("data/TTBar_AllClusters_zsmear.npy")
-    #output_name = "{0}/TTBar_AllClusters_zsmear.root".format(output_dir)
-    #remake_arrays(in_array, output_name)
-    
-    in_array    = read_file("data/SingleMuon_AllClusters.npy")
-    output_name = "{0}/SingleMuon_AllClusters.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-    
-    '''
-    in_array    = read_file("data/TTBar_AllClusters_zsmear.npy")
-    output_name = "{0}/TTBar_AllClusters_zsmear.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-    
-    in_array    = read_file("data/TTBar_OnTrack_zsmear.npy")
-    output_name = "{0}/TTBar_OnTrack_zsmear.root".format(output_dir)
-    remake_arrays(in_array, output_name)
+    inputs_v1 = [
+        "TTBar_AllClusters_zsmear",
+        "TTBar_OnTrack_zsmear",
+        "TTBar_OffTrack_zsmear",
+        #"TTBar_AllClusters",
+        #"TTBar_OnTrack",
+        #"TTBar_OffTrack",
+        #"TTBar_0p2_AllClusters",
+        #"TTBar_0p2_OnTrack",
+        #"TTBar_0p2_OffTrack",
+        #"TTBar_pileup_0p2_AllClusters",
+        #"TTBar_pileup_0p2_OnTrack",
+        #"TTBar_pileup_0p2_OffTrack",
+        #"SingleMuon_AllClusters",
+        #"SingleMuon_OnTrack",
+        #"SingleMuon_OffTrack",
+        #"ZeroBias_AllClusters",
+        #"ZeroBias_OnTrack",
+        #"ZeroBias_OffTrack",
+        #"MinBias_2017B_AllClusters",
+        #"MinBias_2017B_OnTrack",
+        #"MinBias_2017B_OffTrack",
+        #"MinBias_2018C_AllClusters",
+        #"MinBias_2018C_OffTrack",
+        #"MinBias_2018C_OnTrack",
+    ]
+    inputs_v2 = [
+        "ZeroBias_2017B_AllClusters",
+        "ZeroBias_2017B_ClusterSize2_AllClusters",
+        "ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters",
+    ]
+    inputs_v3 = [
+        "ZeroBias_2017B_MoreEvents_AllClusters",
+        "ZeroBias_2017B_MoreEvents_ClusterSize2_AllClusters",
+        "SingleMuon_2017B_MoreEvents_AllClusters",
+        "SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters",
+    ]
 
-    in_array    = read_file("data/TTBar_OffTrack_zsmear.npy")
-    output_name = "{0}/TTBar_OffTrack_zsmear.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-    
-    in_array    = read_file("data/TTBar_AllClusters.npy")
-    output_name = "{0}/TTBar_AllClusters.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/TTBar_OnTrack.npy")
-    output_name = "{0}/TTBar_OnTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/TTBar_OffTrack.npy")
-    output_name = "{0}/TTBar_OffTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-    
-    in_array    = read_file("data/SingleMuon_AllClusters.npy")
-    output_name = "{0}/SingleMuon_AllClusters.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-    
-    in_array    = read_file("data/SingleMuon_OnTrack.npy")
-    output_name = "{0}/SingleMuon_OnTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/SingleMuon_OffTrack.npy")
-    output_name = "{0}/SingleMuon_OffTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-    
-    in_array    = read_file("data/ZeroBias_AllClusters.npy")
-    output_name = "{0}/ZeroBias_AllClusters.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/ZeroBias_OnTrack.npy")
-    output_name = "{0}/ZeroBias_OnTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/ZeroBias_OffTrack.npy")
-    output_name = "{0}/ZeroBias_OffTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-    
-    in_array    = read_file("data/TTBar_0p2_AllClusters.npy")
-    output_name = "{0}/TTBar_0p2_AllClusters.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/TTBar_0p2_OnTrack.py.npy")
-    output_name = "{0}/TTBar_0p2_OnTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/TTBar_0p2_OffTrack.py.npy")
-    output_name = "{0}/TTBar_0p2_OffTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/TTBar_pileup_0p2_AllClusters.npy")
-    output_name = "{0}/TTBar_pileup_0p2_AllClusters.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/TTBar_pileup_0p2_OnTrack.py.npy")
-    output_name = "{0}/TTBar_pileup_0p2_OnTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/TTBar_pileup_0p2_OffTrack.py.npy")
-    output_name = "{0}/TTBar_pileup_0p2_OffTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-   
-    in_array    = read_file("data/MinBias_2017B_AllClusters.npy")
-    output_name = "{0}/MinBias_2017B_AllClusters.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-    
-    in_array    = read_file("data/MinBias_2017B_OnTrack.npy")
-    output_name = "{0}/MinBias_2017B_OnTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/MinBias_2017B_OffTrack.npy")
-    output_name = "{0}/MinBias_2017B_OffTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-    
-    in_array    = read_file("data/MinBias_2018C_AllClusters.npy")
-    output_name = "{0}/MinBias_2018C_AllClusters.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/MinBias_2018C_OffTrack.npy")
-    output_name = "{0}/MinBias_2018C_OffTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-
-    in_array    = read_file("data/MinBias_2018C_OnTrack.npy")
-    output_name = "{0}/MinBias_2018C_OnTrack.root".format(output_dir)
-    remake_arrays(in_array, output_name)
-    '''
+    for sample in inputs_v2:
+        in_array    = read_file("data/{0}.npy".format(sample))
+        output_name = "{0}/{1}.root".format(output_dir, sample)
+        remake_arrays(in_array, output_name)
     
