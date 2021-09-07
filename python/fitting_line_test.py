@@ -9,10 +9,11 @@ def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
 
 def remake_arrays(input_arr_, plot_dir, plot_name):
-    useWeightedAve = False
-    drawFit = False
-    maskPhi = False
-    fixPhi  = True
+    useWeightedAve  = False
+    drawFit         = False
+    maskPhi         = False
+    fixPhi          = True
+    doMinOccCut     = True
     
     # need z-binning corresponding to 1 roc
     w_z_bins = 52  # # of pixels in a roc
@@ -181,13 +182,14 @@ def remake_arrays(input_arr_, plot_dir, plot_name):
         phi_array   = phi_array[    remove_phi * remove_blips_phi]
 
     # remove low occupancy clusters
-    min_occupancy = 30000 
-    occupancy_cut = occ > min_occupancy
-    occ         = occ[       occupancy_cut ]
-    x_array     = x_array[   occupancy_cut ]
-    y_array     = y_array[   occupancy_cut ]
-    z_array     = z_array[   occupancy_cut ]
-    phi_array   = phi_array[ occupancy_cut ]
+    if doMinOccCut:
+        min_occupancy = 20000 
+        occupancy_cut = occ >= min_occupancy
+        occ         = occ[       occupancy_cut ]
+        x_array     = x_array[   occupancy_cut ]
+        y_array     = y_array[   occupancy_cut ]
+        z_array     = z_array[   occupancy_cut ]
+        phi_array   = phi_array[ occupancy_cut ]
 
     def nll(x0, y0, z0, n, b1, b2, b3, a1, a3, c1, c3, ga1, ga3, gc1, gc3):
         ri = np.float64(np.sqrt((x_array - x0) ** 2 + (y_array - y0) ** 2 + (z_array - z0) ** 2))
@@ -372,19 +374,34 @@ def f_example(x, y):
     c3 = 1.0e3
     return (a1*np.sin(y-b2)+a3) * (1 / np.abs(x) ** (b1*np.sin(y-b2)+b3)) + (c1*np.sin(y-b2)+c3)
 
-def runSet(data_dir, plot_dir, name):
-    in_array = read_file(data_dir + name + ".npy")
-    remake_arrays(in_array, plot_dir, name)
+def runSet(data_dir, plot_dir, data_name, plot_name=""):
+    # default: data and plot names are the same
+    # if plot name is given, it is used for plots
+    custom_name = data_name
+    if plot_name:
+        custom_name = plot_name
+    in_array = read_file(data_dir + data_name + ".npy")
+    remake_arrays(in_array, plot_dir, custom_name)
 
 def runZeroBias2017B(data_dir, plot_dir):
     # ZeroBias 2017B
-    names = [
+    data_names = [
         "ZeroBias_2017B_AllClusters",
         "ZeroBias_2017B_ClusterSize2_AllClusters",
         "ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters",
     ]
-    for name in names:
-        runSet(data_dir, plot_dir, name)
+    #plot_names = [
+    #    "ZeroBias_2017B_NoOccMin_AllClusters",
+    #    "ZeroBias_2017B_ClusterSize2_NoOccMin_AllClusters",
+    #    "ZeroBias_2017B_ClusterSize2_NumberClusters2000_NoOccMin_AllClusters",
+    #]
+    plot_names = [
+        "ZeroBias_2017B_MinOcc20000_AllClusters",
+        "ZeroBias_2017B_ClusterSize2_MinOcc20000_AllClusters",
+        "ZeroBias_2017B_ClusterSize2_NumberClusters2000_MinOcc20000_AllClusters",
+    ]
+    for i in range(len(data_names)):
+        runSet(data_dir, plot_dir, data_names[i], plot_names[i])
 
 def runSingleMuon2017B(data_dir, plot_dir):
     # SingleMuon 2017B
@@ -473,10 +490,10 @@ if __name__ == "__main__":
     if plot_dir[-1] != "/":
         plot_dir += "/"
     
-    #runZeroBias2017B(data_dir, plot_dir)
+    runZeroBias2017B(data_dir, plot_dir)
     #runSingleMuon2017B(data_dir, plot_dir)
     #runZeroBias(data_dir, plot_dir)
-    runSingleMuon2018C(data_dir, plot_dir)
+    #runSingleMuon2018C(data_dir, plot_dir)
     #runMinBias2017B(data_dir, plot_dir)
     #runMinBias2018C(data_dir, plot_dir)
     #runTTBar(data_dir, plot_dir)
