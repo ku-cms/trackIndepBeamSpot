@@ -21,6 +21,9 @@ def remake_arrays(input_arr_, file_out_name):
     useWeightedAve = False
     fixPhi         = True
     doMinOccCut    = True
+    min_occupancy  = 20000 
+
+    print("Running to create output file: {0}".format(file_out_name))
     
     w_r_bins = 0.01
 
@@ -269,7 +272,6 @@ def remake_arrays(input_arr_, file_out_name):
 
     # remove low occupancy clusters
     if doMinOccCut:
-        min_occupancy = 20000 
         occupancy_cut = occ >= min_occupancy
         occ             = occ[            occupancy_cut ]
         x_array         = x_array[        occupancy_cut ]
@@ -443,12 +445,7 @@ def remake_arrays(input_arr_, file_out_name):
         rnp.fill_graph(gr_z_hl[hl], np.swapaxes([z_new_hl, occ_z_hl], 0, 1))
         gr_z_hl[hl].SetName("gr_z_occ_hl_" + str(hl))
 
-    # WARNING: this is the wrong way to remove NANs for 2D matrix:
-    # because the final array is flattened into 1D after using the mask
-    #z_ring     = np.array(z_ring)
-    #z_ring     = z_ring[~np.isnan(z_ring)]
-
-    # remove NANs
+    # Remove NANs in 2D array
     for i in range(len(z_ring)):
         z_i = np.array(z_ring[i])
         mask = ~np.isnan(z_i)
@@ -459,11 +456,11 @@ def remake_arrays(input_arr_, file_out_name):
     z_avg_ring = np.array([np.mean(z) for z in z_ring])
     avg_z_sort = np.argsort(z_avg_ring)
     
-    print("length z_ring: {0}".format(len(z_ring)))
-    print("length z_avg_ring: {0}".format(len(z_avg_ring)))
-    print("length avg_z_sort: {0}".format(len(avg_z_sort)))
-    for i in range(len(z_ring)):
-        print("length of z[{0}]: {1}".format(i, len(z_ring[i])))
+    #print("length z_ring: {0}".format(len(z_ring)))
+    #print("length z_avg_ring: {0}".format(len(z_avg_ring)))
+    #print("length avg_z_sort: {0}".format(len(avg_z_sort)))
+    #for i in range(len(z_ring)):
+    #    print("length of z[{0}]: {1}".format(i, len(z_ring[i])))
     #print("z_ring: {0}".format(z_ring))
     #print("z_avg_ring: {0}".format(z_avg_ring))
     #print("avg_z_sort: {0}".format(avg_z_sort))
@@ -473,9 +470,36 @@ def remake_arrays(input_arr_, file_out_name):
     phi_ring = phi_ring[avg_z_sort]
     occ_ring = occ_ring[avg_z_sort]
     z_avg_ring_sorted = z_avg_ring[avg_z_sort]
+        
+    #print("length occ_ring: {0}".format(len(occ_ring)))
+    #print("length phi_ring: {0}".format(len(phi_ring)))
 
+    # remove low occupancy clusters
+    #if doMinOccCut:
+    #    for ring in range(n_rings):
+    #        # attempt 1
+    #        #occupancy_cut = occ_ring[ring] >= min_occupancy
+    #        #
+    #        #print("occupancy_cut: {0}".format(occupancy_cut))
+    #        #print("occ_ring[{0}]: {1}".format(ring, occ_ring[ring]))
+    #        #print("phi_ring[{0}]: {1}".format(ring, phi_ring[ring]))
+    #        #
+    #        #occ_ring[ring] = occ_ring[ring][occupancy_cut]
+    #        #phi_ring[ring] = occ_ring[ring][occupancy_cut]
+    #        
+    #        # attempt 2
+    #        #occupancy_cut = occ_ring >= min_occupancy
+    #        #occ_ring = occ_ring[ occupancy_cut ]
+    #        #phi_ring = phi_ring[ occupancy_cut ]
+    #        #print("occupancy_cut: {0}".format(occupancy_cut))
+    #        #print("occ_ring: {0}".format(occ_ring))
+    #        #print("phi_ring: {0}".format(phi_ring))
+    #        #print("length occupancy_cut: {0}".format(len(occupancy_cut)))
+    #        #print("length occ_ring: {0}".format(len(occ_ring)))
+    #        #print("length phi_ring: {0}".format(len(phi_ring)))
+    
     for ring in range(n_rings):
-        print("ring {0}: z = {1}".format(ring, z_avg_ring_sorted[ring]))
+        #print("ring {0}: z = {1}".format(ring, z_avg_ring_sorted[ring]))
         phi_ring[ring]  = np.array(phi_ring[ring])
         occ_phi_ring    = np.array(occ_ring[ring])
         phi_sort        = np.argsort(phi_ring[ring])
@@ -547,8 +571,8 @@ if __name__ == "__main__":
     ]
     inputs_v2 = [
         "ZeroBias_2017B_AllClusters",
-        "ZeroBias_2017B_ClusterSize2_AllClusters",
-        "ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters",
+        #"ZeroBias_2017B_ClusterSize2_AllClusters",
+        #"ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters",
     ]
     inputs_v3 = [
         "ZeroBias_2017B_MoreEvents_AllClusters",
