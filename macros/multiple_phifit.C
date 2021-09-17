@@ -8,15 +8,12 @@ void multiple_phifit() {
   gStyle->SetStatY(0.99);
   gStyle->SetTitleFontSize(0.04);
 
-  //string h  = "TTBar_pileup_0p2_AllClusters";
-  //string h  = "TTBar_AllClusters_zsmear";
-  string h  = "SingleMuon_AllClusters";
+  string h  = "output/SingleMuon_AllClusters";
 
   TFile *a = new TFile(Form("%s.root", h.c_str()), "READ");
 
   TF1 *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -3.14159265, 3.14159265);
   f->SetParNames("amp", "shift", "avg");
-  f->SetParameters(1000, 0, 1.0e4);
   f->SetParLimits(0, 0, 1e8);
   f->SetParLimits(1, -3.14159265, 3.14159265);
   
@@ -24,6 +21,7 @@ void multiple_phifit() {
   TGraph *g[64];
   TCanvas *c[64];
   for(int i=0; i<64; i++) {
+    f->SetParameters(1000, 0, 1.0e4);
     g[i] = (TGraph*) a->Get(Form("gr_phi_occ_ring_%d",i));
     c[i] = new TCanvas(Form("%s gr_phi_occ_ring_%d", h.c_str(), i), Form("%s gr_phi_occ_ring_%d", h.c_str(), i));
     
