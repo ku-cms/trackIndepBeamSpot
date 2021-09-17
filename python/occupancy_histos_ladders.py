@@ -453,6 +453,7 @@ def remake_arrays(input_arr_, file_out_name):
         z_ring[i] = z_i_new
     
     gr_phi_ring = []
+    gr_phi_ring_subtracted = []
     z_avg_ring = np.array([np.mean(z) for z in z_ring])
     avg_z_sort = np.argsort(z_avg_ring)
     
@@ -498,7 +499,13 @@ def remake_arrays(input_arr_, file_out_name):
     #        #print("length occ_ring: {0}".format(len(occ_ring)))
     #        #print("length phi_ring: {0}".format(len(phi_ring)))
     
+    onlyGoodRings = True
+    phi_ring_sum = np.zeros(12)
+    occ_phi_ring_subtracted_sum = np.zeros(12)
+    num_good_rings = 0
     for ring in range(n_rings):
+        # sort by phi for phi distribution
+
         #print("ring {0}: z = {1}".format(ring, z_avg_ring_sorted[ring]))
         phi_ring[ring]  = np.array(phi_ring[ring])
         occ_phi_ring    = np.array(occ_ring[ring])
@@ -506,14 +513,51 @@ def remake_arrays(input_arr_, file_out_name):
         phi_ring[ring]  = phi_ring[ring][phi_sort]
         occ_phi_ring    = occ_phi_ring[phi_sort]
 
+        # subtract average
+        n_vals = len(occ_phi_ring)
+        avg = np.mean(occ_phi_ring)
+        std_dev = np.std(occ_phi_ring)
+        #print("ring {0}: n_vals = {1}, avg = {2:.2f}, std_dev = {3:.2f}".format(ring, n_vals, avg, std_dev))
+
+        occ_phi_ring_subtracted = occ_phi_ring - avg
+        
+        # skip rings if there are NANs
+        num_nans = len(phi_ring[ring][np.isnan(phi_ring[ring])])
+        if num_nans == 0:
+            print("good ring: {0}".format(ring))
+            num_good_rings += 1
+            phi_ring_sum = phi_ring_sum + phi_ring[ring]
+        
+        if onlyGoodRings:
+            if num_nans == 0:
+                occ_phi_ring_subtracted_sum = occ_phi_ring_subtracted_sum + occ_phi_ring_subtracted
+        else:
+            occ_phi_ring_subtracted_sum = occ_phi_ring_subtracted_sum + occ_phi_ring_subtracted
+
         gr_phi_ring.append(rt.TGraph())
         rnp.fill_graph(gr_phi_ring[ring], np.swapaxes([phi_ring[ring], occ_phi_ring], 0, 1))
         gr_phi_ring[ring].SetName("gr_phi_occ_ring_"+str(ring))
 
+        # gr_phi_ring_subtracted
+        gr_phi_ring_subtracted.append(rt.TGraph())
+        rnp.fill_graph(gr_phi_ring_subtracted[ring], np.swapaxes([phi_ring[ring], occ_phi_ring_subtracted], 0, 1))
+        gr_phi_ring_subtracted[ring].SetName("gr_phi_occ_ring_subtracted_"+str(ring))
+
+    phi_ring_avg = phi_ring_sum / num_good_rings
+
+    print("number of good rings: {0}".format(num_good_rings))
+    print("phi_condense (length {0}): {1}".format(len(phi_condense), phi_condense))
+    print("occ_phi_condense (length {0}): {1}".format(len(occ_phi_condense), occ_phi_condense))
+    print("phi_ring_avg (length {0}): {1}".format(len(phi_ring_avg), phi_ring_avg))
+    print("occ_phi_ring_subtracted_sum (length {0}): {1}".format(len(occ_phi_ring_subtracted_sum), occ_phi_ring_subtracted_sum))
 
     gr_phi = rt.TGraph()
     rnp.fill_graph(gr_phi, np.swapaxes([phi_condense, occ_phi_condense], 0, 1))
     gr_phi.SetName("gr_phi_occ")
+    
+    gr_phi_subtracted_sum = rt.TGraph()
+    rnp.fill_graph(gr_phi_subtracted_sum, np.swapaxes([phi_ring_avg, occ_phi_ring_subtracted_sum], 0, 1))
+    gr_phi_subtracted_sum.SetName("gr_phi_subtracted_sum_occ")
 
     gr_z = rt.TGraph()
     rnp.fill_graph(gr_z, np.swapaxes([z_condense, occ_z_condense], 0, 1))
@@ -522,6 +566,7 @@ def remake_arrays(input_arr_, file_out_name):
     gr_r3d = rt.TGraph()
     rnp.fill_graph(gr_r3d, np.swapaxes([r_condense, occ_r_condense], 0, 1))
     gr_r3d.SetName("gr_r_occ")
+    
     gr_r3d = rt.TGraph()
     rnp.fill_graph(gr_r3d, np.swapaxes([r_condense_comb, occ_r_condense_comb], 0, 1))
     gr_r3d.SetName("gr_r_occ_pm_comb")
@@ -529,6 +574,7 @@ def remake_arrays(input_arr_, file_out_name):
     file_out = rt.TFile(file_out_name, "RECREATE")
 
     gr_phi.Write()
+    gr_phi_subtracted_sum.Write()
     gr_z.Write()
     gr_r3d.Write()
     for hl in range(n_ladders):
@@ -536,6 +582,7 @@ def remake_arrays(input_arr_, file_out_name):
         gr_z_hl[hl].Write()
     for ring in range(n_rings):
         gr_phi_ring[ring].Write()
+        gr_phi_ring_subtracted[ring].Write()
     file_out.Close()
 
 
@@ -545,8 +592,8 @@ if __name__ == "__main__":
     makeDir(output_dir)
     inputs_v1 = [
         "TTBar_AllClusters_zsmear",
-        "TTBar_OnTrack_zsmear",
-        "TTBar_OffTrack_zsmear",
+        #"TTBar_OnTrack_zsmear",
+        #"TTBar_OffTrack_zsmear",
         #"TTBar_AllClusters",
         #"TTBar_OnTrack",
         #"TTBar_OffTrack",
@@ -571,8 +618,8 @@ if __name__ == "__main__":
     ]
     inputs_v2 = [
         "ZeroBias_2017B_AllClusters",
-        #"ZeroBias_2017B_ClusterSize2_AllClusters",
-        #"ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters",
+        "ZeroBias_2017B_ClusterSize2_AllClusters",
+        "ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters",
     ]
     inputs_v3 = [
         "ZeroBias_2017B_MoreEvents_AllClusters",
@@ -581,7 +628,7 @@ if __name__ == "__main__":
         "SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters",
     ]
 
-    for sample in inputs_v2:
+    for sample in inputs_v3:
         in_array    = read_file("data/{0}.npy".format(sample))
         output_name = "{0}/{1}.root".format(output_dir, sample)
         remake_arrays(in_array, output_name)
