@@ -78,24 +78,26 @@ void loop()
     std::vector<std::string> input_files;
     //input_files.push_back("TTBar_AllClusters_zsmear");
     //input_files.push_back("SingleMuon_AllClusters");
-    input_files.push_back("ZeroBias_2017B_AllClusters");
-    input_files.push_back("ZeroBias_2017B_ClusterSize2_AllClusters");
-    input_files.push_back("ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters");
-    //input_files.push_back("ZeroBias_2017B_MoreEvents_AllClusters");
-    //input_files.push_back("ZeroBias_2017B_MoreEvents_ClusterSize2_AllClusters");
-    //input_files.push_back("SingleMuon_2017B_MoreEvents_AllClusters");
-    //input_files.push_back("SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters");
+    
+    //input_files.push_back("ZeroBias_2017B_AllClusters");
+    //input_files.push_back("ZeroBias_2017B_ClusterSize2_AllClusters");
+    //input_files.push_back("ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters");
+    
+    input_files.push_back("ZeroBias_2017B_MoreEvents_AllClusters");
+    input_files.push_back("ZeroBias_2017B_MoreEvents_ClusterSize2_AllClusters");
+    input_files.push_back("SingleMuon_2017B_MoreEvents_AllClusters");
+    input_files.push_back("SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters");
     
     std::vector<double> y_min_vals;
     std::vector<double> y_max_vals;
     y_min_vals.push_back(0.0); 
     y_min_vals.push_back(0.0); 
     y_min_vals.push_back(0.0); 
-    //y_max_vals.push_back(20000.0);
-    //y_max_vals.push_back(100000.0);
-    y_max_vals.push_back(100000.0);
-    y_max_vals.push_back(100000.0);
-    y_max_vals.push_back(100000.0);
+    y_min_vals.push_back(0.0); 
+    y_max_vals.push_back(300000.0);
+    y_max_vals.push_back(300000.0);
+    y_max_vals.push_back(300000.0);
+    y_max_vals.push_back(300000.0);
 
     for (int i = 0; i < input_files.size(); ++i)
     {
