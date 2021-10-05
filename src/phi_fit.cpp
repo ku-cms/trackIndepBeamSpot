@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <filesystem>
+
 #include "TFile.h"
 #include "TF1.h"
 #include "TGraph.h"
@@ -10,9 +12,14 @@
 #include "TAxis.h"
 #include "TStyle.h"
 
+namespace fs = std::filesystem;
+
 void fit(std::string input_file, std::string input_dir, std::string plot_dir, double y_min, double y_max)
 {
     std::cout << "Fitting for input file: " << input_file << std::endl;
+
+    // create directory for plots
+    fs::create_directory(plot_dir);
     
     gStyle->SetOptFit(111);
     gStyle->SetStatW(0.1);                

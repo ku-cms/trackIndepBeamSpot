@@ -83,6 +83,7 @@ root multiple_phifit_v2.C
 
 Fitting with ROOT in C++:
 ```
+mkdir -p bin
 g++ src/phi_fit.cpp -o bin/phi_fit `root-config --cflags --glibs --ldflags` --std=c++2a
 ./bin/phi_fit
 ```
