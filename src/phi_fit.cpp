@@ -25,6 +25,7 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     TFile *a = new TFile(Form("%s/%s.root", input_dir.c_str(), input_file.c_str()), "READ");
     TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -1 * pi, pi);
     f->SetParNames("amp", "shift", "avg");
+    
     f->SetParLimits(0, 0, 1e8);
     f->SetParLimits(1, -1 * pi, pi);
     
@@ -35,12 +36,21 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     for(int i = 0; i < 64; ++i)
     {
         // set parameter starting values for each fit
-        f->SetParameters(1000, 0, 1.0e4);
+        //f->SetParameters(1000, 0, 1.0e4);
+        f->SetParameters(1000, 0, 0.0);
+        
+        // standard
         g[i] = (TGraph*) a->Get(Form("gr_phi_occ_ring_%d",i));
         c[i] = new TCanvas(Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i), Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i));
-        
         g[i]->Fit(f, "R");
         g[i]->SetTitle(Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i));
+        
+        // subtracted
+        //g[i] = (TGraph*) a->Get(Form("gr_phi_occ_ring_subtracted_%d",i));
+        //c[i] = new TCanvas(Form("%s gr_phi_occ_ring_subtracted_%d", input_file.c_str(), i), Form("%s gr_phi_occ_ring_subtracted_%d", input_file.c_str(), i));
+        //g[i]->Fit(f, "R");
+        //g[i]->SetTitle(Form("%s gr_phi_occ_ring_subtracted_%d", input_file.c_str(), i));
+        
         g[i]->SetMarkerStyle(20);
         g[i]->GetYaxis()->SetRangeUser(y_min, y_max);
    
@@ -83,21 +93,28 @@ void loop()
     //input_files.push_back("ZeroBias_2017B_ClusterSize2_AllClusters");
     //input_files.push_back("ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters");
     
-    input_files.push_back("ZeroBias_2017B_MoreEvents_AllClusters");
-    input_files.push_back("ZeroBias_2017B_MoreEvents_ClusterSize2_AllClusters");
-    input_files.push_back("SingleMuon_2017B_MoreEvents_AllClusters");
-    input_files.push_back("SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters");
+    //input_files.push_back("ZeroBias_2017B_MoreEvents_AllClusters");
+    //input_files.push_back("ZeroBias_2017B_MoreEvents_ClusterSize2_AllClusters");
+    //input_files.push_back("SingleMuon_2017B_MoreEvents_AllClusters");
+    //input_files.push_back("SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters");
+
+    // Legacy 2017
+    input_files.push_back("ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
+    input_files.push_back("SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
     
     std::vector<double> y_min_vals;
     std::vector<double> y_max_vals;
-    y_min_vals.push_back(0.0); 
-    y_min_vals.push_back(0.0); 
+    
     y_min_vals.push_back(0.0); 
     y_min_vals.push_back(0.0); 
     y_max_vals.push_back(300000.0);
     y_max_vals.push_back(300000.0);
-    y_max_vals.push_back(300000.0);
-    y_max_vals.push_back(300000.0);
+    
+    //y_min_vals.push_back(0.0); 
+    //y_max_vals.push_back(300000.0);
+    
+    //y_min_vals.push_back(-10000.0); 
+    //y_max_vals.push_back(10000.0); 
 
     for (int i = 0; i < input_files.size(); ++i)
     {
