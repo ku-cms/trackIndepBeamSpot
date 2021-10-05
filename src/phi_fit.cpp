@@ -32,6 +32,22 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     double amp[64], s[64], avg[64];
     TGraph  *g[64];
     TCanvas *c[64];
+
+    std::string tag = "";
+    int option = 2;
+
+    if (option == 1)
+    {
+        tag = "subtracted";
+    }
+    else if (option == 2)
+    {
+        tag = "postcut";
+    }
+    else
+    {
+        tag = "standard";
+    }
   
     for(int i = 0; i < 64; ++i)
     {
@@ -51,10 +67,26 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         //g[i]->SetTitle(Form("%s gr_phi_occ_ring_subtracted_%d", input_file.c_str(), i));
         
         // postcut
-        g[i] = (TGraph*) a->Get(Form("gr_phi_occ_ring_postcut_%d",i));
-        c[i] = new TCanvas(Form("%s gr_phi_occ_ring_postcut_%d", input_file.c_str(), i), Form("%s gr_phi_occ_ring_postcut_%d", input_file.c_str(), i));
+        //g[i] = (TGraph*) a->Get(Form("gr_phi_occ_ring_postcut_%d",i));
+        //c[i] = new TCanvas(Form("%s gr_phi_occ_ring_postcut_%d", input_file.c_str(), i), Form("%s gr_phi_occ_ring_postcut_%d", input_file.c_str(), i));
+        //g[i]->Fit(f, "R");
+        //g[i]->SetTitle(Form("%s gr_phi_occ_ring_postcut_%d", input_file.c_str(), i));
+        
+        //std::string ring_name = "gr_phi_occ_ring_" + tag + "_" + std::to_string(i);
+        const char* ring_name = Form("gr_phi_occ_ring_%s_%d", tag.c_str(), i);
+        const char* file_ring_name = Form("%s gr_phi_occ_ring_%s_%d", input_file.c_str(), tag.c_str(), i);
+        std::cout << ring_name << std::endl;
+        std::cout << file_ring_name << std::endl;
+        
+        //g[i] = (TGraph*) a->Get(Form("gr_phi_occ_ring_%s_%d", tag.c_str(), i));
+        //c[i] = new TCanvas(Form("%s gr_phi_occ_ring_%s_%d", input_file.c_str(), tag.c_str(), i), Form("%s gr_phi_occ_ring_%s_%d", input_file.c_str(), tag.c_str(), i));
+        //g[i]->Fit(f, "R");
+        //g[i]->SetTitle(Form("%s gr_phi_occ_ring_%s_%d", input_file.c_str(), tag.c_str(), i));
+        
+        g[i] = (TGraph*) a->Get(ring_name);
+        c[i] = new TCanvas(file_ring_name, file_ring_name);
         g[i]->Fit(f, "R");
-        g[i]->SetTitle(Form("%s gr_phi_occ_ring_postcut_%d", input_file.c_str(), i));
+        g[i]->SetTitle(file_ring_name);
         
         g[i]->SetMarkerStyle(20);
         g[i]->GetYaxis()->SetRangeUser(y_min, y_max);
@@ -68,12 +100,24 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     }
     
     // create pdf
-    c[0]->Print(Form("%s/%s.pdf(", plot_dir.c_str(), input_file.c_str()));
+    
+    c[0]->Print(Form("%s/%s_%s.pdf(", plot_dir.c_str(), input_file.c_str(), tag.c_str()));
     for(int i = 1; i < 63; ++i)
     {
-        c[i]->Print(Form("%s/%s.pdf", plot_dir.c_str(), input_file.c_str()));
+        c[i]->Print(Form("%s/%s_%s.pdf", plot_dir.c_str(), input_file.c_str(), tag.c_str()));
     }
-    c[63]->Print(Form("%s/%s.pdf)", plot_dir.c_str(), input_file.c_str()));
+    c[63]->Print(Form("%s/%s_%s.pdf)", plot_dir.c_str(), input_file.c_str(), tag.c_str()));
+    
+    //const char* file_name_first  = Form("%s/%s.pdf(", plot_dir.c_str(), input_file.c_str());
+    //const char* file_name_middle = Form("%s/%s.pdf", plot_dir.c_str(), input_file.c_str());
+    //const char* file_name_last   = Form("%s/%s.pdf)", plot_dir.c_str(), input_file.c_str());
+    //
+    //c[0]->Print(file_name_first);
+    //for(int i = 1; i < 63; ++i)
+    //{
+    //    c[i]->Print(file_name_middle);
+    //}
+    //c[63]->Print(file_name_last);
     
     // delete canvases
     for(int i = 0; i < 64; ++i)

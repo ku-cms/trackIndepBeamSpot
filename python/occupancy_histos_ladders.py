@@ -20,8 +20,6 @@ def read_file(input_file_):
 def remake_arrays(input_arr_, file_out_name):
     useWeightedAve = False
     fixPhi         = True
-    doMinOccCut    = True
-    min_occupancy  = 20000 
 
     print("Running to create output file: {0}".format(file_out_name))
     
@@ -270,19 +268,6 @@ def remake_arrays(input_arr_, file_out_name):
     z_err_array     = z_err_array[      remove_phi]
     phi_err_array   = phi_err_array[    remove_phi]
 
-    # remove low occupancy clusters
-    if doMinOccCut:
-        occupancy_cut = occ >= min_occupancy
-        occ             = occ[            occupancy_cut ]
-        x_array         = x_array[        occupancy_cut ]
-        y_array         = y_array[        occupancy_cut ]
-        z_array         = z_array[        occupancy_cut ]
-        phi_array       = phi_array[      occupancy_cut ]
-        r_array         = r_array[        occupancy_cut ]
-        r_err_array     = r_err_array[    occupancy_cut ]
-        z_err_array     = z_err_array[    occupancy_cut ]
-        phi_err_array   = phi_err_array[  occupancy_cut ]
-
     phi_sort = np.argsort(phi_array)
     z_sort   = np.argsort(z_array)
     r_sort   = np.argsort(r_array)
@@ -475,32 +460,8 @@ def remake_arrays(input_arr_, file_out_name):
         
     #print("length occ_ring: {0}".format(len(occ_ring)))
     #print("length phi_ring: {0}".format(len(phi_ring)))
-
-    # remove low occupancy clusters
-    #if doMinOccCut:
-    #    for ring in range(n_rings):
-    #        # attempt 1
-    #        #occupancy_cut = occ_ring[ring] >= min_occupancy
-    #        #
-    #        #print("occupancy_cut: {0}".format(occupancy_cut))
-    #        #print("occ_ring[{0}]: {1}".format(ring, occ_ring[ring]))
-    #        #print("phi_ring[{0}]: {1}".format(ring, phi_ring[ring]))
-    #        #
-    #        #occ_ring[ring] = occ_ring[ring][occupancy_cut]
-    #        #phi_ring[ring] = occ_ring[ring][occupancy_cut]
-    #        
-    #        # attempt 2
-    #        #occupancy_cut = occ_ring >= min_occupancy
-    #        #occ_ring = occ_ring[ occupancy_cut ]
-    #        #phi_ring = phi_ring[ occupancy_cut ]
-    #        #print("occupancy_cut: {0}".format(occupancy_cut))
-    #        #print("occ_ring: {0}".format(occ_ring))
-    #        #print("phi_ring: {0}".format(phi_ring))
-    #        #print("length occupancy_cut: {0}".format(len(occupancy_cut)))
-    #        #print("length occ_ring: {0}".format(len(occ_ring)))
-    #        #print("length phi_ring: {0}".format(len(phi_ring)))
     
-    min_occupancy = 60000 
+    min_occupancy = 0
     onlyGoodRings = True
     phi_ring_sum = np.zeros(12)
     occ_phi_ring_subtracted_sum = np.zeros(12)
@@ -516,11 +477,12 @@ def remake_arrays(input_arr_, file_out_name):
         occ_phi_ring    = occ_phi_ring[phi_sort]
 
         # cut on occupancy
-        print("Length before cut: {0}".format(len(occ_phi_ring)))
         occupancy_cut         = occ_phi_ring >= min_occupancy
         occ_phi_ring_postcut  = occ_phi_ring[ occupancy_cut ]
         phi_ring_postcut      = phi_ring[ring][ occupancy_cut ]
-        print("Length after cut: {0}".format(len(occ_phi_ring_postcut)))
+        length_before_cut     = len(occ_phi_ring)
+        length_after_cut      = len(occ_phi_ring_postcut)
+        print("Ring {0}: num. points: before cut: {1}, after cut: {2}".format(ring, length_before_cut, length_after_cut))
 
         # subtract average
         n_vals = len(occ_phi_ring)
@@ -545,7 +507,7 @@ def remake_arrays(input_arr_, file_out_name):
 
         gr_phi_ring.append(rt.TGraph())
         rnp.fill_graph(gr_phi_ring[ring], np.swapaxes([phi_ring[ring], occ_phi_ring], 0, 1))
-        gr_phi_ring[ring].SetName("gr_phi_occ_ring_"+str(ring))
+        gr_phi_ring[ring].SetName("gr_phi_occ_ring_standard_"+str(ring))
 
         # gr_phi_ring_subtracted
         gr_phi_ring_subtracted.append(rt.TGraph())
