@@ -61,16 +61,13 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         // set parameter starting values for each fit
         f->SetParameters(1000, 0, 1.0e4);
         
-        //std::string ring_name = "gr_phi_occ_ring_" + tag + "_" + std::to_string(i);
         const char* ring_name = Form("gr_phi_occ_ring_%s_%d", tag.c_str(), i);
         const char* file_ring_name = Form("%s gr_phi_occ_ring_%s_%d", input_file.c_str(), tag.c_str(), i);
-        std::cout << ring_name << std::endl;
-        std::cout << file_ring_name << std::endl;
         
         g[i] = (TGraph*) a->Get(ring_name);
         c[i] = new TCanvas(file_ring_name, file_ring_name);
         g[i]->Fit(f, "R");
-        g[i]->SetTitle(file_ring_name);
+        g[i]->SetTitle(ring_name);
         
         g[i]->SetMarkerStyle(20);
         g[i]->GetYaxis()->SetRangeUser(y_min, y_max);
