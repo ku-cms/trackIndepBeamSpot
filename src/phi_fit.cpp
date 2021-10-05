@@ -36,20 +36,25 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     for(int i = 0; i < 64; ++i)
     {
         // set parameter starting values for each fit
-        //f->SetParameters(1000, 0, 1.0e4);
-        f->SetParameters(1000, 0, 0.0);
+        f->SetParameters(1000, 0, 1.0e4);
         
         // standard
-        g[i] = (TGraph*) a->Get(Form("gr_phi_occ_ring_%d",i));
-        c[i] = new TCanvas(Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i), Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i));
-        g[i]->Fit(f, "R");
-        g[i]->SetTitle(Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i));
+        //g[i] = (TGraph*) a->Get(Form("gr_phi_occ_ring_%d",i));
+        //c[i] = new TCanvas(Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i), Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i));
+        //g[i]->Fit(f, "R");
+        //g[i]->SetTitle(Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i));
         
         // subtracted
         //g[i] = (TGraph*) a->Get(Form("gr_phi_occ_ring_subtracted_%d",i));
         //c[i] = new TCanvas(Form("%s gr_phi_occ_ring_subtracted_%d", input_file.c_str(), i), Form("%s gr_phi_occ_ring_subtracted_%d", input_file.c_str(), i));
         //g[i]->Fit(f, "R");
         //g[i]->SetTitle(Form("%s gr_phi_occ_ring_subtracted_%d", input_file.c_str(), i));
+        
+        // postcut
+        g[i] = (TGraph*) a->Get(Form("gr_phi_occ_ring_postcut_%d",i));
+        c[i] = new TCanvas(Form("%s gr_phi_occ_ring_postcut_%d", input_file.c_str(), i), Form("%s gr_phi_occ_ring_postcut_%d", input_file.c_str(), i));
+        g[i]->Fit(f, "R");
+        g[i]->SetTitle(Form("%s gr_phi_occ_ring_postcut_%d", input_file.c_str(), i));
         
         g[i]->SetMarkerStyle(20);
         g[i]->GetYaxis()->SetRangeUser(y_min, y_max);

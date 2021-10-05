@@ -454,6 +454,7 @@ def remake_arrays(input_arr_, file_out_name):
     
     gr_phi_ring = []
     gr_phi_ring_subtracted = []
+    gr_phi_ring_postcut = []
     z_avg_ring = np.array([np.mean(z) for z in z_ring])
     avg_z_sort = np.argsort(z_avg_ring)
     
@@ -499,6 +500,7 @@ def remake_arrays(input_arr_, file_out_name):
     #        #print("length occ_ring: {0}".format(len(occ_ring)))
     #        #print("length phi_ring: {0}".format(len(phi_ring)))
     
+    min_occupancy = 60000 
     onlyGoodRings = True
     phi_ring_sum = np.zeros(12)
     occ_phi_ring_subtracted_sum = np.zeros(12)
@@ -512,6 +514,13 @@ def remake_arrays(input_arr_, file_out_name):
         phi_sort        = np.argsort(phi_ring[ring])
         phi_ring[ring]  = phi_ring[ring][phi_sort]
         occ_phi_ring    = occ_phi_ring[phi_sort]
+
+        # cut on occupancy
+        print("Length before cut: {0}".format(len(occ_phi_ring)))
+        occupancy_cut         = occ_phi_ring >= min_occupancy
+        occ_phi_ring_postcut  = occ_phi_ring[ occupancy_cut ]
+        phi_ring_postcut      = phi_ring[ring][ occupancy_cut ]
+        print("Length after cut: {0}".format(len(occ_phi_ring_postcut)))
 
         # subtract average
         n_vals = len(occ_phi_ring)
@@ -542,6 +551,11 @@ def remake_arrays(input_arr_, file_out_name):
         gr_phi_ring_subtracted.append(rt.TGraph())
         rnp.fill_graph(gr_phi_ring_subtracted[ring], np.swapaxes([phi_ring[ring], occ_phi_ring_subtracted], 0, 1))
         gr_phi_ring_subtracted[ring].SetName("gr_phi_occ_ring_subtracted_"+str(ring))
+
+        # fill after cut
+        gr_phi_ring_postcut.append(rt.TGraph())
+        rnp.fill_graph(gr_phi_ring_postcut[ring], np.swapaxes([phi_ring_postcut, occ_phi_ring_postcut], 0, 1))
+        gr_phi_ring_postcut[ring].SetName("gr_phi_occ_ring_postcut_"+str(ring))
 
     phi_ring_avg = phi_ring_sum / num_good_rings
 
@@ -583,6 +597,7 @@ def remake_arrays(input_arr_, file_out_name):
     for ring in range(n_rings):
         gr_phi_ring[ring].Write()
         gr_phi_ring_subtracted[ring].Write()
+        gr_phi_ring_postcut[ring].Write()
     file_out.Close()
 
 
