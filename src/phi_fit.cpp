@@ -41,7 +41,7 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     TCanvas *c[64];
 
     std::string tag = "";
-    int option = 2;
+    int option = 0;
 
     if (option == 1)
     {
@@ -166,11 +166,10 @@ void loop()
     y_max_vals.push_back(300000.0);
     y_max_vals.push_back(300000.0);
     
-    //y_min_vals.push_back(0.0); 
-    //y_max_vals.push_back(300000.0);
-    
-    //y_min_vals.push_back(-10000.0); 
-    //y_max_vals.push_back(10000.0); 
+    //y_min_vals.push_back(-100000.0); 
+    //y_min_vals.push_back(-100000.0); 
+    //y_max_vals.push_back(100000.0); 
+    //y_max_vals.push_back(100000.0); 
 
     for (int i = 0; i < input_files.size(); ++i)
     {
