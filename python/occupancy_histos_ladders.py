@@ -461,7 +461,8 @@ def remake_arrays(input_arr_, file_out_name):
     #print("length occ_ring: {0}".format(len(occ_ring)))
     #print("length phi_ring: {0}".format(len(phi_ring)))
     
-    min_occupancy = 0
+    min_occupancy = 1
+    #min_occupancy = 20000
     onlyGoodRings = True
     phi_ring_sum = np.zeros(12)
     occ_phi_ring_subtracted_sum = np.zeros(12)
@@ -495,7 +496,7 @@ def remake_arrays(input_arr_, file_out_name):
         # skip rings if there are NANs
         num_nans = len(phi_ring[ring][np.isnan(phi_ring[ring])])
         if num_nans == 0:
-            print("good ring: {0}".format(ring))
+            print(" --- good ring: {0}".format(ring))
             num_good_rings += 1
             phi_ring_sum = phi_ring_sum + phi_ring[ring]
         

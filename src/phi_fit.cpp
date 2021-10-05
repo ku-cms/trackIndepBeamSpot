@@ -41,7 +41,7 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     TCanvas *c[64];
 
     std::string tag = "";
-    int option = 0;
+    int option = 2;
 
     if (option == 1)
     {
