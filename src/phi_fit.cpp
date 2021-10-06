@@ -7,6 +7,7 @@
 
 #include "TFile.h"
 #include "TF1.h"
+#include "TH1.h"
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "TAxis.h"
@@ -14,6 +15,18 @@
 
 namespace fs = std::filesystem;
 
+// draw and save histogram
+void draw(TH1F &hist, std::string output_name, std::string x_label, std::string y_label)
+{
+    TCanvas c;
+    c.cd();
+    hist.GetXaxis()->SetTitle(x_label.c_str());
+    hist.GetYaxis()->SetTitle(y_label.c_str());
+    hist.Draw();
+    c.SaveAs(output_name.c_str());
+}
+
+// run fit
 void fit(std::string input_file, std::string input_dir, std::string plot_dir, double y_min, double y_max)
 {
     std::cout << "Fitting for input file: " << input_file << std::endl;
@@ -26,19 +39,31 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     gStyle->SetStatH(0.1);
     gStyle->SetStatY(0.99);
     gStyle->SetTitleFontSize(0.04);
-
+    
     double pi = 3.14159265;
+    
+    double chisq[64];
+    double amp[64];
+    double shift[64];
+    double offset[64];
+    double amp_err[64];
+    double shift_err[64];
+    double offset_err[64];
+    
+    TGraph  *g[64];
+    TCanvas *c[64];
+    
+    TH1F *h_chisq   = new TH1F("h_chisq",   "Fit chi squares", 64, 0, 64);
+    TH1F *h_amp     = new TH1F("h_amp",     "Fit amplitudes", 64, 0, 64);
+    TH1F *h_shift   = new TH1F("h_shift",   "Fit phi shifts", 64, 0, 64);
+    TH1F *h_offset  = new TH1F("h_offset",  "Fit offsets", 64, 0, 64);
     
     TFile *a = new TFile(Form("%s/%s.root", input_dir.c_str(), input_file.c_str()), "READ");
     TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -1 * pi, pi);
-    f->SetParNames("amp", "shift", "avg");
     
+    f->SetParNames("amp", "shift", "offset");
     f->SetParLimits(0, 0, 1e8);
     f->SetParLimits(1, -1 * pi, pi);
-    
-    double amp[64], s[64], avg[64];
-    TGraph  *g[64];
-    TCanvas *c[64];
 
     std::string tag = "";
     int option = 2;
@@ -75,9 +100,15 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         c[i]->cd();
         g[i]->Draw("AP");
 
-        amp[i] = f->GetParameter(0);
-        s[i]   = f->GetParameter(1);
-        avg[i] = f->GetParameter(2);
+        chisq[i]        = f->GetChisquare();
+        amp[i]          = f->GetParameter(0);
+        shift[i]        = f->GetParameter(1);
+        offset[i]       = f->GetParameter(2);
+        amp_err[i]      = f->GetParError(0);
+        shift_err[i]    = f->GetParError(1);
+        offset_err[i]   = f->GetParError(2);
+
+        h_chisq->SetBinContent(i + 1, chisq[i]);
     }
     
     // create pdf
@@ -87,6 +118,9 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         c[i]->Print(Form("%s/%s_%s.pdf", plot_dir.c_str(), input_file.c_str(), tag.c_str()));
     }
     c[63]->Print(Form("%s/%s_%s.pdf)", plot_dir.c_str(), input_file.c_str(), tag.c_str()));
+
+    //draw(*h_chisq, plot_dir + "/chisq.pdf", "ring", "chi sq.");
+    draw(*h_chisq, plot_dir + "/" + input_file + "_" + tag + "_chisq.pdf", "ring", "chi sq.");
     
     // delete canvases
     for(int i = 0; i < 64; ++i)
@@ -96,6 +130,10 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     
     delete a;
     delete f;
+    delete h_chisq;
+    delete h_amp;
+    delete h_shift;
+    delete h_offset;
 }
 
 void loop()
