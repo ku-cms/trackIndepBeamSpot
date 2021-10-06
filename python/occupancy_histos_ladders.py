@@ -610,7 +610,7 @@ if __name__ == "__main__":
         "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
 
-    for sample in inputs_v4:
+    for sample in inputs_v1:
         in_array    = read_file("data/{0}.npy".format(sample))
         output_name = "{0}/{1}.root".format(output_dir, sample)
         remake_arrays(in_array, output_name)
