@@ -4,9 +4,14 @@ This repository contains python scripts used for reading layer 1 pixel clusters 
 
 ## Setup
 
-Clone this repository:
+Create CMSSW area and clone this repository.
 ```
+export SCRAM_ARCH=slc7_amd64_gcc900
+cmsrel CMSSW_11_2_0
+cd CMSSW_11_2_0/src
+cmsenv
 git clone https://github.com/ku-cms/trackIndepBeamSpot.git
+cd trackIndepBeamSpot
 ```
 
 There are two main steps that this framework does: reading clusters and fitting.
@@ -78,6 +83,7 @@ root multiple_phifit_v2.C
 
 Fitting with ROOT in C++:
 ```
+mkdir -p bin
 g++ src/phi_fit.cpp -o bin/phi_fit `root-config --cflags --glibs --ldflags` --std=c++2a
 ./bin/phi_fit
 ```

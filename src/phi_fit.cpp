@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <filesystem>
+
 #include "TFile.h"
 #include "TF1.h"
 #include "TGraph.h"
@@ -10,9 +12,14 @@
 #include "TAxis.h"
 #include "TStyle.h"
 
+namespace fs = std::filesystem;
+
 void fit(std::string input_file, std::string input_dir, std::string plot_dir, double y_min, double y_max)
 {
     std::cout << "Fitting for input file: " << input_file << std::endl;
+
+    // create directory for plots
+    fs::create_directory(plot_dir);
     
     gStyle->SetOptFit(111);
     gStyle->SetStatW(0.1);                
@@ -25,22 +32,43 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     TFile *a = new TFile(Form("%s/%s.root", input_dir.c_str(), input_file.c_str()), "READ");
     TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -1 * pi, pi);
     f->SetParNames("amp", "shift", "avg");
+    
     f->SetParLimits(0, 0, 1e8);
     f->SetParLimits(1, -1 * pi, pi);
     
     double amp[64], s[64], avg[64];
     TGraph  *g[64];
     TCanvas *c[64];
+
+    std::string tag = "";
+    int option = 2;
+
+    if (option == 1)
+    {
+        tag = "subtracted";
+    }
+    else if (option == 2)
+    {
+        tag = "postcut";
+    }
+    else
+    {
+        tag = "standard";
+    }
   
     for(int i = 0; i < 64; ++i)
     {
         // set parameter starting values for each fit
         f->SetParameters(1000, 0, 1.0e4);
-        g[i] = (TGraph*) a->Get(Form("gr_phi_occ_ring_%d",i));
-        c[i] = new TCanvas(Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i), Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i));
         
+        const char* ring_name = Form("gr_phi_occ_ring_%s_%d", tag.c_str(), i);
+        const char* file_ring_name = Form("%s gr_phi_occ_ring_%s_%d", input_file.c_str(), tag.c_str(), i);
+        
+        g[i] = (TGraph*) a->Get(ring_name);
+        c[i] = new TCanvas(file_ring_name, file_ring_name);
         g[i]->Fit(f, "R");
-        g[i]->SetTitle(Form("%s gr_phi_occ_ring_%d", input_file.c_str(), i));
+        g[i]->SetTitle(ring_name);
+        
         g[i]->SetMarkerStyle(20);
         g[i]->GetYaxis()->SetRangeUser(y_min, y_max);
    
@@ -53,12 +81,12 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     }
     
     // create pdf
-    c[0]->Print(Form("%s/%s.pdf(", plot_dir.c_str(), input_file.c_str()));
+    c[0]->Print(Form("%s/%s_%s.pdf(", plot_dir.c_str(), input_file.c_str(), tag.c_str()));
     for(int i = 1; i < 63; ++i)
     {
-        c[i]->Print(Form("%s/%s.pdf", plot_dir.c_str(), input_file.c_str()));
+        c[i]->Print(Form("%s/%s_%s.pdf", plot_dir.c_str(), input_file.c_str(), tag.c_str()));
     }
-    c[63]->Print(Form("%s/%s.pdf)", plot_dir.c_str(), input_file.c_str()));
+    c[63]->Print(Form("%s/%s_%s.pdf)", plot_dir.c_str(), input_file.c_str(), tag.c_str()));
     
     // delete canvases
     for(int i = 0; i < 64; ++i)
@@ -83,21 +111,27 @@ void loop()
     //input_files.push_back("ZeroBias_2017B_ClusterSize2_AllClusters");
     //input_files.push_back("ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters");
     
-    input_files.push_back("ZeroBias_2017B_MoreEvents_AllClusters");
-    input_files.push_back("ZeroBias_2017B_MoreEvents_ClusterSize2_AllClusters");
-    input_files.push_back("SingleMuon_2017B_MoreEvents_AllClusters");
-    input_files.push_back("SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters");
+    //input_files.push_back("ZeroBias_2017B_MoreEvents_AllClusters");
+    //input_files.push_back("ZeroBias_2017B_MoreEvents_ClusterSize2_AllClusters");
+    //input_files.push_back("SingleMuon_2017B_MoreEvents_AllClusters");
+    //input_files.push_back("SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters");
+
+    // Legacy 2017
+    input_files.push_back("ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
+    input_files.push_back("SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
     
     std::vector<double> y_min_vals;
     std::vector<double> y_max_vals;
-    y_min_vals.push_back(0.0); 
-    y_min_vals.push_back(0.0); 
+    
     y_min_vals.push_back(0.0); 
     y_min_vals.push_back(0.0); 
     y_max_vals.push_back(300000.0);
     y_max_vals.push_back(300000.0);
-    y_max_vals.push_back(300000.0);
-    y_max_vals.push_back(300000.0);
+    
+    //y_min_vals.push_back(-100000.0); 
+    //y_min_vals.push_back(-100000.0); 
+    //y_max_vals.push_back(100000.0); 
+    //y_max_vals.push_back(100000.0); 
 
     for (int i = 0; i < input_files.size(); ++i)
     {
