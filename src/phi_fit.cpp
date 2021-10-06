@@ -16,12 +16,14 @@
 namespace fs = std::filesystem;
 
 // draw and save histogram
-void draw(TH1F &hist, std::string output_name, std::string x_label, std::string y_label)
+void draw(TH1F &hist, std::string output_name, std::string x_label, std::string y_label, double x_min, double x_max, double y_min, double y_max)
 {
     TCanvas c;
     c.cd();
     hist.GetXaxis()->SetTitle(x_label.c_str());
     hist.GetYaxis()->SetTitle(y_label.c_str());
+    hist.GetXaxis()->SetRangeUser(x_min, x_max);
+    hist.GetYaxis()->SetRangeUser(y_min, y_max);
     hist.Draw();
     c.SaveAs(output_name.c_str());
 }
@@ -59,11 +61,11 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     TH1F *h_offset  = new TH1F("h_offset",  "Fit offsets", 64, 0, 64);
     
     TFile *a = new TFile(Form("%s/%s.root", input_dir.c_str(), input_file.c_str()), "READ");
-    TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -1 * pi, pi);
+    TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -pi, pi);
     
     f->SetParNames("amp", "shift", "offset");
     f->SetParLimits(0, 0, 1e8);
-    f->SetParLimits(1, -1 * pi, pi);
+    f->SetParLimits(1, -pi, pi);
 
     std::string tag = "";
     int option = 2;
@@ -108,19 +110,29 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         shift_err[i]    = f->GetParError(1);
         offset_err[i]   = f->GetParError(2);
 
-        h_chisq->SetBinContent(i + 1, chisq[i]);
+        h_chisq->SetBinContent(i + 1,  chisq[i]);
+        h_amp->SetBinContent(i + 1,    amp[i]);
+        h_shift->SetBinContent(i + 1,  shift[i]);
+        h_offset->SetBinContent(i + 1, offset[i]);
+        h_amp->SetBinError(i + 1,      amp_err[i]);
+        h_shift->SetBinError(i + 1,    shift_err[i]);
+        h_offset->SetBinError(i + 1,   offset_err[i]);
     }
+
+    std::string base_name = plot_dir + "/" + input_file + "_" + tag;
     
     // create pdf
-    c[0]->Print(Form("%s/%s_%s.pdf(", plot_dir.c_str(), input_file.c_str(), tag.c_str()));
+    c[0]->Print(Form("%s.pdf(", base_name.c_str()));
     for(int i = 1; i < 63; ++i)
     {
-        c[i]->Print(Form("%s/%s_%s.pdf", plot_dir.c_str(), input_file.c_str(), tag.c_str()));
+        c[i]->Print(Form("%s.pdf", base_name.c_str()));
     }
-    c[63]->Print(Form("%s/%s_%s.pdf)", plot_dir.c_str(), input_file.c_str(), tag.c_str()));
+    c[63]->Print(Form("%s.pdf)", base_name.c_str()));
 
-    //draw(*h_chisq, plot_dir + "/chisq.pdf", "ring", "chi sq.");
-    draw(*h_chisq, plot_dir + "/" + input_file + "_" + tag + "_chisq.pdf", "ring", "chi sq.");
+    draw(*h_chisq,  base_name + "_chisq.pdf",  "ring", "chi sq.",   0, 64, 0, 1e10);
+    draw(*h_amp,    base_name + "_amp.pdf",    "ring", "amplitude", 0, 64, 0, 5e4);
+    draw(*h_shift,  base_name + "_shift.pdf",  "ring", "shift",     0, 64, -pi, pi);
+    draw(*h_offset, base_name + "_offset.pdf", "ring", "offset",    0, 64, 0, 3e5);
     
     // delete canvases
     for(int i = 0; i < 64; ++i)
