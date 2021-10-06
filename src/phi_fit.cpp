@@ -25,7 +25,9 @@ void draw(TH1F &hist, std::string output_name, std::string x_label, std::string 
     hist.GetXaxis()->SetRangeUser(x_min, x_max);
     hist.GetYaxis()->SetRangeUser(y_min, y_max);
     hist.Draw();
-    c.SaveAs(output_name.c_str());
+    c.SaveAs(Form("%s.pdf", output_name.c_str()));
+    c.SaveAs(Form("%s.png", output_name.c_str()));
+    //c.SaveAs(output_name.c_str());
 }
 
 // run fit
@@ -130,16 +132,16 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     c[63]->Print(Form("%s.pdf)", base_name.c_str()));
 
     // limits for ttbar
-    //draw(*h_chisq,  base_name + "_chisq.pdf",  "ring", "chi sq.",   0, 64, 0, 1e6);
-    //draw(*h_amp,    base_name + "_amp.pdf",    "ring", "amplitude", 0, 64, 0, 2e3);
-    //draw(*h_shift,  base_name + "_shift.pdf",  "ring", "shift",     0, 64, -pi, pi);
-    //draw(*h_offset, base_name + "_offset.pdf", "ring", "offset",    0, 64, 0, 2e4);
+    //draw(*h_chisq,  base_name + "_chisq",  "ring", "chi sq.",   0, 64, 0, 1e6);
+    //draw(*h_amp,    base_name + "_amp",    "ring", "amplitude", 0, 64, 0, 2e3);
+    //draw(*h_shift,  base_name + "_shift",  "ring", "shift",     0, 64, -pi, pi);
+    //draw(*h_offset, base_name + "_offset", "ring", "offset",    0, 64, 0, 2e4);
     
     // limits for legacy 2017 data
-    draw(*h_chisq,  base_name + "_chisq.pdf",  "ring", "chi sq.",   0, 64, 0, 2e10);
-    draw(*h_amp,    base_name + "_amp.pdf",    "ring", "amplitude", 0, 64, 0, 5e4);
-    draw(*h_shift,  base_name + "_shift.pdf",  "ring", "shift",     0, 64, -pi, pi);
-    draw(*h_offset, base_name + "_offset.pdf", "ring", "offset",    0, 64, 0, 3e5);
+    draw(*h_chisq,  base_name + "_chisq",  "ring", "chi sq.",   0, 64, 0, 2e10);
+    draw(*h_amp,    base_name + "_amp",    "ring", "amplitude", 0, 64, 0, 5e4);
+    draw(*h_shift,  base_name + "_shift",  "ring", "shift",     0, 64, -pi, pi);
+    draw(*h_offset, base_name + "_offset", "ring", "offset",    0, 64, 0, 3e5);
     
     // delete canvases
     for(int i = 0; i < 64; ++i)

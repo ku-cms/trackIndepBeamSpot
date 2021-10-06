@@ -461,6 +461,7 @@ def remake_arrays(input_arr_, file_out_name):
     #print("length occ_ring: {0}".format(len(occ_ring)))
     #print("length phi_ring: {0}".format(len(phi_ring)))
     
+    # using fixed occupancy cut
     #min_occupancy = 1
     min_occupancy = 20000
     onlyGoodRings = True
@@ -476,9 +477,24 @@ def remake_arrays(input_arr_, file_out_name):
         phi_sort        = np.argsort(phi_ring[ring])
         phi_ring[ring]  = phi_ring[ring][phi_sort]
         occ_phi_ring    = occ_phi_ring[phi_sort]
+        
+        n_vals  = len(occ_phi_ring)
+        avg     = np.mean(occ_phi_ring)
+        std_dev = np.std(occ_phi_ring)
+        #print("ring {0}: n_vals = {1}, avg = {2:.2f}, std_dev = {3:.2f}".format(ring, n_vals, avg, std_dev))
 
         # cut on occupancy
-        occupancy_cut         = occ_phi_ring >= min_occupancy
+        
+        # using fixed occupancy cut
+        #occupancy_cut         = occ_phi_ring >= min_occupancy
+        
+        # using varied occupancy cut 
+        delta = 0.30 * avg
+        min_occupancy         = avg - delta
+        max_occupancy         = avg + delta
+        #occupancy_cut         = (occ_phi_ring >= min_occupancy) & (occ_phi_ring <= max_occupancy)
+        occupancy_cut         = (occ_phi_ring >= min_occupancy)
+        
         occ_phi_ring_postcut  = occ_phi_ring[ occupancy_cut ]
         phi_ring_postcut      = phi_ring[ring][ occupancy_cut ]
         length_before_cut     = len(occ_phi_ring)
@@ -486,11 +502,6 @@ def remake_arrays(input_arr_, file_out_name):
         print("Ring {0}: num. points: before cut: {1}, after cut: {2}".format(ring, length_before_cut, length_after_cut))
 
         # subtract average
-        n_vals = len(occ_phi_ring)
-        avg = np.mean(occ_phi_ring)
-        std_dev = np.std(occ_phi_ring)
-        #print("ring {0}: n_vals = {1}, avg = {2:.2f}, std_dev = {3:.2f}".format(ring, n_vals, avg, std_dev))
-
         occ_phi_ring_subtracted = occ_phi_ring - avg
         
         # skip rings if there are NANs
