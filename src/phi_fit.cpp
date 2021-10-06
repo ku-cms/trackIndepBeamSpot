@@ -130,16 +130,16 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     c[63]->Print(Form("%s.pdf)", base_name.c_str()));
 
     // limits for ttbar
-    draw(*h_chisq,  base_name + "_chisq.pdf",  "ring", "chi sq.",   0, 64, 0, 1e6);
-    draw(*h_amp,    base_name + "_amp.pdf",    "ring", "amplitude", 0, 64, 0, 2e3);
-    draw(*h_shift,  base_name + "_shift.pdf",  "ring", "shift",     0, 64, -pi, pi);
-    draw(*h_offset, base_name + "_offset.pdf", "ring", "offset",    0, 64, 0, 2e4);
+    //draw(*h_chisq,  base_name + "_chisq.pdf",  "ring", "chi sq.",   0, 64, 0, 1e6);
+    //draw(*h_amp,    base_name + "_amp.pdf",    "ring", "amplitude", 0, 64, 0, 2e3);
+    //draw(*h_shift,  base_name + "_shift.pdf",  "ring", "shift",     0, 64, -pi, pi);
+    //draw(*h_offset, base_name + "_offset.pdf", "ring", "offset",    0, 64, 0, 2e4);
     
     // limits for legacy 2017 data
-    //draw(*h_chisq,  base_name + "_chisq.pdf",  "ring", "chi sq.",   0, 64, 0, 1e10);
-    //draw(*h_amp,    base_name + "_amp.pdf",    "ring", "amplitude", 0, 64, 0, 5e4);
-    //draw(*h_shift,  base_name + "_shift.pdf",  "ring", "shift",     0, 64, -pi, pi);
-    //draw(*h_offset, base_name + "_offset.pdf", "ring", "offset",    0, 64, 0, 3e5);
+    draw(*h_chisq,  base_name + "_chisq.pdf",  "ring", "chi sq.",   0, 64, 0, 2e10);
+    draw(*h_amp,    base_name + "_amp.pdf",    "ring", "amplitude", 0, 64, 0, 5e4);
+    draw(*h_shift,  base_name + "_shift.pdf",  "ring", "shift",     0, 64, -pi, pi);
+    draw(*h_offset, base_name + "_offset.pdf", "ring", "offset",    0, 64, 0, 3e5);
     
     // delete canvases
     for(int i = 0; i < 64; ++i)
@@ -161,7 +161,9 @@ void loop()
     std::string plot_dir  = "phi_fit_plots";
     
     std::vector<std::string> input_files;
-    input_files.push_back("TTBar_AllClusters_zsmear");
+    
+    //input_files.push_back("TTBar_AllClusters_zsmear");
+    
     //input_files.push_back("SingleMuon_AllClusters");
     
     //input_files.push_back("ZeroBias_2017B_AllClusters");
@@ -174,21 +176,21 @@ void loop()
     //input_files.push_back("SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters");
 
     // Legacy 2017
-    //input_files.push_back("ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
-    //input_files.push_back("SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
+    input_files.push_back("ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
+    input_files.push_back("SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
     
     std::vector<double> y_min_vals;
     std::vector<double> y_max_vals;
     
     // limits for ttbar
-    y_min_vals.push_back(0.0); 
-    y_max_vals.push_back(30000.0);
+    //y_min_vals.push_back(0.0); 
+    //y_max_vals.push_back(30000.0);
     
     // limits for legacy 2017 data
-    //y_min_vals.push_back(0.0); 
-    //y_min_vals.push_back(0.0); 
-    //y_max_vals.push_back(300000.0);
-    //y_max_vals.push_back(300000.0);
+    y_min_vals.push_back(0.0); 
+    y_min_vals.push_back(0.0); 
+    y_max_vals.push_back(300000.0);
+    y_max_vals.push_back(300000.0);
     
     // limits for subtracted version
     //y_min_vals.push_back(-100000.0); 

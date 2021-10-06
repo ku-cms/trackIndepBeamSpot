@@ -461,8 +461,8 @@ def remake_arrays(input_arr_, file_out_name):
     #print("length occ_ring: {0}".format(len(occ_ring)))
     #print("length phi_ring: {0}".format(len(phi_ring)))
     
-    min_occupancy = 1
-    #min_occupancy = 20000
+    #min_occupancy = 1
+    min_occupancy = 20000
     onlyGoodRings = True
     phi_ring_sum = np.zeros(12)
     occ_phi_ring_subtracted_sum = np.zeros(12)
@@ -610,7 +610,7 @@ if __name__ == "__main__":
         "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
 
-    for sample in inputs_v1:
+    for sample in inputs_v4:
         in_array    = read_file("data/{0}.npy".format(sample))
         output_name = "{0}/{1}.root".format(output_dir, sample)
         remake_arrays(in_array, output_name)
