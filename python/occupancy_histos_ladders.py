@@ -461,8 +461,10 @@ def remake_arrays(input_arr_, file_out_name):
     #print("length occ_ring: {0}".format(len(occ_ring)))
     #print("length phi_ring: {0}".format(len(phi_ring)))
     
-    min_occupancy = 1
-    #min_occupancy = 20000
+    # using fixed occupancy cut
+    useFixedCut = False
+    #min_occupancy = 1
+    min_occupancy = 20000
     onlyGoodRings = True
     phi_ring_sum = np.zeros(12)
     occ_phi_ring_subtracted_sum = np.zeros(12)
@@ -476,9 +478,26 @@ def remake_arrays(input_arr_, file_out_name):
         phi_sort        = np.argsort(phi_ring[ring])
         phi_ring[ring]  = phi_ring[ring][phi_sort]
         occ_phi_ring    = occ_phi_ring[phi_sort]
+        
+        n_vals  = len(occ_phi_ring)
+        avg     = np.mean(occ_phi_ring)
+        std_dev = np.std(occ_phi_ring)
+        #print("ring {0}: n_vals = {1}, avg = {2:.2f}, std_dev = {3:.2f}".format(ring, n_vals, avg, std_dev))
 
         # cut on occupancy
-        occupancy_cut         = occ_phi_ring >= min_occupancy
+        
+        # using fixed occupancy cut
+        if useFixedCut:
+            occupancy_cut         = occ_phi_ring >= min_occupancy
+        
+        # using varied occupancy cut 
+        else: 
+            delta = 0.30 * avg
+            min_occupancy         = avg - delta
+            max_occupancy         = avg + delta
+            #occupancy_cut         = (occ_phi_ring >= min_occupancy) & (occ_phi_ring <= max_occupancy)
+            occupancy_cut         = (occ_phi_ring >= min_occupancy)
+        
         occ_phi_ring_postcut  = occ_phi_ring[ occupancy_cut ]
         phi_ring_postcut      = phi_ring[ring][ occupancy_cut ]
         length_before_cut     = len(occ_phi_ring)
@@ -486,17 +505,12 @@ def remake_arrays(input_arr_, file_out_name):
         print("Ring {0}: num. points: before cut: {1}, after cut: {2}".format(ring, length_before_cut, length_after_cut))
 
         # subtract average
-        n_vals = len(occ_phi_ring)
-        avg = np.mean(occ_phi_ring)
-        std_dev = np.std(occ_phi_ring)
-        #print("ring {0}: n_vals = {1}, avg = {2:.2f}, std_dev = {3:.2f}".format(ring, n_vals, avg, std_dev))
-
         occ_phi_ring_subtracted = occ_phi_ring - avg
         
         # skip rings if there are NANs
         num_nans = len(phi_ring[ring][np.isnan(phi_ring[ring])])
         if num_nans == 0:
-            print(" --- good ring: {0}".format(ring))
+            #print(" --- good ring: {0}".format(ring))
             num_good_rings += 1
             phi_ring_sum = phi_ring_sum + phi_ring[ring]
         
@@ -522,11 +536,11 @@ def remake_arrays(input_arr_, file_out_name):
 
     phi_ring_avg = phi_ring_sum / num_good_rings
 
-    print("number of good rings: {0}".format(num_good_rings))
-    print("phi_condense (length {0}): {1}".format(len(phi_condense), phi_condense))
-    print("occ_phi_condense (length {0}): {1}".format(len(occ_phi_condense), occ_phi_condense))
-    print("phi_ring_avg (length {0}): {1}".format(len(phi_ring_avg), phi_ring_avg))
-    print("occ_phi_ring_subtracted_sum (length {0}): {1}".format(len(occ_phi_ring_subtracted_sum), occ_phi_ring_subtracted_sum))
+    #print("number of good rings: {0}".format(num_good_rings))
+    #print("phi_condense (length {0}): {1}".format(len(phi_condense), phi_condense))
+    #print("occ_phi_condense (length {0}): {1}".format(len(occ_phi_condense), occ_phi_condense))
+    #print("phi_ring_avg (length {0}): {1}".format(len(phi_ring_avg), phi_ring_avg))
+    #print("occ_phi_ring_subtracted_sum (length {0}): {1}".format(len(occ_phi_ring_subtracted_sum), occ_phi_ring_subtracted_sum))
 
     gr_phi = rt.TGraph()
     rnp.fill_graph(gr_phi, np.swapaxes([phi_condense, occ_phi_condense], 0, 1))
