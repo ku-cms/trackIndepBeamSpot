@@ -26,8 +26,6 @@ void draw(TH1F &hist, std::string output_name, std::string x_label, std::string 
     hist.GetYaxis()->SetRangeUser(y_min, y_max);
     hist.Draw();
     c.SaveAs(Form("%s.pdf", output_name.c_str()));
-    c.SaveAs(Form("%s.png", output_name.c_str()));
-    //c.SaveAs(output_name.c_str());
 }
 
 // run fit
