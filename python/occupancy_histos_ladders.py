@@ -440,6 +440,8 @@ def remake_arrays(input_arr_, file_out_name):
     gr_phi_ring = []
     gr_phi_ring_subtracted = []
     gr_phi_ring_postcut = []
+    ring_array = []
+    phi_per_ring_arrary = []
     z_avg_ring = np.array([np.mean(z) for z in z_ring])
     avg_z_sort = np.argsort(z_avg_ring)
     
@@ -473,6 +475,7 @@ def remake_arrays(input_arr_, file_out_name):
         # sort by phi for phi distribution
 
         #print("ring {0}: z = {1}".format(ring, z_avg_ring_sorted[ring]))
+        ring_array.append(ring)
         phi_ring[ring]  = np.array(phi_ring[ring])
         occ_phi_ring    = np.array(occ_ring[ring])
         phi_sort        = np.argsort(phi_ring[ring])
@@ -502,6 +505,7 @@ def remake_arrays(input_arr_, file_out_name):
         phi_ring_postcut      = phi_ring[ring][ occupancy_cut ]
         length_before_cut     = len(occ_phi_ring)
         length_after_cut      = len(occ_phi_ring_postcut)
+        phi_per_ring_arrary.append(length_after_cut)
         print("Ring {0}: num. points: before cut: {1}, after cut: {2}".format(ring, length_before_cut, length_after_cut))
 
         # subtract average
@@ -533,6 +537,13 @@ def remake_arrays(input_arr_, file_out_name):
         gr_phi_ring_postcut.append(rt.TGraph())
         rnp.fill_graph(gr_phi_ring_postcut[ring], np.swapaxes([phi_ring_postcut, occ_phi_ring_postcut], 0, 1))
         gr_phi_ring_postcut[ring].SetName("gr_phi_occ_ring_postcut_"+str(ring))
+
+    # number of phi points after cut
+    ring_array = np.array(ring_array)
+    phi_per_ring_arrary = np.array(phi_per_ring_arrary)
+    gr_num_phi_per_ring = rt.TGraph()
+    rnp.fill_graph(gr_num_phi_per_ring, np.swapaxes([ring_array, phi_per_ring_arrary], 0, 1))
+    gr_num_phi_per_ring.SetName("gr_num_phi_per_ring")
 
     phi_ring_avg = phi_ring_sum / num_good_rings
 
@@ -568,6 +579,7 @@ def remake_arrays(input_arr_, file_out_name):
     gr_phi_subtracted_sum.Write()
     gr_z.Write()
     gr_r3d.Write()
+    gr_num_phi_per_ring.Write()
     for hl in range(n_ladders):
         gr_r_hl[hl].Write()
         gr_z_hl[hl].Write()

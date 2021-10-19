@@ -59,6 +59,7 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     TH1F *h_amp     = new TH1F("h_amp",     "Fit amplitudes", 64, 0, 64);
     TH1F *h_shift   = new TH1F("h_shift",   "Fit phi shifts", 64, 0, 64);
     TH1F *h_offset  = new TH1F("h_offset",  "Fit offsets", 64, 0, 64);
+    TH1F *h_num_phi = new TH1F("h_num_phi",  "Number of phi points", 64, 0, 64);
     
     TFile *a = new TFile(Form("%s/%s.root", input_dir.c_str(), input_file.c_str()), "READ");
     TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -pi, pi);
@@ -82,6 +83,14 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     {
         tag = "standard";
     }
+
+    std::string base_name = plot_dir + "/" + input_file + "_" + tag;
+    
+    // number of phi after cut
+    TGraph *num_phi = (TGraph*) a->Get("gr_num_phi_per_ring");
+    if (num_phi) printf("PASS: loaded num_phi\n");
+    else         printf("FAIL: did not load num_phi\n");
+
   
     for(int i = 0; i < 64; ++i)
     {
@@ -102,6 +111,11 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         c[i]->cd();
         g[i]->Draw("AP");
 
+        double num_phi_x = num_phi->GetPointX(i);
+        double num_phi_y = num_phi->GetPointY(i);
+        printf("ring %d: number of phi (x, y) = (%f, %f)\n", i, num_phi_x, num_phi_y);
+        h_num_phi->SetBinContent(i + 1, num_phi_y);
+
         chisq[i]        = f->GetChisquare();
         amp[i]          = f->GetParameter(0);
         shift[i]        = f->GetParameter(1);
@@ -119,7 +133,6 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         h_offset->SetBinError(i + 1,   offset_err[i]);
     }
 
-    std::string base_name = plot_dir + "/" + input_file + "_" + tag;
     
     // create pdf
     c[0]->Print(Form("%s.pdf(", base_name.c_str()));
@@ -136,10 +149,11 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     //draw(*h_offset, base_name + "_offset", "ring", "offset",    0, 64, 0, 2e4);
     
     // limits for legacy 2017 data
-    draw(*h_chisq,  base_name + "_chisq",  "ring", "chi sq.",   0, 64, 0, 2e10);
-    draw(*h_amp,    base_name + "_amp",    "ring", "amplitude", 0, 64, 0, 5e4);
-    draw(*h_shift,  base_name + "_shift",  "ring", "shift",     0, 64, -pi, pi);
-    draw(*h_offset, base_name + "_offset", "ring", "offset",    0, 64, 0, 3e5);
+    draw(*h_chisq,   base_name + "_chisq",   "ring", "chi sq.",   0, 64, 0, 2e10);
+    draw(*h_amp,     base_name + "_amp",     "ring", "amplitude", 0, 64, 0, 5e4);
+    draw(*h_shift,   base_name + "_shift",   "ring", "shift",     0, 64, -pi, pi);
+    draw(*h_offset,  base_name + "_offset",  "ring", "offset",    0, 64, 0, 3e5);
+    draw(*h_num_phi, base_name + "_num_phi", "ring", "num_phi",   0, 64, 0, 20);
     
     // delete canvases
     for(int i = 0; i < 64; ++i)
@@ -153,6 +167,7 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     delete h_amp;
     delete h_shift;
     delete h_offset;
+    delete h_num_phi;
 }
 
 void loop()
