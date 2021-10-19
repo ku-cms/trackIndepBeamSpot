@@ -55,11 +55,16 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     TGraph  *g[64];
     TCanvas *c[64];
     
-    TH1F *h_chisq   = new TH1F("h_chisq",   "Fit chi squares", 64, 0, 64);
-    TH1F *h_amp     = new TH1F("h_amp",     "Fit amplitudes", 64, 0, 64);
-    TH1F *h_shift   = new TH1F("h_shift",   "Fit phi shifts", 64, 0, 64);
-    TH1F *h_offset  = new TH1F("h_offset",  "Fit offsets", 64, 0, 64);
-    TH1F *h_num_phi = new TH1F("h_num_phi",  "Number of phi points", 64, 0, 64);
+    TH1F *h_num_phi     = new TH1F("h_num_phi",     "Number of phi points", 64, 0, 64);
+    TH1F *h_chisq       = new TH1F("h_chisq",       "Fit chi squares", 64, 0, 64);
+    TH1F *h_amp         = new TH1F("h_amp",         "Fit amplitudes", 64, 0, 64);
+    TH1F *h_shift       = new TH1F("h_shift",       "Fit phi shifts", 64, 0, 64);
+    TH1F *h_offset      = new TH1F("h_offset",      "Fit offsets", 64, 0, 64);
+    TH1F *h_num_phi_cut = new TH1F("h_num_phi_cut", "Number of phi points after cut", 64, 0, 64);
+    TH1F *h_chisq_cut   = new TH1F("h_chisq_cut",   "Fit chi squares after cut", 64, 0, 64);
+    TH1F *h_amp_cut     = new TH1F("h_amp_cut",     "Fit amplitudes after cut", 64, 0, 64);
+    TH1F *h_shift_cut   = new TH1F("h_shift_cut",   "Fit phi shifts after cut", 64, 0, 64);
+    TH1F *h_offset_cut  = new TH1F("h_offset_cut",  "Fit offsets after cut", 64, 0, 64);
     
     TFile *a = new TFile(Form("%s/%s.root", input_dir.c_str(), input_file.c_str()), "READ");
     TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -pi, pi);
@@ -131,6 +136,18 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         h_amp->SetBinError(i + 1,      amp_err[i]);
         h_shift->SetBinError(i + 1,    shift_err[i]);
         h_offset->SetBinError(i + 1,   offset_err[i]);
+        
+        if(num_phi_y >= 10)
+        {
+            h_num_phi_cut->SetBinContent(i + 1, num_phi_y);
+            h_chisq_cut->SetBinContent(i + 1,   chisq[i]);
+            h_amp_cut->SetBinContent(i + 1,     amp[i]);
+            h_shift_cut->SetBinContent(i + 1,   shift[i]);
+            h_offset_cut->SetBinContent(i + 1,  offset[i]);
+            h_amp_cut->SetBinError(i + 1,       amp_err[i]);
+            h_shift_cut->SetBinError(i + 1,     shift_err[i]);
+            h_offset_cut->SetBinError(i + 1,    offset_err[i]);
+        }
     }
 
     
@@ -149,11 +166,16 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     //draw(*h_offset, base_name + "_offset", "ring", "offset",    0, 64, 0, 2e4);
     
     // limits for legacy 2017 data
-    draw(*h_chisq,   base_name + "_chisq",   "ring", "chi sq.",   0, 64, 0, 2e10);
-    draw(*h_amp,     base_name + "_amp",     "ring", "amplitude", 0, 64, 0, 5e4);
-    draw(*h_shift,   base_name + "_shift",   "ring", "shift",     0, 64, -pi, pi);
-    draw(*h_offset,  base_name + "_offset",  "ring", "offset",    0, 64, 0, 3e5);
-    draw(*h_num_phi, base_name + "_num_phi", "ring", "num_phi",   0, 64, 0, 20);
+    draw(*h_num_phi,        base_name + "_num_phi",     "ring", "num_phi",   0, 64, 0, 20);
+    draw(*h_chisq,          base_name + "_chisq",       "ring", "chi sq.",   0, 64, 0, 2e10);
+    draw(*h_amp,            base_name + "_amp",         "ring", "amplitude", 0, 64, 0, 5e4);
+    draw(*h_shift,          base_name + "_shift",       "ring", "shift",     0, 64, -pi, pi);
+    draw(*h_offset,         base_name + "_offset",      "ring", "offset",    0, 64, 0, 3e5);
+    draw(*h_num_phi_cut,    base_name + "_num_phi_cut", "ring", "num_phi",   0, 64, 0, 20);
+    draw(*h_chisq_cut,      base_name + "_chisq_cut",   "ring", "chi sq.",   0, 64, 0, 2e10);
+    draw(*h_amp_cut,        base_name + "_amp_cut",     "ring", "amplitude", 0, 64, 0, 5e4);
+    draw(*h_shift_cut,      base_name + "_shift_cut",   "ring", "shift",     0, 64, -pi, pi);
+    draw(*h_offset_cut,     base_name + "_offset_cut",  "ring", "offset",    0, 64, 0, 3e5);
     
     // delete canvases
     for(int i = 0; i < 64; ++i)
@@ -163,11 +185,16 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     
     delete a;
     delete f;
+    delete h_num_phi;
     delete h_chisq;
     delete h_amp;
     delete h_shift;
     delete h_offset;
-    delete h_num_phi;
+    delete h_num_phi_cut;
+    delete h_chisq_cut;
+    delete h_amp_cut;
+    delete h_shift_cut;
+    delete h_offset_cut;
 }
 
 void loop()
