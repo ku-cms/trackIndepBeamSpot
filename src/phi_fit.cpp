@@ -70,7 +70,7 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -pi, pi);
     
     f->SetParNames("amp", "shift", "offset");
-    f->SetParLimits(0, 0, 1e8);
+    f->SetParLimits(0, 0, 1e10);
     f->SetParLimits(1, -pi, pi);
 
     std::string tag = "";
@@ -100,7 +100,8 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     for(int i = 0; i < 64; ++i)
     {
         // set parameter starting values for each fit
-        f->SetParameters(1000, 0, 1.0e4);
+        //f->SetParameters(1000, 0, 1.0e4);
+        f->SetParameters(4386, 1.484, 1.132e5);
         
         const char* ring_name = Form("gr_phi_occ_ring_%s_%d", tag.c_str(), i);
         const char* file_ring_name = Form("%s gr_phi_occ_ring_%s_%d", input_file.c_str(), tag.c_str(), i);
@@ -137,7 +138,7 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         h_shift->SetBinError(i + 1,    shift_err[i]);
         h_offset->SetBinError(i + 1,   offset_err[i]);
         
-        if(num_phi_y >= 10)
+        if(num_phi_y >= 9)
         {
             h_num_phi_cut->SetBinContent(i + 1, num_phi_y);
             h_chisq_cut->SetBinContent(i + 1,   chisq[i]);
@@ -218,7 +219,7 @@ void loop()
     //input_files.push_back("SingleMuon_2017B_MoreEvents_ClusterSize2_AllClusters");
 
     // Legacy 2017
-    input_files.push_back("ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
+    //input_files.push_back("ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
     input_files.push_back("SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
     
     std::vector<double> y_min_vals;
