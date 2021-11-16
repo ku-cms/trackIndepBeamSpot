@@ -24,9 +24,7 @@ def plotChain(chain, name, var, cuts=""):
     c.Update()
     c.SaveAs(plot_name)
 
-# run over local files
-def run(input_directory, num_files, name, isData):
-    input_files = get_file_list(input_directory)
+def getChain(input_files, num_files):
     # use num_files as max if it is not negative
     if num_files >= 0:
         input_files = input_files[0:num_files]
@@ -34,7 +32,21 @@ def run(input_directory, num_files, name, isData):
     chain = ROOT.TChain('pixelTree')
     for f in input_files:
         chain.Add(f)
-    
+    return chain
+
+# run over local files
+def run(input_directory, num_files, name, isData):
+    input_files = get_file_list(input_directory)
+    chain       = getChain(input_files, num_files)
+    makePlots(chain, name, isData)
+
+# run over eos files
+def runEOS(input_directory, num_files, name, isData):
+    input_files = get_eos_file_list(input_directory)
+    chain       = getChain(input_files, num_files)
+    makePlots(chain, name, isData)
+
+def makePlots(chain, name, isData):
     #plotChain(chain, name, "PvN", "ClN>=2000")
     #plotChain(chain, name, "PvN", "ClN<2000")
     #plotChain(chain, name, "ClN", "ClN>=2000")
@@ -42,7 +54,7 @@ def run(input_directory, num_files, name, isData):
     #plotChain(chain, name, "ClSize", "ClN>=2000")
     #plotChain(chain, name, "ClSize", "ClN>=2000 && ClSize>=2")
     
-    #plotChain(chain, name, "ClN")
+    plotChain(chain, name, "ClN")
     #plotChain(chain, name, "ClN", "ClTkN<1")
     #plotChain(chain, name, "ClN", "ClTkN>=1")
     #plotChain(chain, name, "ClN", "ClTkN>=0")
@@ -53,10 +65,10 @@ def run(input_directory, num_files, name, isData):
     #plotChain(chain, name, "ClCharge")
     #plotChain(chain, name, "ClChargeCorr")
     
-    #plotChain(chain, name, "PvN")
-    #plotChain(chain, name, "PvX")
-    #plotChain(chain, name, "PvY")
-    #plotChain(chain, name, "PvZ")
+    plotChain(chain, name, "PvN")
+    plotChain(chain, name, "PvX")
+    plotChain(chain, name, "PvY")
+    plotChain(chain, name, "PvZ")
     #plotChain(chain, name, "PvX", "ClTkN<1")
     #plotChain(chain, name, "PvX", "ClTkN>=1")
     #plotChain(chain, name, "PvY", "ClTkN<1")
@@ -70,31 +82,16 @@ def run(input_directory, num_files, name, isData):
     #plotChain(chain, name, "PvY", "run==297050")
     #plotChain(chain, name, "PvZ", "run==297050")
     
-    plotChain(chain, name, "ClN", "run==297050 && ClN>=2000")
-    plotChain(chain, name, "PvN", "run==297050 && ClN>=2000")
-    plotChain(chain, name, "PvX", "run==297050 && ClN>=2000")
-    plotChain(chain, name, "PvY", "run==297050 && ClN>=2000")
-    plotChain(chain, name, "PvZ", "run==297050 && ClN>=2000")
+    #plotChain(chain, name, "ClN", "run==297050 && ClN>=2000")
+    #plotChain(chain, name, "PvN", "run==297050 && ClN>=2000")
+    #plotChain(chain, name, "PvX", "run==297050 && ClN>=2000")
+    #plotChain(chain, name, "PvY", "run==297050 && ClN>=2000")
+    #plotChain(chain, name, "PvZ", "run==297050 && ClN>=2000")
     
     if not isData:
         plotChain(chain, name, "BsX")
         plotChain(chain, name, "BsY")
         plotChain(chain, name, "BsZ")
-
-# run over eos files
-def runEOS(input_directory, num_files, name, isData):
-    input_files = get_eos_file_list(input_directory)
-    
-    # use num_files as max if it is not negative
-    if num_files >= 0:
-        input_files = input_files[0:num_files]
-    
-    chain = ROOT.TChain('pixelTree')
-    for f in input_files:
-        print(f)
-        chain.Add(f)
-    
-    plotChain(chain, name, "PvN")
 
 def runData2017B():
     # # Min Bias 2017B
