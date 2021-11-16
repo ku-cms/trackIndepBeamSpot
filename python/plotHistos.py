@@ -1,5 +1,6 @@
 import ROOT
-from inputFiles_cfi import get_list_of_files
+from inputFiles_cfi import get_file_list, get_eos_file_list
+from tools import makeDir
 
 # make sure ROOT.TFile.Open(fileURL) does not seg fault when $ is in sys.argv (e.g. $ passed in as argument)
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -10,6 +11,7 @@ ROOT.TH1.AddDirectory(False)
 
 def plotChain(chain, name, var, cuts=""):
     plot_dir  = "plots/"
+    makeDir(plot_dir)
     if cuts:
         plot_name = "{0}hist_{1}_{2}_{3}.png".format(plot_dir, name, var, cuts)
     else:
@@ -22,9 +24,12 @@ def plotChain(chain, name, var, cuts=""):
     c.Update()
     c.SaveAs(plot_name)
 
+# run over local files
 def run(input_directory, num_files, name, isData):
-    input_files = get_list_of_files(input_directory)
-    input_files = input_files[0:num_files]
+    input_files = get_file_list(input_directory)
+    # use num_files as max if it is not negative
+    if num_files >= 0:
+        input_files = input_files[0:num_files]
     
     chain = ROOT.TChain('pixelTree')
     for f in input_files:
@@ -76,6 +81,21 @@ def run(input_directory, num_files, name, isData):
         plotChain(chain, name, "BsY")
         plotChain(chain, name, "BsZ")
 
+# run over eos files
+def runEOS(input_directory, num_files, name, isData):
+    input_files = get_eos_file_list(input_directory)
+    
+    # use num_files as max if it is not negative
+    if num_files >= 0:
+        input_files = input_files[0:num_files]
+    
+    chain = ROOT.TChain('pixelTree')
+    for f in input_files:
+        print(f)
+        chain.Add(f)
+    
+    plotChain(chain, name, "PvN")
+
 def runData2017B():
     # # Min Bias 2017B
     # input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/MinimumBias/crab_PixelTree_MinBias_2017B_RAW_v3/210715_152921/0000'
@@ -114,7 +134,6 @@ def runData2017B():
     num_files       = 2
     run(input_directory, num_files, name, isData)
 
-
 def runData2018C():
     # # Single Muon
     # input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
@@ -152,12 +171,13 @@ def runData2018C():
     run(input_directory, num_files, name, isData)
 
 def runData2021():
-    input_directory = ''
-    name            = ""
+    # directory on root://cmseos.fnal.gov
+    # use eos functions for eos files
+    input_directory = '/store/user/lpcsusylep/PixelTrees/ExpressPhysics/crab_PixelTree_Express_2021_Run346512_v1/211110_190014/0000'
+    name            = "ExpressPhysics_2021_Run346512"
     isData          = True
-    num_files       = 1
-    run(input_directory, num_files, name, isData)
-
+    num_files       = -1
+    runEOS(input_directory, num_files, name, isData)
 
 def runMC():
     # TTbar (Z smeared)
@@ -189,9 +209,9 @@ def runMC():
     run(input_directory, num_files, name, isData)
 
 def main():
-    runData2017B()
+    #runData2017B()
     #runData2018C()
-    #runData2021()
+    runData2021()
     #runMC()
 
 if __name__ == "__main__":
