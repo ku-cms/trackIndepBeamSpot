@@ -102,14 +102,16 @@ def runData2017B():
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2017B_RAW_v4/210909_195432/0000'
     name            = "ZeroBias_2017B_v2_MoreEvents"
     isData          = True
-    num_files       = 20
+    #num_files       = 20
+    num_files       = 2
     run(input_directory, num_files, name, isData)
     
     # Single Muon 2017B v2: using golden json
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2017B_RAW_v2/210909_000356/0000'
     name            = "SingleMuon_2017B_v2_MoreEvents"
     isData          = True
-    num_files       = 20
+    #num_files       = 20
+    num_files       = 2
     run(input_directory, num_files, name, isData)
 
 
@@ -149,6 +151,14 @@ def runData2018C():
     num_files       = 3
     run(input_directory, num_files, name, isData)
 
+def runData2021():
+    input_directory = ''
+    name            = ""
+    isData          = True
+    num_files       = 1
+    run(input_directory, num_files, name, isData)
+
+
 def runMC():
     # TTbar (Z smeared)
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000'
@@ -181,6 +191,7 @@ def runMC():
 def main():
     runData2017B()
     #runData2018C()
+    #runData2021()
     #runMC()
 
 if __name__ == "__main__":
