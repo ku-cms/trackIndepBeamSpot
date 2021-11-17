@@ -2,11 +2,22 @@
 
 import os
 import glob
+import ROOT
 
 # creates directory if it does not exist
 def makeDir(dir_name):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
+
+# get chain from list of ROOT files
+def getChain(input_files, num_files):
+    # use num_files as max if it is not negative
+    if num_files >= 0:
+        input_files = input_files[0:num_files]
+    chain = ROOT.TChain('pixelTree')
+    for f in input_files:
+        chain.Add(f)
+    return chain
 
 # get list of local files
 def get_file_list(dir_):

@@ -1,5 +1,5 @@
 import ROOT
-from tools import makeDir, get_file_list, get_eos_file_list
+from tools import makeDir, getChain, get_file_list, get_eos_file_list
 
 # make sure ROOT.TFile.Open(fileURL) does not seg fault when $ is in sys.argv (e.g. $ passed in as argument)
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -22,15 +22,6 @@ def plotChain(chain, name, var, cuts=""):
 
     c.Update()
     c.SaveAs(plot_name)
-
-def getChain(input_files, num_files):
-    # use num_files as max if it is not negative
-    if num_files >= 0:
-        input_files = input_files[0:num_files]
-    chain = ROOT.TChain('pixelTree')
-    for f in input_files:
-        chain.Add(f)
-    return chain
 
 # run over local files
 def run(input_directory, num_files, name, isData):
