@@ -1,6 +1,5 @@
 import ROOT
-from inputFiles_cfi import get_file_list, get_eos_file_list
-from tools import makeDir
+from tools import makeDir, get_file_list, get_eos_file_list
 
 # make sure ROOT.TFile.Open(fileURL) does not seg fault when $ is in sys.argv (e.g. $ passed in as argument)
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -28,7 +27,6 @@ def getChain(input_files, num_files):
     # use num_files as max if it is not negative
     if num_files >= 0:
         input_files = input_files[0:num_files]
-    
     chain = ROOT.TChain('pixelTree')
     for f in input_files:
         chain.Add(f)

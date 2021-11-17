@@ -6,7 +6,7 @@ import time
 import ROOT as rt
 import numpy as np
 from pixelMapping_cfi import *
-from inputFiles_cfi import get_list_of_files
+from tools import get_file_list
 from array import array
 from collections import OrderedDict
 
@@ -522,7 +522,7 @@ def read_clusters(input_files, f_name_):
 
 def run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut):
     # --- get list of files --- #
-    file_list = get_list_of_files(directory)
+    file_list = get_file_list(directory)
     file_list = file_list[0:num_files]
    
     # --- printing --- #
