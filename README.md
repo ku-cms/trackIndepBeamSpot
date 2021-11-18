@@ -96,7 +96,7 @@ The fitting scripts should be run in Python 3 and require these packages:
 - iminuit
 
 The version of the iminuit package is important because there were large usage changes.
-Most scripts (e.g. fitting_line_test.py) are written to use iminuit 1.4.9 (recommended).
+Most scripts (e.g. runFit.py) are written to use iminuit 1.4.9 (recommended).
 The script "plotOccupancy.py" uses iminuit 2.4.0.  
 
 Create a virtual environment for python.
@@ -171,7 +171,7 @@ source <full_path>/python3_env/bin/activate
 
 Requires iminuit 1.4.9:
 ```
-python python/fitting_line_test.py
+python python/runFit.py
 ```
 
 Requires iminuit 2.4.0:
