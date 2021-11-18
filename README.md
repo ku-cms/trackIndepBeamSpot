@@ -68,10 +68,10 @@ python python/plotHistos.py
 ```
 Depending on the number of root files loaded, the number of events, and the number of variables plotted, this script can take some time to run (e.g. 15 min).
 
-In addition, occupancy histograms can be created and saved to ROOT files using occupancy_histos_ladders.py.
+In addition, occupancy histograms can be created and saved to ROOT files using makeHistos.py.
 ```
 cmsenv
-python3 python/occupancy_histos_ladders.py 
+python3 python/makeHistos.py 
 ```
 
 ## Fitting with ROOT
