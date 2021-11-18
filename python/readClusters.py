@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# readClusters.py
+
 import sys
 import os
 import time

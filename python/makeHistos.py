@@ -1,3 +1,5 @@
+# makeHistos.py
+
 import numpy as np
 import scipy.optimize as so
 import scipy.stats as ss
@@ -6,6 +8,7 @@ import root_numpy as rnp
 import string
 import pandas as pd
 import os
+import csv
 
 alpha_low = string.ascii_lowercase
 
@@ -17,11 +20,11 @@ def makeDir(dir_name):
 def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
 
-def remake_arrays(input_arr_, file_out_name):
+def remake_arrays(input_arr_, root_output_name, csv_output_name):
     useWeightedAve = False
     fixPhi         = True
 
-    print("Running to create output file: {0}".format(file_out_name))
+    print("Running to create output file: {0}".format(root_output_name))
     
     w_r_bins = 0.01
 
@@ -71,7 +74,7 @@ def remake_arrays(input_arr_, file_out_name):
     z_ring = []
 
     n_ladders = 12
-    n_rings = 64
+    n_rings   = 64
 
     for x in range(n_ladders):
         occ_hl.append([])
@@ -471,74 +474,88 @@ def remake_arrays(input_arr_, file_out_name):
     phi_ring_sum = np.zeros(12)
     occ_phi_ring_subtracted_sum = np.zeros(12)
     num_good_rings = 0
-    for ring in range(n_rings):
-        # sort by phi for phi distribution
+    
+    # output to csv file
+    output_column_titles = ["index", "ring", "ladder"]
+    with open(csv_output_name, 'w', newline='') as output_csv:
+        output_writer = csv.writer(output_csv)
+        output_writer.writerow(output_column_titles)
+        index = 0
+        for ring in range(n_rings):
+            # sort by phi for phi distribution
 
-        #print("ring {0}: z = {1}".format(ring, z_avg_ring_sorted[ring]))
-        ring_array.append(ring)
-        phi_ring[ring]  = np.array(phi_ring[ring])
-        occ_phi_ring    = np.array(occ_ring[ring])
-        phi_sort        = np.argsort(phi_ring[ring])
-        phi_ring[ring]  = phi_ring[ring][phi_sort]
-        occ_phi_ring    = occ_phi_ring[phi_sort]
-        
-        n_vals  = len(occ_phi_ring)
-        avg     = np.mean(occ_phi_ring)
-        std_dev = np.std(occ_phi_ring)
-        #print("ring {0}: n_vals = {1}, avg = {2:.2f}, std_dev = {3:.2f}".format(ring, n_vals, avg, std_dev))
+            #print("ring {0}: z = {1}".format(ring, z_avg_ring_sorted[ring]))
+            ring_array.append(ring)
+            phi_ring[ring]  = np.array(phi_ring[ring])
+            occ_phi_ring    = np.array(occ_ring[ring])
+            phi_sort        = np.argsort(phi_ring[ring])
+            phi_ring[ring]  = phi_ring[ring][phi_sort]
+            occ_phi_ring    = occ_phi_ring[phi_sort]
+            
+            n_vals  = len(occ_phi_ring)
+            avg     = np.mean(occ_phi_ring)
+            std_dev = np.std(occ_phi_ring)
+            #print("ring {0}: n_vals = {1}, avg = {2:.2f}, std_dev = {3:.2f}".format(ring, n_vals, avg, std_dev))
 
-        # cut on occupancy
-        
-        # using fixed occupancy cut
-        if useFixedCut:
-            occupancy_cut         = occ_phi_ring >= min_occupancy
-        
-        # using varied occupancy cut 
-        else: 
-            delta = 0.30 * avg
-            min_occupancy         = avg - delta
-            max_occupancy         = avg + delta
-            #occupancy_cut         = (occ_phi_ring >= min_occupancy) & (occ_phi_ring <= max_occupancy)
-            occupancy_cut         = (occ_phi_ring >= min_occupancy)
-        
-        occ_phi_ring_postcut  = occ_phi_ring[ occupancy_cut ]
-        phi_ring_postcut      = phi_ring[ring][ occupancy_cut ]
-        length_before_cut     = len(occ_phi_ring)
-        length_after_cut      = len(occ_phi_ring_postcut)
-        phi_per_ring_arrary.append(length_after_cut)
-        print("Ring {0}: num. points: before cut: {1}, after cut: {2}".format(ring, length_before_cut, length_after_cut))
-        print("occ_phi_ring: {0}".format(occ_phi_ring))
-        print("occ_phi_ring_postcut: {0}".format(occ_phi_ring_postcut))
+            # cut on occupancy
+            
+            # using fixed occupancy cut
+            if useFixedCut:
+                occupancy_cut         = occ_phi_ring >= min_occupancy
+            
+            # using varied occupancy cut 
+            else: 
+                delta = 0.30 * avg
+                min_occupancy         = avg - delta
+                max_occupancy         = avg + delta
+                #occupancy_cut         = (occ_phi_ring >= min_occupancy) & (occ_phi_ring <= max_occupancy)
+                occupancy_cut         = (occ_phi_ring >= min_occupancy)
+            
+            occ_phi_ring_postcut  = occ_phi_ring[ occupancy_cut ]
+            phi_ring_postcut      = phi_ring[ring][ occupancy_cut ]
+            length_before_cut     = len(occ_phi_ring)
+            length_after_cut      = len(occ_phi_ring_postcut)
+            phi_per_ring_arrary.append(length_after_cut)
+            print("Ring {0}: num. points: before cut: {1}, after cut: {2}".format(ring, length_before_cut, length_after_cut))
+            #print("occ_phi_ring: {0}".format(occ_phi_ring))
+            #print("occ_phi_ring_postcut: {0}".format(occ_phi_ring_postcut))
 
-        # subtract average
-        occ_phi_ring_subtracted = occ_phi_ring - avg
-        
-        # skip rings if there are NANs
-        num_nans = len(phi_ring[ring][np.isnan(phi_ring[ring])])
-        if num_nans == 0:
-            #print(" --- good ring: {0}".format(ring))
-            num_good_rings += 1
-            phi_ring_sum = phi_ring_sum + phi_ring[ring]
-        
-        if onlyGoodRings:
+            # subtract average
+            occ_phi_ring_subtracted = occ_phi_ring - avg
+            
+            # skip rings if there are NANs
+            num_nans = len(phi_ring[ring][np.isnan(phi_ring[ring])])
             if num_nans == 0:
+                #print(" --- good ring: {0}".format(ring))
+                num_good_rings += 1
+                phi_ring_sum = phi_ring_sum + phi_ring[ring]
+            
+            if onlyGoodRings:
+                if num_nans == 0:
+                    occ_phi_ring_subtracted_sum = occ_phi_ring_subtracted_sum + occ_phi_ring_subtracted
+            else:
                 occ_phi_ring_subtracted_sum = occ_phi_ring_subtracted_sum + occ_phi_ring_subtracted
-        else:
-            occ_phi_ring_subtracted_sum = occ_phi_ring_subtracted_sum + occ_phi_ring_subtracted
 
-        gr_phi_ring.append(rt.TGraph())
-        rnp.fill_graph(gr_phi_ring[ring], np.swapaxes([phi_ring[ring], occ_phi_ring], 0, 1))
-        gr_phi_ring[ring].SetName("gr_phi_occ_ring_standard_"+str(ring))
+            gr_phi_ring.append(rt.TGraph())
+            rnp.fill_graph(gr_phi_ring[ring], np.swapaxes([phi_ring[ring], occ_phi_ring], 0, 1))
+            gr_phi_ring[ring].SetName("gr_phi_occ_ring_standard_"+str(ring))
 
-        # gr_phi_ring_subtracted
-        gr_phi_ring_subtracted.append(rt.TGraph())
-        rnp.fill_graph(gr_phi_ring_subtracted[ring], np.swapaxes([phi_ring[ring], occ_phi_ring_subtracted], 0, 1))
-        gr_phi_ring_subtracted[ring].SetName("gr_phi_occ_ring_subtracted_"+str(ring))
+            # gr_phi_ring_subtracted
+            gr_phi_ring_subtracted.append(rt.TGraph())
+            rnp.fill_graph(gr_phi_ring_subtracted[ring], np.swapaxes([phi_ring[ring], occ_phi_ring_subtracted], 0, 1))
+            gr_phi_ring_subtracted[ring].SetName("gr_phi_occ_ring_subtracted_"+str(ring))
 
-        # fill after cut
-        gr_phi_ring_postcut.append(rt.TGraph())
-        rnp.fill_graph(gr_phi_ring_postcut[ring], np.swapaxes([phi_ring_postcut, occ_phi_ring_postcut], 0, 1))
-        gr_phi_ring_postcut[ring].SetName("gr_phi_occ_ring_postcut_"+str(ring))
+            # fill after cut
+            gr_phi_ring_postcut.append(rt.TGraph())
+            rnp.fill_graph(gr_phi_ring_postcut[ring], np.swapaxes([phi_ring_postcut, occ_phi_ring_postcut], 0, 1))
+            gr_phi_ring_postcut[ring].SetName("gr_phi_occ_ring_postcut_"+str(ring))
+        
+            # write to csv file
+            for ladder in range(n_ladders):
+                output_row = [index, ring, ladder]
+                output_writer.writerow(output_row)
+
+                index += 1
 
     # number of phi points after cut
     ring_array = np.array(ring_array)
@@ -575,7 +592,7 @@ def remake_arrays(input_arr_, file_out_name):
     rnp.fill_graph(gr_r3d, np.swapaxes([r_condense_comb, occ_r_condense_comb], 0, 1))
     gr_r3d.SetName("gr_r_occ_pm_comb")
 
-    file_out = rt.TFile(file_out_name, "RECREATE")
+    file_out = rt.TFile(root_output_name, "RECREATE")
 
     gr_phi.Write()
     gr_phi_subtracted_sum.Write()
@@ -639,7 +656,8 @@ if __name__ == "__main__":
     ]
 
     for sample in inputs_v4:
-        in_array    = read_file("data/{0}.npy".format(sample))
-        output_name = "{0}/{1}.root".format(output_dir, sample)
-        remake_arrays(in_array, output_name)
+        in_array            = read_file("data/{0}.npy".format(sample))
+        root_output_name    = "{0}/{1}.root".format(output_dir, sample)
+        csv_output_name     = "{0}/{1}.csv".format(output_dir, sample)
+        remake_arrays(in_array, root_output_name, csv_output_name)
     

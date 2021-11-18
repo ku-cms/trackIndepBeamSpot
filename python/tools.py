@@ -1,6 +1,7 @@
 # tools.py
 
 import os
+import csv
 import glob
 import ROOT
 
@@ -8,6 +9,15 @@ import ROOT
 def makeDir(dir_name):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
+
+# takes a csv file as input and outputs data in a matrix
+def getData(input_file):
+    data = []
+    with open(input_file, "r") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            data.append(row)
+    return data
 
 # get chain from list of ROOT files
 def getChain(input_files, num_files):
