@@ -507,6 +507,8 @@ def remake_arrays(input_arr_, file_out_name):
         length_after_cut      = len(occ_phi_ring_postcut)
         phi_per_ring_arrary.append(length_after_cut)
         print("Ring {0}: num. points: before cut: {1}, after cut: {2}".format(ring, length_before_cut, length_after_cut))
+        print("occ_phi_ring: {0}".format(occ_phi_ring))
+        print("occ_phi_ring_postcut: {0}".format(occ_phi_ring_postcut))
 
         # subtract average
         occ_phi_ring_subtracted = occ_phi_ring - avg

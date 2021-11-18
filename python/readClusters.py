@@ -659,7 +659,7 @@ def runExpressData2021():
     #num_files   = 20
     num_files   = -1
     doClusterSizeCut    = True
-    doNumberClustersCut = True
+    doNumberClustersCut = False
     runEOS(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
 
 def runTTBarPU():
