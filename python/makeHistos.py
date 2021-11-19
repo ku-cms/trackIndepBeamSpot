@@ -13,11 +13,19 @@ import pandas as pd
 
 alpha_low = string.ascii_lowercase
 
+# TODO:
+# Improve bin definitions and logic.
+# Right now, when a point is in the wrong ladder bin, 
+# this messes up the rest of the ring.
+
+# get ladder for given phi based on phi binning 
 def getLadder(phi):
     if phi > np.pi or phi < -np.pi:
         print("ERROR: phi = {0} is outside of [-pi, pi]".format(phi))
         return -999
-    phi_bin_edges = [-np.pi, -2.30, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75, 2.30, 2.90, np.pi]
+    # TODO: fix bins and logic
+    #phi_bin_edges = [-np.pi, -2.30, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75, 2.30, 2.90, np.pi]
+    phi_bin_edges = [-np.pi, -2.25, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75, 2.30, 2.90, np.pi]
     for i in range(len(phi_bin_edges)):
         if phi >= phi_bin_edges[i] and phi < phi_bin_edges[i+1]:
             return i
@@ -685,7 +693,7 @@ if __name__ == "__main__":
         "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
 
-    for sample in inputs_v1:
+    for sample in inputs_v4:
         in_array            = read_file("data/{0}.npy".format(sample))
         root_output_name    = "{0}/{1}.root".format(output_dir, sample)
         csv_output_name     = "{0}/{1}.csv".format(output_dir, sample)
