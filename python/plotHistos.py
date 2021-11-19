@@ -1,9 +1,9 @@
 import ROOT
 from tools import makeDir, getChain, get_file_list, get_eos_file_list
 
-# make sure ROOT.TFile.Open(fileURL) does not seg fault when $ is in sys.argv (e.g. $ passed in as argument)
+# Make sure ROOT.TFile.Open(fileURL) does not seg fault when $ is in sys.argv (e.g. $ passed in as argument)
 ROOT.PyConfig.IgnoreCommandLineOptions = True
-# make plots faster without displaying them
+# Make plots faster without displaying them
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 # Tell ROOT not to be in charge of memory, fix issue of histograms being deleted when ROOT file is closed:
 ROOT.TH1.AddDirectory(False)
@@ -202,4 +202,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
+ 
