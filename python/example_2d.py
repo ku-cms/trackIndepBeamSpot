@@ -7,13 +7,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # create data
-x = np.random.normal(size=50000)
-y = 2 * x + np.random.normal(size=50000)
-#y = np.random.normal(size=50000)
-#y = 2 * x
+#x = np.random.normal(size=50000)
+#y = 2 * x + np.random.normal(size=50000)
+
+x = [1.0, 2.0]
+y = [1.0, 2.0]
 
 # Big bins
 #plt.hist2d(x, y, bins=(100, 100), cmap=plt.cm.jet)
-plt.hist2d(x, y, bins=(100, 100), cmap=plt.cm.viridis)
+plt.hist2d(x, y, bins=(10, 10), cmap=plt.cm.viridis)
 plt.show()
 
