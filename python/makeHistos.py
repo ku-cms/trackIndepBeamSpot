@@ -17,7 +17,7 @@ def getLadder(phi):
     if phi > np.pi or phi < -np.pi:
         print("ERROR: phi = {0} is outside of [-pi, pi]".format(phi))
         return -999
-    phi_bin_edges = [-np.pi, -2.30, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 2.30, 2.90, np.pi]
+    phi_bin_edges = [-np.pi, -2.30, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75, 2.30, 2.90, np.pi]
     for i in range(len(phi_bin_edges)):
         if phi >= phi_bin_edges[i] and phi < phi_bin_edges[i+1]:
             return i
@@ -574,6 +574,7 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
                 ladderFromPhi   = getLadder(phi)
                 if np.isnan(phi):
                     print("WARNING: phi is NAN")
+                print("ring {0}, ladder {1}, ladderFromPhi {2}, ladderIndex {3}, phi {4}".format(ring, ladder, ladderFromPhi, ladderIndex, phi))
                 # make sure correct ladder is used
                 if ladderFromPhi == ladder:
                     ladderIndex += 1
@@ -684,7 +685,7 @@ if __name__ == "__main__":
         "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
 
-    for sample in inputs_v4:
+    for sample in inputs_v1:
         in_array            = read_file("data/{0}.npy".format(sample))
         root_output_name    = "{0}/{1}.root".format(output_dir, sample)
         csv_output_name     = "{0}/{1}.csv".format(output_dir, sample)
