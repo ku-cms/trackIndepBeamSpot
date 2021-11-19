@@ -13,6 +13,17 @@ import pandas as pd
 
 alpha_low = string.ascii_lowercase
 
+def getLadder(phi):
+    if phi > np.pi or phi < -np.pi:
+        print("ERROR: phi = {0} is outside of [-pi, pi]".format(phi))
+        return -999
+    phi_bin_edges = [-np.pi, -2.30, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 2.30, 2.90, np.pi]
+    for i in range(len(phi_bin_edges)):
+        if phi >= phi_bin_edges[i] and phi < phi_bin_edges[i+1]:
+            return i
+    print("No valid ladder for phi = {0}".format(phi))
+    return -999
+
 def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
 
@@ -552,13 +563,27 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
             rnp.fill_graph(gr_phi_ring_postcut[ring], np.swapaxes([phi_ring_postcut, occ_phi_ring_postcut], 0, 1))
             gr_phi_ring_postcut[ring].SetName("gr_phi_occ_ring_postcut_"+str(ring))
         
-            # write to csv file
-            for ladder in range(n_ladders):
-                occupancy = occ_phi_ring[ladder]
+            # write to csv file and fill 2D histogram
+            # be careful about missing phi points and phi = NAN
+            ladder = 0
+            ladderIndex = 0
+            ladderFromPhi = 0
+            while ladder < n_ladders:
+                phi             = phi_ring[ring][ladderIndex]
+                occupancy       = occ_phi_ring[ladderIndex]
+                ladderFromPhi   = getLadder(phi)
+                if np.isnan(phi):
+                    print("WARNING: phi is NAN")
+                # make sure correct ladder is used
+                if ladderFromPhi == ladder:
+                    ladderIndex += 1
+                else:
+                    occupancy = 0
                 output_row = [index, ring, ladder, occupancy]
                 output_writer.writerow(output_row)
                 h2d_occupancy.SetBinContent(ring+1, ladder+1, occupancy)
-                index += 1
+                ladder += 1
+                index  += 1
 
     # number of phi points after cut
     ring_array = np.array(ring_array)
@@ -659,7 +684,7 @@ if __name__ == "__main__":
         "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
 
-    for sample in inputs_v1:
+    for sample in inputs_v4:
         in_array            = read_file("data/{0}.npy".format(sample))
         root_output_name    = "{0}/{1}.root".format(output_dir, sample)
         csv_output_name     = "{0}/{1}.csv".format(output_dir, sample)
