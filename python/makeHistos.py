@@ -1,21 +1,17 @@
 # makeHistos.py
 
-import numpy as np
-import scipy.optimize as so
-import scipy.stats as ss
 import ROOT as rt
 import root_numpy as rnp
+import numpy as np
+import tools
 import string
-import pandas as pd
 import os
 import csv
+import scipy.optimize as so
+import scipy.stats as ss
+import pandas as pd
 
 alpha_low = string.ascii_lowercase
-
-# creates directory if it does not exist
-def makeDir(dir_name):
-    if not os.path.exists(dir_name):
-        os.makedirs(dir_name)
 
 def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
@@ -522,7 +518,8 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
             length_after_cut      = len(occ_phi_ring_postcut)
             phi_per_ring_arrary.append(length_after_cut)
             print("Ring {0}: num. points: before cut: {1}, after cut: {2}".format(ring, length_before_cut, length_after_cut))
-            #print("occ_phi_ring: {0}".format(occ_phi_ring))
+            print("phi_ring[{0}]: {1}".format(ring, phi_ring[ring]))
+            print("occ_phi_ring: {0}".format(occ_phi_ring))
             #print("occ_phi_ring_postcut: {0}".format(occ_phi_ring_postcut))
 
             # subtract average
@@ -619,7 +616,7 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
 if __name__ == "__main__":
     output_dir = "output"
     
-    makeDir(output_dir)
+    tools.makeDir(output_dir)
     inputs_v1 = [
         "TTBar_AllClusters_zsmear",
         #"TTBar_OnTrack_zsmear",
