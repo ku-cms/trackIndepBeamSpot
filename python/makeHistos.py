@@ -474,6 +474,9 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
     phi_ring_sum = np.zeros(12)
     occ_phi_ring_subtracted_sum = np.zeros(12)
     num_good_rings = 0
+
+    # 2D histograms
+    h2d_occupancy = rt.TH2F("h2d_occupancy", "h2d_occupancy", 64, 0.0, 64.0, 12, 0.0, 12.0)
     
     # output to csv file
     output_column_titles = ["index", "ring", "ladder", "occupancy"]
@@ -557,6 +560,7 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
                 occupancy = occ_phi_ring[ladder]
                 output_row = [index, ring, ladder, occupancy]
                 output_writer.writerow(output_row)
+                h2d_occupancy.SetBinContent(ring+1, ladder+1, occupancy)
                 index += 1
 
     # number of phi points after cut
@@ -594,8 +598,9 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
     rnp.fill_graph(gr_r3d, np.swapaxes([r_condense_comb, occ_r_condense_comb], 0, 1))
     gr_r3d.SetName("gr_r_occ_pm_comb")
 
+    # output ROOT file
     file_out = rt.TFile(root_output_name, "RECREATE")
-
+    h2d_occupancy.Write()
     gr_phi.Write()
     gr_phi_subtracted_sum.Write()
     gr_z.Write()
@@ -657,9 +662,9 @@ if __name__ == "__main__":
         "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
 
-    for sample in inputs_v4:
+    for sample in inputs_v1:
         in_array            = read_file("data/{0}.npy".format(sample))
         root_output_name    = "{0}/{1}.root".format(output_dir, sample)
         csv_output_name     = "{0}/{1}.csv".format(output_dir, sample)
         remake_arrays(in_array, root_output_name, csv_output_name)
-    
+ 
