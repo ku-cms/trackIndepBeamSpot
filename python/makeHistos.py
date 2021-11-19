@@ -476,7 +476,7 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
     num_good_rings = 0
     
     # output to csv file
-    output_column_titles = ["index", "ring", "ladder"]
+    output_column_titles = ["index", "ring", "ladder", "occupancy"]
     with open(csv_output_name, 'w', newline='') as output_csv:
         output_writer = csv.writer(output_csv)
         output_writer.writerow(output_column_titles)
@@ -493,6 +493,8 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
             occ_phi_ring    = occ_phi_ring[phi_sort]
             
             n_vals  = len(occ_phi_ring)
+            if n_vals != n_ladders:
+                print("ERROR for ring = {0}: there are {1} values, expected {2} values".format(ring, n_vals, n_ladders))
             avg     = np.mean(occ_phi_ring)
             std_dev = np.std(occ_phi_ring)
             #print("ring {0}: n_vals = {1}, avg = {2:.2f}, std_dev = {3:.2f}".format(ring, n_vals, avg, std_dev))
@@ -552,9 +554,9 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
         
             # write to csv file
             for ladder in range(n_ladders):
-                output_row = [index, ring, ladder]
+                occupancy = occ_phi_ring[ladder]
+                output_row = [index, ring, ladder, occupancy]
                 output_writer.writerow(output_row)
-
                 index += 1
 
     # number of phi points after cut
