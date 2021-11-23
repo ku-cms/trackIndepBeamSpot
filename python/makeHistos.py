@@ -64,7 +64,7 @@ def getLadderOccupancy(ladder_nums, occ_phi_ring):
     ladder_occ  = np.zeros(len_nums)
     for i, num in enumerate(ladder_nums):
         if num >= 0: 
-            ladder_occ[num] = occ_phi_ring[num]
+            ladder_occ[num] = occ_phi_ring[i]
     print("ladder_nums: {0}".format(ladder_nums))
     print("ladder_occ: {0}".format(ladder_occ))
     return ladder_occ
