@@ -18,19 +18,56 @@ alpha_low = string.ascii_lowercase
 # Right now, when a point is in the wrong ladder bin, 
 # this messes up the rest of the ring.
 
+# Improve logic to give unique ladder indices.
+# When a ladder index is used twice, check if it should be
+# decreased or increased.
+
 # get ladder for given phi based on phi binning 
 def getLadder(phi):
     if phi > np.pi or phi < -np.pi:
         print("ERROR: phi = {0} is outside of [-pi, pi]".format(phi))
         return -999
     # TODO: fix bins and logic
-    #phi_bin_edges = [-np.pi, -2.30, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75, 2.30, 2.90, np.pi]
-    phi_bin_edges = [-np.pi, -2.25, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75, 2.30, 2.90, np.pi]
+    phi_bin_edges = [-np.pi, -2.30, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75, 2.30, 2.90, np.pi]
+    #phi_bin_edges = [-np.pi, -2.25, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75, 2.30, 2.90, np.pi]
     for i in range(len(phi_bin_edges)):
+        if np.isnan(phi):
+            continue
         if phi >= phi_bin_edges[i] and phi < phi_bin_edges[i+1]:
             return i
-    print("No valid ladder for phi = {0}".format(phi))
+    #print("No valid ladder for phi = {0}".format(phi))
     return -999
+
+# get ladder indices given phi values
+def getLadderNums(phi_vals):
+    ladder_nums = []
+    ladder      = -1
+    last_ladder = -1
+    for i, phi in enumerate(phi_vals):
+        if np.isnan(phi):
+            ladder = -1
+        else:
+            ladder = getLadder(phi)
+        # each ladder index can only be used once
+        if ladder >= 0 and ladder == last_ladder:
+            ladder += 1
+        # max ladder is 11
+        if ladder > 11:
+            ladder = 11
+        last_ladder = ladder
+        ladder_nums.append(ladder)
+    return ladder_nums
+
+# get occupancy per ladder number
+def getLadderOccupancy(ladder_nums, occ_phi_ring):
+    len_nums    = len(ladder_nums)
+    ladder_occ  = np.zeros(len_nums)
+    for i, num in enumerate(ladder_nums):
+        if num >= 0: 
+            ladder_occ[num] = occ_phi_ring[num]
+    print("ladder_nums: {0}".format(ladder_nums))
+    print("ladder_occ: {0}".format(ladder_occ))
+    return ladder_occ
 
 def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
@@ -576,18 +613,24 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
             ladder = 0
             ladderIndex = 0
             ladderFromPhi = 0
+            ladder_nums = getLadderNums(phi_ring[ring])
+            ladder_occ  = getLadderOccupancy(ladder_nums, occ_phi_ring)
             while ladder < n_ladders:
-                phi             = phi_ring[ring][ladderIndex]
-                occupancy       = occ_phi_ring[ladderIndex]
-                ladderFromPhi   = getLadder(phi)
-                if np.isnan(phi):
-                    print("WARNING: phi is NAN")
-                print("ring {0}, ladder {1}, ladderFromPhi {2}, ladderIndex {3}, phi {4}".format(ring, ladder, ladderFromPhi, ladderIndex, phi))
+                #phi             = phi_ring[ring][ladderIndex]
+                #occupancy       = occ_phi_ring[ladderIndex]
+                #ladderFromPhi   = ladder_nums[ladder]
+                
+                #if np.isnan(phi):
+                #    print("WARNING: phi is NAN")
+                #print("ring {0}, ladder {1}, ladderFromPhi {2}, ladderIndex {3}, phi {4}".format(ring, ladder, ladderFromPhi, ladderIndex, phi))
+                
                 # make sure correct ladder is used
-                if ladderFromPhi == ladder:
-                    ladderIndex += 1
-                else:
-                    occupancy = 0
+                #if ladderFromPhi == ladder:
+                #    ladderIndex += 1
+                #else:
+                #    occupancy = 0
+                
+                occupancy = ladder_occ[ladder]
                 output_row = [index, ring, ladder, occupancy]
                 output_writer.writerow(output_row)
                 h2d_occupancy.SetBinContent(ring+1, ladder+1, occupancy)
