@@ -1,15 +1,16 @@
 import ROOT
-from inputFiles_cfi import get_list_of_files
+from tools import makeDir, getChain, get_file_list, get_eos_file_list
 
-# make sure ROOT.TFile.Open(fileURL) does not seg fault when $ is in sys.argv (e.g. $ passed in as argument)
+# Make sure ROOT.TFile.Open(fileURL) does not seg fault when $ is in sys.argv (e.g. $ passed in as argument)
 ROOT.PyConfig.IgnoreCommandLineOptions = True
-# make plots faster without displaying them
+# Make plots faster without displaying them
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 # Tell ROOT not to be in charge of memory, fix issue of histograms being deleted when ROOT file is closed:
 ROOT.TH1.AddDirectory(False)
 
 def plotChain(chain, name, var, cuts=""):
     plot_dir  = "plots/"
+    makeDir(plot_dir)
     if cuts:
         plot_name = "{0}hist_{1}_{2}_{3}.png".format(plot_dir, name, var, cuts)
     else:
@@ -22,14 +23,19 @@ def plotChain(chain, name, var, cuts=""):
     c.Update()
     c.SaveAs(plot_name)
 
+# run over local files
 def run(input_directory, num_files, name, isData):
-    input_files = get_list_of_files(input_directory)
-    input_files = input_files[0:num_files]
-    
-    chain = ROOT.TChain('pixelTree')
-    for f in input_files:
-        chain.Add(f)
-    
+    input_files = get_file_list(input_directory)
+    chain       = getChain(input_files, num_files)
+    makePlots(chain, name, isData)
+
+# run over eos files
+def runEOS(input_directory, num_files, name, isData):
+    input_files = get_eos_file_list(input_directory)
+    chain       = getChain(input_files, num_files)
+    makePlots(chain, name, isData)
+
+def makePlots(chain, name, isData):
     #plotChain(chain, name, "PvN", "ClN>=2000")
     #plotChain(chain, name, "PvN", "ClN<2000")
     #plotChain(chain, name, "ClN", "ClN>=2000")
@@ -37,7 +43,7 @@ def run(input_directory, num_files, name, isData):
     #plotChain(chain, name, "ClSize", "ClN>=2000")
     #plotChain(chain, name, "ClSize", "ClN>=2000 && ClSize>=2")
     
-    #plotChain(chain, name, "ClN")
+    plotChain(chain, name, "ClN")
     #plotChain(chain, name, "ClN", "ClTkN<1")
     #plotChain(chain, name, "ClN", "ClTkN>=1")
     #plotChain(chain, name, "ClN", "ClTkN>=0")
@@ -48,10 +54,10 @@ def run(input_directory, num_files, name, isData):
     #plotChain(chain, name, "ClCharge")
     #plotChain(chain, name, "ClChargeCorr")
     
-    #plotChain(chain, name, "PvN")
-    #plotChain(chain, name, "PvX")
-    #plotChain(chain, name, "PvY")
-    #plotChain(chain, name, "PvZ")
+    plotChain(chain, name, "PvN")
+    plotChain(chain, name, "PvX")
+    plotChain(chain, name, "PvY")
+    plotChain(chain, name, "PvZ")
     #plotChain(chain, name, "PvX", "ClTkN<1")
     #plotChain(chain, name, "PvX", "ClTkN>=1")
     #plotChain(chain, name, "PvY", "ClTkN<1")
@@ -65,11 +71,11 @@ def run(input_directory, num_files, name, isData):
     #plotChain(chain, name, "PvY", "run==297050")
     #plotChain(chain, name, "PvZ", "run==297050")
     
-    plotChain(chain, name, "ClN", "run==297050 && ClN>=2000")
-    plotChain(chain, name, "PvN", "run==297050 && ClN>=2000")
-    plotChain(chain, name, "PvX", "run==297050 && ClN>=2000")
-    plotChain(chain, name, "PvY", "run==297050 && ClN>=2000")
-    plotChain(chain, name, "PvZ", "run==297050 && ClN>=2000")
+    #plotChain(chain, name, "ClN", "run==297050 && ClN>=2000")
+    #plotChain(chain, name, "PvN", "run==297050 && ClN>=2000")
+    #plotChain(chain, name, "PvX", "run==297050 && ClN>=2000")
+    #plotChain(chain, name, "PvY", "run==297050 && ClN>=2000")
+    #plotChain(chain, name, "PvZ", "run==297050 && ClN>=2000")
     
     if not isData:
         plotChain(chain, name, "BsX")
@@ -102,16 +108,17 @@ def runData2017B():
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2017B_RAW_v4/210909_195432/0000'
     name            = "ZeroBias_2017B_v2_MoreEvents"
     isData          = True
-    num_files       = 20
+    #num_files       = 20
+    num_files       = 2
     run(input_directory, num_files, name, isData)
     
     # Single Muon 2017B v2: using golden json
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2017B_RAW_v2/210909_000356/0000'
     name            = "SingleMuon_2017B_v2_MoreEvents"
     isData          = True
-    num_files       = 20
+    #num_files       = 20
+    num_files       = 2
     run(input_directory, num_files, name, isData)
-
 
 def runData2018C():
     # # Single Muon
@@ -149,6 +156,15 @@ def runData2018C():
     num_files       = 3
     run(input_directory, num_files, name, isData)
 
+def runData2021():
+    # directory on root://cmseos.fnal.gov
+    # use eos functions for eos files
+    input_directory = '/store/user/lpcsusylep/PixelTrees/ExpressPhysics/crab_PixelTree_Express_2021_Run346512_v1/211110_190014/0000'
+    name            = "ExpressPhysics_2021_Run346512"
+    isData          = True
+    num_files       = -1
+    runEOS(input_directory, num_files, name, isData)
+
 def runMC():
     # TTbar (Z smeared)
     input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eschmitz/PixelTrees/RelValTTbar_13TeV/crab_RelValTTbar_13TeVdesign_0p1_neg0p08_GEN/190819_222045/0000'
@@ -179,10 +195,11 @@ def runMC():
     run(input_directory, num_files, name, isData)
 
 def main():
-    runData2017B()
+    #runData2017B()
     #runData2018C()
+    runData2021()
     #runMC()
 
 if __name__ == "__main__":
     main()
-    
+ 

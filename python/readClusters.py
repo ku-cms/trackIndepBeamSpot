@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 
+# readClusters.py
+
 import sys
 import os
 import time
 import ROOT as rt
 import numpy as np
 from pixelMapping_cfi import *
-from inputFiles_cfi import get_list_of_files
+from tools import getChain, get_file_list, get_eos_file_list
 from array import array
 from collections import OrderedDict
 
-def make_cluster_map(input_files_, doClusterSizeCut, doNumberClustersCut):
+def make_cluster_map(input_files_, num_files, doClusterSizeCut, doNumberClustersCut):
     """
     function to make a cluster occupancy map of layer 1 pixels, with 1:1 pixel, index correspondence
     :param input_files: list of PixelTree ntuples to be processed
     :return: numpy file with cluster occupancy
     """
     debug = False
-    chain = rt.TChain('pixelTree')
-    for f in input_files_:
-        chain.Add(f)
+    chain = getChain(input_files_, num_files)
 
     # creating empty array to be used as map
     occ_array = np.full((1920, 3328), None)
@@ -513,26 +513,21 @@ def read_clusters(input_files, f_name_):
     #         for ipix in xrange(n_pixels):
     #             clust_per_mod_outer[mod]['quad'].Fill(quad)
 
-
-
     of.Write()
     #g_r_phi.Write()
     of.Close()
 
 
 def run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut):
-    # --- get list of files --- #
-    file_list = get_list_of_files(directory)
-    file_list = file_list[0:num_files]
-   
-    # --- printing --- #
     print message
-    print "Number of files: {0}".format(len(file_list))
-    #for f in file_list:
-    #    print " - {0}".format(f)
-    
-    # --- create cluster map --- #
-    occ_map = make_cluster_map(file_list, doClusterSizeCut, doNumberClustersCut)
+    file_list   = get_file_list(directory)
+    occ_map     = make_cluster_map(file_list, num_files, doClusterSizeCut, doNumberClustersCut)
+    np.save(output_file, occ_map)
+
+def runEOS(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut):
+    print message
+    file_list   = get_eos_file_list(directory)
+    occ_map     = make_cluster_map(file_list, num_files, doClusterSizeCut, doNumberClustersCut)
     np.save(output_file, occ_map)
 
 def runSingleMuon2017B():
@@ -658,6 +653,17 @@ def runMinBias2018C():
     
     run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
 
+def runExpressData2021():
+    directory   = '/store/user/lpcsusylep/PixelTrees/ExpressPhysics/crab_PixelTree_Express_2021_Run346512_v1/211110_190014/0000'
+    #output_file = 'ExpressPhysics_2021_Run346512_v1.npy'
+    output_file = 'ExpressPhysics_2021_Run346512_v2.npy'
+    message     = 'Running over Express Data from 2021.'
+    #num_files   = 20
+    num_files   = -1
+    doClusterSizeCut    = True
+    doNumberClustersCut = False
+    runEOS(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
+
 def runTTBarPU():
     
     # TTBar with pileup
@@ -694,12 +700,14 @@ def main():
     t_start = time.time()
     
     #runZeroBias2017B()
-    runSingleMuon2017B()
+    #runSingleMuon2017B()
     #runMinBias2017B()
     
     #runSingleMuon2018C()
     #runMinBias2018C()
     #runZeroBias2018C()
+
+    runExpressData2021()
     
     #runTTBarPU()
     #runTTBar()
