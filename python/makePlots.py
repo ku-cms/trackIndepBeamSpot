@@ -50,6 +50,14 @@ def makePlots():
     y_title    = "Ladder"
     plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
     
+    input_file = "output/TTBar_AllClusters_zsmear.root"
+    plot_name  = "plots/TTBar_AllClusters_zsmear_occupancy_mask"
+    hist_name  = "h2d_occupancy_mask"
+    title      = "TTBar Occ. (mask)"
+    x_title    = "Ring"
+    y_title    = "Ladder"
+    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+    
     input_file = "output/SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters.root"
     plot_name  = "plots/SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters_occupancy"
     hist_name  = "h2d_occupancy"
@@ -66,6 +74,14 @@ def makePlots():
     y_title    = "Ladder"
     plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
     
+    input_file = "output/SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters.root"
+    plot_name  = "plots/SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters_occupancy_mask"
+    hist_name  = "h2d_occupancy_mask"
+    title      = "Single Muon 2017B Occ. (mask)"
+    x_title    = "Ring"
+    y_title    = "Ladder"
+    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+    
     input_file = "output/ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters.root"
     plot_name  = "plots/ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters_occupancy"
     hist_name  = "h2d_occupancy"
@@ -78,6 +94,14 @@ def makePlots():
     plot_name  = "plots/ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters_occupancy_cut"
     hist_name  = "h2d_occupancy_cut"
     title      = "Zero Bias 2017B Occ. (cut)"
+    x_title    = "Ring"
+    y_title    = "Ladder"
+    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+
+    input_file = "output/ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters.root"
+    plot_name  = "plots/ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters_occupancy_mask"
+    hist_name  = "h2d_occupancy_mask"
+    title      = "Zero Bias 2017B Occ. (mask)"
     x_title    = "Ring"
     y_title    = "Ladder"
     plot2D(input_file, plot_name, hist_name, title, x_title, y_title)

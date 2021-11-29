@@ -521,8 +521,9 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
     num_good_rings = 0
 
     # 2D histograms
-    h2d_occupancy       = rt.TH2F("h2d_occupancy",     "h2d_occupancy",     64, 0.0, 64.0, 12, 0.0, 12.0)
-    h2d_occupancy_cut   = rt.TH2F("h2d_occupancy_cut", "h2d_occupancy_cut", 64, 0.0, 64.0, 12, 0.0, 12.0)
+    h2d_occupancy       = rt.TH2F("h2d_occupancy",      "h2d_occupancy",      64, 0.0, 64.0, 12, 0.0, 12.0)
+    h2d_occupancy_cut   = rt.TH2F("h2d_occupancy_cut",  "h2d_occupancy_cut",  64, 0.0, 64.0, 12, 0.0, 12.0)
+    h2d_occupancy_mask  = rt.TH2F("h2d_occupancy_mask", "h2d_occupancy_mask", 64, 0.0, 64.0, 12, 0.0, 12.0)
     
     # output to csv file
     output_column_titles = ["index", "ring", "ladder", "occupancy"]
@@ -609,10 +610,18 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
                 output_writer.writerow(output_row)
                 # --- cut on occupancy --- #
                 occupancy_after_cut = 0
+                mask = 0
+                # occupancy passing min occupancy cut
                 if occupancy >= min_occupancy:
                     occupancy_after_cut = occupancy
+                # mask:
+                # 0 for points that pass selection
+                # 1 for points that fail selection
+                else:
+                    mask = 1
                 h2d_occupancy.SetBinContent(ring+1, ladder+1, occupancy)
                 h2d_occupancy_cut.SetBinContent(ring+1, ladder+1, occupancy_after_cut)
+                h2d_occupancy_mask.SetBinContent(ring+1, ladder+1, mask)
                 ladder += 1
                 index  += 1
 
@@ -655,6 +664,7 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
     file_out = rt.TFile(root_output_name, "RECREATE")
     h2d_occupancy.Write()
     h2d_occupancy_cut.Write()
+    h2d_occupancy_mask.Write()
     gr_phi.Write()
     gr_phi_subtracted_sum.Write()
     gr_z.Write()
@@ -715,8 +725,13 @@ if __name__ == "__main__":
         "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
         "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
+    inputs_v5 = [
+        "TTBar_AllClusters_zsmear",
+        "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
+        "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
+    ]
 
-    for sample in inputs_v4:
+    for sample in inputs_v5:
         in_array            = read_file("data/{0}.npy".format(sample))
         root_output_name    = "{0}/{1}.root".format(output_dir, sample)
         csv_output_name     = "{0}/{1}.csv".format(output_dir, sample)
