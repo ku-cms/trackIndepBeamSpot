@@ -13,23 +13,12 @@ import pandas as pd
 
 alpha_low = string.ascii_lowercase
 
-# TODO:
-# Improve bin definitions and logic.
-# Right now, when a point is in the wrong ladder bin, 
-# this messes up the rest of the ring.
-
-# Improve logic to give unique ladder indices.
-# When a ladder index is used twice, check if it should be
-# decreased or increased.
-
 # get ladder for given phi based on phi binning 
 def getLadder(phi):
     if phi > np.pi or phi < -np.pi:
         print("ERROR: phi = {0} is outside of [-pi, pi]".format(phi))
         return -999
-    # TODO: fix bins and logic
     phi_bin_edges = [-np.pi, -2.30, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75, 2.30, 2.90, np.pi]
-    #phi_bin_edges = [-np.pi, -2.25, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75, 2.30, 2.90, np.pi]
     for i in range(len(phi_bin_edges)):
         if np.isnan(phi):
             continue
@@ -37,6 +26,10 @@ def getLadder(phi):
             return i
     #print("No valid ladder for phi = {0}".format(phi))
     return -999
+
+# TODO: Fix cases of repeats in ladder nums (e.g. two 11s)
+# TODO: Check cases where missing ladders are on left and right... 
+#       Assigned ladders may need to shift left or right
 
 # get ladder indices given phi values
 def getLadderNums(phi_vals):
@@ -65,8 +58,8 @@ def getLadderOccupancy(ladder_nums, occ_phi_ring):
     for i, num in enumerate(ladder_nums):
         if num >= 0: 
             ladder_occ[num] = occ_phi_ring[i]
-    print("ladder_nums: {0}".format(ladder_nums))
-    print("ladder_occ: {0}".format(ladder_occ))
+    #print("ladder_nums: {0}".format(ladder_nums))
+    #print("ladder_occ: {0}".format(ladder_occ))
     return ladder_occ
 
 def read_file(input_file_):
@@ -563,19 +556,17 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
             # using varied occupancy cut 
             else: 
                 delta = 0.30 * avg
-                min_occupancy         = avg - delta
-                max_occupancy         = avg + delta
-                #occupancy_cut         = (occ_phi_ring >= min_occupancy) & (occ_phi_ring <= max_occupancy)
-                occupancy_cut         = (occ_phi_ring >= min_occupancy)
+                min_occupancy = avg - delta
+                occupancy_cut = (occ_phi_ring >= min_occupancy)
             
             occ_phi_ring_postcut  = occ_phi_ring[ occupancy_cut ]
             phi_ring_postcut      = phi_ring[ring][ occupancy_cut ]
             length_before_cut     = len(occ_phi_ring)
             length_after_cut      = len(occ_phi_ring_postcut)
             phi_per_ring_arrary.append(length_after_cut)
-            print("Ring {0}: num. points: before cut: {1}, after cut: {2}".format(ring, length_before_cut, length_after_cut))
-            print("phi_ring[{0}]: {1}".format(ring, phi_ring[ring]))
-            print("occ_phi_ring: {0}".format(occ_phi_ring))
+            #print("Ring {0}: num. points: before cut: {1}, after cut: {2}".format(ring, length_before_cut, length_after_cut))
+            #print("phi_ring[{0}]: {1}".format(ring, phi_ring[ring]))
+            #print("occ_phi_ring: {0}".format(occ_phi_ring))
             #print("occ_phi_ring_postcut: {0}".format(occ_phi_ring_postcut))
 
             # subtract average
@@ -616,20 +607,6 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
             ladder_nums = getLadderNums(phi_ring[ring])
             ladder_occ  = getLadderOccupancy(ladder_nums, occ_phi_ring)
             while ladder < n_ladders:
-                #phi             = phi_ring[ring][ladderIndex]
-                #occupancy       = occ_phi_ring[ladderIndex]
-                #ladderFromPhi   = ladder_nums[ladder]
-                
-                #if np.isnan(phi):
-                #    print("WARNING: phi is NAN")
-                #print("ring {0}, ladder {1}, ladderFromPhi {2}, ladderIndex {3}, phi {4}".format(ring, ladder, ladderFromPhi, ladderIndex, phi))
-                
-                # make sure correct ladder is used
-                #if ladderFromPhi == ladder:
-                #    ladderIndex += 1
-                #else:
-                #    occupancy = 0
-                
                 occupancy = ladder_occ[ladder]
                 output_row = [index, ring, ladder, occupancy]
                 output_writer.writerow(output_row)
