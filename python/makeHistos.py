@@ -521,7 +521,8 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
     num_good_rings = 0
 
     # 2D histograms
-    h2d_occupancy = rt.TH2F("h2d_occupancy", "h2d_occupancy", 64, 0.0, 64.0, 12, 0.0, 12.0)
+    h2d_occupancy       = rt.TH2F("h2d_occupancy",     "h2d_occupancy",     64, 0.0, 64.0, 12, 0.0, 12.0)
+    h2d_occupancy_cut   = rt.TH2F("h2d_occupancy_cut", "h2d_occupancy_cut", 64, 0.0, 64.0, 12, 0.0, 12.0)
     
     # output to csv file
     output_column_titles = ["index", "ring", "ladder", "occupancy"]
@@ -545,19 +546,15 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
                 print("ERROR for ring = {0}: there are {1} values, expected {2} values".format(ring, n_vals, n_ladders))
             avg     = np.mean(occ_phi_ring)
             std_dev = np.std(occ_phi_ring)
+            delta   = 0.30 * avg
             #print("ring {0}: n_vals = {1}, avg = {2:.2f}, std_dev = {3:.2f}".format(ring, n_vals, avg, std_dev))
 
-            # cut on occupancy
-            
-            # using fixed occupancy cut
-            if useFixedCut:
-                occupancy_cut         = occ_phi_ring >= min_occupancy
-            
-            # using varied occupancy cut 
-            else: 
-                delta = 0.30 * avg
+            # --- cut on occupancy --- #
+            # default:  use fixed value for cut
+            # variable: based on percent difference from average
+            if not useFixedCut:
                 min_occupancy = avg - delta
-                occupancy_cut = (occ_phi_ring >= min_occupancy)
+            occupancy_cut = occ_phi_ring >= min_occupancy
             
             occ_phi_ring_postcut  = occ_phi_ring[ occupancy_cut ]
             phi_ring_postcut      = phi_ring[ring][ occupancy_cut ]
@@ -610,7 +607,12 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
                 occupancy = ladder_occ[ladder]
                 output_row = [index, ring, ladder, occupancy]
                 output_writer.writerow(output_row)
+                # --- cut on occupancy --- #
+                occupancy_after_cut = 0
+                if occupancy >= min_occupancy:
+                    occupancy_after_cut = occupancy
                 h2d_occupancy.SetBinContent(ring+1, ladder+1, occupancy)
+                h2d_occupancy_cut.SetBinContent(ring+1, ladder+1, occupancy_after_cut)
                 ladder += 1
                 index  += 1
 
@@ -652,6 +654,7 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
     # output ROOT file
     file_out = rt.TFile(root_output_name, "RECREATE")
     h2d_occupancy.Write()
+    h2d_occupancy_cut.Write()
     gr_phi.Write()
     gr_phi_subtracted_sum.Write()
     gr_z.Write()
