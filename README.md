@@ -69,12 +69,21 @@ python python/plotHistos.py
 Depending on the number of root files loaded, the number of events, and the number of variables plotted, this script can take some time to run (e.g. 15 min).
 
 In addition, occupancy histograms can be created and saved to ROOT files using makeHistos.py.
+This script creates 1D histograms (e.g. occupancy vs. phi for all rings) and 2D histograms (e.g. occupancy vs. ladder and ring) saved in ROOT files.
+The script also saves an occupancy table as a csv file.
 ```
 cmsenv
 python3 python/makeHistos.py 
 ```
+To create plots of the 2D occupancy vs. ladder and ring histograms from the ROOT files, run
+```
+cmsenv
+python3 python/makePlots.py
+```
 
 ## Fitting with ROOT
+
+The fitting script fits the 1D occupancy vs. phi histograms created by makeHistos.py.
 
 Fitting with ROOT macro:
 ```
