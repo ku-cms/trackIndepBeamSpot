@@ -1,3 +1,5 @@
+# runFit.py
+
 import numpy as np
 import matplotlib.pyplot as plt
 import iminuit as im
@@ -462,7 +464,16 @@ def runMinBias2018C(data_dir, plot_dir):
     ]
     for name in names:
         runSet(data_dir, plot_dir, name)
-    
+
+def runExpressData2021(data_dir, plot_dir):
+    # Express Data 2021
+    names = [
+        "ExpressPhysics_2021_Run346512_v1",
+        "ExpressPhysics_2021_Run346512_v2",
+    ]
+    for name in names:
+        runSet(data_dir, plot_dir, name)
+
 def runTTBar(data_dir, plot_dir):
     # TTBar
     names = [
@@ -490,7 +501,9 @@ if __name__ == "__main__":
     if plot_dir[-1] != "/":
         plot_dir += "/"
     
-    runZeroBias2017B(data_dir, plot_dir)
+    runExpressData2021(data_dir, plot_dir)
+    
+    #runZeroBias2017B(data_dir, plot_dir)
     #runSingleMuon2017B(data_dir, plot_dir)
     #runZeroBias(data_dir, plot_dir)
     #runSingleMuon2018C(data_dir, plot_dir)

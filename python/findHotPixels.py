@@ -260,7 +260,7 @@ def main_roc(inputFiles, directory, factor, sample_type='realistic'):
 
 
 if __name__ == "__main__":
-    from inputFiles_cfi import *
+    from tools import *
     # directory = './files/pixeltrees_mc/design/'
     directory = './files/pixeltrees_mc/realistic/'
     # directory = './files/pixeltrees_mc/RelValTTbar_13TeV/crab_RelValTTbar_13TeVrealistic_0/190710_173122/0000/'

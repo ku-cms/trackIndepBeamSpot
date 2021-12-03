@@ -68,13 +68,22 @@ python python/plotHistos.py
 ```
 Depending on the number of root files loaded, the number of events, and the number of variables plotted, this script can take some time to run (e.g. 15 min).
 
-In addition, occupancy histograms can be created and saved to ROOT files using occupancy_histos_ladders.py.
+In addition, occupancy histograms can be created and saved to ROOT files using makeHistos.py.
+This script creates 1D histograms (e.g. occupancy vs. phi for all rings) and 2D histograms (e.g. occupancy vs. ladder and ring) saved in ROOT files.
+The script also saves an occupancy table as a csv file.
 ```
 cmsenv
-python3 python/occupancy_histos_ladders.py 
+python3 python/makeHistos.py 
+```
+To create plots of the 2D occupancy vs. ladder and ring histograms from the ROOT files, run
+```
+cmsenv
+python3 python/makePlots.py
 ```
 
 ## Fitting with ROOT
+
+The fitting script fits the 1D occupancy vs. phi histograms created by makeHistos.py.
 
 Fitting with ROOT macro:
 ```
@@ -96,7 +105,7 @@ The fitting scripts should be run in Python 3 and require these packages:
 - iminuit
 
 The version of the iminuit package is important because there were large usage changes.
-Most scripts (e.g. fitting_line_test.py) are written to use iminuit 1.4.9 (recommended).
+Most scripts (e.g. runFit.py) are written to use iminuit 1.4.9 (recommended).
 The script "plotOccupancy.py" uses iminuit 2.4.0.  
 
 Create a virtual environment for python.
@@ -171,7 +180,7 @@ source <full_path>/python3_env/bin/activate
 
 Requires iminuit 1.4.9:
 ```
-python python/fitting_line_test.py
+python python/runFit.py
 ```
 
 Requires iminuit 2.4.0:
