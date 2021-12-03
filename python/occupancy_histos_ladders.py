@@ -459,7 +459,10 @@ def remake_arrays(input_arr_, file_out_name):
     phi_ring = phi_ring[avg_z_sort]
     occ_ring = occ_ring[avg_z_sort]
     z_avg_ring_sorted = z_avg_ring[avg_z_sort]
-        
+    phi_avg_hl_sorted = phi_avg_hl[avg_phi_sort]
+
+    for hl in range(n_ladders):
+        print("half ladder {0}: phi = {1}".format(hl, phi_avg_hl_sorted[hl]))
     #print("length occ_ring: {0}".format(len(occ_ring)))
     #print("length phi_ring: {0}".format(len(phi_ring)))
     
@@ -635,8 +638,12 @@ if __name__ == "__main__":
         "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
         "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
+    inputs_v5 = [
+        "design_0_ge_2pix",
+        "design_0_ge_2pix_nosmear",
+    ]
 
-    for sample in inputs_v4:
+    for sample in inputs_v5:
         in_array    = read_file("data/{0}.npy".format(sample))
         output_name = "{0}/{1}.root".format(output_dir, sample)
         remake_arrays(in_array, output_name)
