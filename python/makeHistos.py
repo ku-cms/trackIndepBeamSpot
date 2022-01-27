@@ -526,7 +526,7 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
     h2d_occupancy_mask  = rt.TH2F("h2d_occupancy_mask", "h2d_occupancy_mask", 64, 0.0, 64.0, 12, 0.0, 12.0)
     
     # output to csv file
-    output_column_titles = ["index", "ring", "ladder", "occupancy", "mask"]
+    output_column_titles = ["index", "ring", "ladder", "phi", "occupancy", "mask"]
     with open(csv_output_name, 'w', newline='') as output_csv:
         output_writer = csv.writer(output_csv)
         output_writer.writerow(output_column_titles)
@@ -605,6 +605,7 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
             ladder_nums = getLadderNums(phi_ring[ring])
             ladder_occ  = getLadderOccupancy(ladder_nums, occ_phi_ring)
             while ladder < n_ladders:
+                phi = phi_ring[ring][ladder]
                 occupancy = ladder_occ[ladder]
                 # --- cut on occupancy --- #
                 occupancy_after_cut = 0
@@ -622,7 +623,7 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
                 h2d_occupancy_cut.SetBinContent(ring+1, ladder+1, occupancy_after_cut)
                 h2d_occupancy_mask.SetBinContent(ring+1, ladder+1, mask)
                 # write to csv file
-                output_row = [index, ring, ladder, occupancy, mask]
+                output_row = [index, ring, ladder, phi, occupancy, mask]
                 output_writer.writerow(output_row)
                 
                 ladder += 1
