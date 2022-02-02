@@ -736,7 +736,7 @@ if __name__ == "__main__":
         "design_0_ge_2pix_nosmear",
     ]
 
-    for sample in inputs_v5:
+    for sample in inputs_v4:
         in_array            = read_file("data/{0}.npy".format(sample))
         root_output_name    = "{0}/{1}.root".format(output_dir, sample)
         csv_output_name     = "{0}/{1}.csv".format(output_dir, sample)
