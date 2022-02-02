@@ -106,8 +106,16 @@ def makePlots():
     y_title    = "Ladder"
     plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
 
+def makePlots2():
+    input_file = "output/design_0_ge_2pix.root"
+    plot_name  = "plots/design_0_ge_2pix_occupancy"
+    title      = "design_0_ge_2pix occupancy"
+    x_title    = "Ring"
+    y_title    = "Ladder"
+    plot(input_file, plot_name, title, x_title, y_title)
+
 def main():
-    makePlots()
+    makePlots2()
 
 if __name__ == "__main__":
     main()

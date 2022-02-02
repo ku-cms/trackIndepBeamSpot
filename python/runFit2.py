@@ -4,18 +4,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 import iminuit as im
 import string
+import tools
 
 alpha_low = string.ascii_lowercase
 
 def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
 
-def remake_arrays(input_arr_, plot_dir, plot_name):
+def remake_arrays(input_arr_, csv_data, plot_dir, plot_name):
     useWeightedAve  = False
     drawFit         = False
     maskPhi         = False
     fixPhi          = True
     doMinOccCut     = True
+
+    for row in csv_data:
+        print(row)
     
     # need z-binning corresponding to 1 roc
     w_z_bins = 52  # # of pixels in a roc
@@ -376,21 +380,27 @@ def f_example(x, y):
     c3 = 1.0e3
     return (a1*np.sin(y-b2)+a3) * (1 / np.abs(x) ** (b1*np.sin(y-b2)+b3)) + (c1*np.sin(y-b2)+c3)
 
-def runSet(data_dir, plot_dir, data_name, plot_name=""):
+def runSet(data_dir, plot_dir, data_name, plot_name="", csv_name=""):
     # default: data and plot names are the same
     # if plot name is given, it is used for plots
     custom_name = data_name
     if plot_name:
         custom_name = plot_name
     in_array = read_file(data_dir + data_name + ".npy")
-    remake_arrays(in_array, plot_dir, custom_name)
+    csv_data = []
+    if csv_name:
+        csv_data = tools.getData(data_dir + csv_name + ".csv")
+    remake_arrays(in_array, csv_data, plot_dir, custom_name)
 
 def runZeroBias2017B(data_dir, plot_dir):
     # ZeroBias 2017B
     data_names = [
-        "ZeroBias_2017B_AllClusters",
-        "ZeroBias_2017B_ClusterSize2_AllClusters",
-        "ZeroBias_2017B_ClusterSize2_NumberClusters2000_AllClusters",
+    #    "ZeroBias_2017B_AllClusters",
+    #    "ZeroBias_2017B_ClusterSize2_AllClusters",
+         "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
+    ]
+    csv_names = [
+        "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters"
     ]
     #plot_names = [
     #    "ZeroBias_2017B_NoOccMin_AllClusters",
@@ -398,12 +408,12 @@ def runZeroBias2017B(data_dir, plot_dir):
     #    "ZeroBias_2017B_ClusterSize2_NumberClusters2000_NoOccMin_AllClusters",
     #]
     plot_names = [
-        "ZeroBias_2017B_MinOcc20000_AllClusters",
-        "ZeroBias_2017B_ClusterSize2_MinOcc20000_AllClusters",
+    #   "ZeroBias_2017B_MinOcc20000_AllClusters",
+    #    "ZeroBias_2017B_ClusterSize2_MinOcc20000_AllClusters",
         "ZeroBias_2017B_ClusterSize2_NumberClusters2000_MinOcc20000_AllClusters",
     ]
     for i in range(len(data_names)):
-        runSet(data_dir, plot_dir, data_names[i], plot_names[i])
+        runSet(data_dir, plot_dir, data_names[i], plot_names[i], csv_names[i])
 
 def runSingleMuon2017B(data_dir, plot_dir):
     # SingleMuon 2017B
@@ -501,9 +511,9 @@ if __name__ == "__main__":
     if plot_dir[-1] != "/":
         plot_dir += "/"
     
-    runExpressData2021(data_dir, plot_dir)
+    #runExpressData2021(data_dir, plot_dir)
     
-    #runZeroBias2017B(data_dir, plot_dir)
+    runZeroBias2017B(data_dir, plot_dir)
     #runSingleMuon2017B(data_dir, plot_dir)
     #runZeroBias(data_dir, plot_dir)
     #runSingleMuon2018C(data_dir, plot_dir)

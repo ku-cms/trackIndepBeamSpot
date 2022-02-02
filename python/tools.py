@@ -3,7 +3,7 @@
 import os
 import csv
 import glob
-import ROOT
+#import ROOT
 
 # creates directory if it does not exist
 def makeDir(dir_name):
