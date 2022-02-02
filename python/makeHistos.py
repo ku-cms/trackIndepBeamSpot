@@ -605,7 +605,8 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
             ladder_nums = getLadderNums(phi_ring[ring])
             ladder_occ  = getLadderOccupancy(ladder_nums, occ_phi_ring)
             while ladder < n_ladders:
-                phi = phi_ring[ring][ladder]
+                ladder_for_phi = ladder_nums[ladder]
+                phi = phi_ring[ring][ladder_for_phi]
                 occupancy = ladder_occ[ladder]
                 # --- cut on occupancy --- #
                 occupancy_after_cut = 0
