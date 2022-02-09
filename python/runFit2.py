@@ -398,9 +398,11 @@ def runZeroBias2017B(data_dir, plot_dir):
     #    "ZeroBias_2017B_AllClusters",
     #    "ZeroBias_2017B_ClusterSize2_AllClusters",
          "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
+         "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
     csv_names = [
-        "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters"
+        "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
+        "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
     #plot_names = [
     #    "ZeroBias_2017B_NoOccMin_AllClusters",
@@ -411,6 +413,7 @@ def runZeroBias2017B(data_dir, plot_dir):
     #   "ZeroBias_2017B_MinOcc20000_AllClusters",
     #    "ZeroBias_2017B_ClusterSize2_MinOcc20000_AllClusters",
         "ZeroBias_2017B_ClusterSize2_NumberClusters2000_MinOcc20000_AllClusters",
+        "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
     for i in range(len(data_names)):
         runSet(data_dir, plot_dir, data_names[i], plot_names[i], csv_names[i])
