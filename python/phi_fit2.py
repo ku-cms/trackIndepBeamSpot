@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from iminuit import Minuit
 from iminuit.cost import LeastSquares
 import string
+from matplotlib.backends.backend_pdf import PdfPages
 
 def makeDir(dir_name):
     if not os.path.exists(dir_name):
@@ -47,6 +48,8 @@ def fit(input_file, input_dir, plot_dir, y_min, y_max):
     else:          
         print("FAIL: did not load num_phi")
 
+    pp = PdfPages("{0}2.pdf".format(input_file))
+
     for i in range(64):
 
         #f.SetParameters(4386, 1.484, 1.132e5)
@@ -66,13 +69,23 @@ def fit(input_file, input_dir, plot_dir, y_min, y_max):
             data_x.append(g[-1].GetPointX(j))
             data_y.append(g[-1].GetPointY(j))
             data_yerr.append(np.sqrt(g[-1].GetPointY(j)))
-        
+
+        min_y = np.min(data_y)
+        max_y = np.max(data_y)
+        delta_y = max_y - min_y
+        #h_y = 0.8*delta_y + min_y
+        h_y = 250000
+        c_start = np.mean(data_y)
         least_squares = LeastSquares(data_x, data_y, data_yerr, sin)
-        m = Minuit(least_squares, a=4386, b=1.484, c=1.132e5)
+        m = Minuit(least_squares, a=5000, b=0, c=c_start, limit_a=[0,20000], limit_b=[-pi,pi])
         #m = Minuit(least_squares, a=0, b=0)
 
         m.migrad() 
         m.hesse()
+        print(m.values)
+        #print(m.values["error_b"])
+        print(m.get_param_states())
+        print(m.get_fmin())
         
         #print(m.values["a"])
         a_fit = m.values["a"]
@@ -83,13 +96,30 @@ def fit(input_file, input_dir, plot_dir, y_min, y_max):
         b_fit_list = np.array(n*[b_fit])
         c_fit_list = np.array(n*[c_fit])
 
+        xf = np.arange(-pi, pi, 0.1)
+        nf = len(xf)
+        an = np.array(nf*[a_fit])
+        bn = np.array(nf*[b_fit])
+        cn = np.array(nf*[c_fit])
+
+        yf = sin(xf, an, bn, cn)
+
         plt.errorbar(data_x, data_y, data_yerr, fmt="o", label="data")
-        plt.plot(data_x, sin(data_x, a_fit_list, b_fit_list, c_fit_list), label="fit")
-        plt.savefig("plots/ring{0}".format(i))
+        plt.plot(xf, yf, label="fit")
+        #plt.plot(xf, sin(xf, a_fit_list, b_fit_list, c_fit_list), label="fit")
+        plt.text(-2, h_y, "a={0:.2f}\nb={1:.2f}\nc={2:.2f}".format(a_fit, b_fit, c_fit))
+        plt.legend()
+        plt.title("Ring {0}".format(i))
+        plt.xlabel("phi")
+        plt.ylabel("occupancy")
+        plt.xlim([-pi, pi])
+        plt.ylim([0, 300000])
+        #plt.savefig("plots/ring{0}".format(i))
+        pp.savefig()
         plt.clf()
         #print("n={0}".format(n))
-        print("x={0}".format(data_x))
-        print("y={0}".format(data_y))
+        #print("x={0}".format(data_x))
+        #print("y={0}".format(data_y))
         #g[-1].Fit(f, "R")
         #g[-1].SetTitle(ring_name)
         
@@ -98,7 +128,9 @@ def fit(input_file, input_dir, plot_dir, y_min, y_max):
    
         #c[-1].cd()
         #g[-1].Draw("AP")
-
+        
+        
+    pp.close()
 '''        
     c[0].Print("{0}.pdf(".format(base_name))
     for i in range(1,63):
