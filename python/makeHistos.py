@@ -509,8 +509,8 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
     z_avg_ring_sorted = z_avg_ring[avg_z_sort]
     phi_avg_hl_sorted = phi_avg_hl[avg_phi_sort]
 
-    for hl in range(n_ladders):
-        print("half ladder {0}: phi = {1}".format(hl, phi_avg_hl_sorted[hl]))
+    #for hl in range(n_ladders):
+    #    print("half ladder {0}: phi = {1}".format(hl, phi_avg_hl_sorted[hl]))
     #print("length occ_ring: {0}".format(len(occ_ring)))
     #print("length phi_ring: {0}".format(len(phi_ring)))
     
@@ -603,13 +603,23 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
             # write to csv file and fill 2D histogram
             # be careful about missing phi points and phi = NAN
             ladder = 0
-            ladderIndex = 0
-            ladderFromPhi = 0
+            current_ladder = 0 
             ladder_nums = getLadderNums(phi_ring[ring])
             ladder_occ  = getLadderOccupancy(ladder_nums, occ_phi_ring)
             while ladder < n_ladders:
-                ladder_for_phi = ladder_nums[ladder]
+                # default
+                phi = -999
+                #ladder_for_phi = ladder_nums[ladder]
+                ladder_for_phi = ladder_nums[current_ladder]
+                if ladder == ladder_for_phi:
+                    pass
+                else:
+                    pass
+                
+                print("ladder = {0}, ladder_for_phi = {1}".format(ladder, ladder_for_phi))
+                
                 phi = phi_ring[ring][ladder_for_phi]
+                
                 occupancy = ladder_occ[ladder]
                 # --- cut on occupancy --- #
                 occupancy_after_cut = 0
