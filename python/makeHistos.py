@@ -609,12 +609,13 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
             while ladder < n_ladders:
                 # default
                 phi = -999
-                #ladder_for_phi = ladder_nums[ladder]
-                ladder_for_phi = ladder_nums[current_ladder]
-                if ladder == ladder_for_phi:
-                    pass
-                else:
-                    pass
+                ladder_for_phi = ladder_nums[ladder]
+                
+                #ladder_for_phi = ladder_nums[current_ladder]
+                #if ladder == ladder_for_phi:
+                #    pass
+                #else:
+                #    pass
                 
                 print("ladder = {0}, ladder_for_phi = {1}".format(ladder, ladder_for_phi))
                 
