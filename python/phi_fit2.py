@@ -40,10 +40,10 @@ def fit(input_file, input_dir, plot_dir):
     else:          
         print("FAIL: did not load num_phi")
 
-    pp = PdfPages("{0}_cut.pdf".format(input_file))
+    pp = PdfPages("{0}.pdf".format(input_file))
 
-    csv_output_name = "{0}_cut_parameters.csv".format(input_file)
-    output_column_titles = ["ring", "nop", "amp", "amp error", "shift", "shift error", "offset", "offset error"]
+    csv_output_name = "{0}_parameters.csv".format(input_file)
+    output_column_titles = ["ring", "nop", "amp", "amp error", "shift", "shift error", "offset", "offset error", "chi^2", "dof"]
     with open(csv_output_name, 'w', newline='') as output_csv:
         output_writer = csv.writer(output_csv)
         output_writer.writerow(output_column_titles)
@@ -59,8 +59,8 @@ def fit(input_file, input_dir, plot_dir):
             n = g[-1].GetN()
 
             # cut on number of points
-            if n < 9:
-                continue
+            #if n < 9:
+                #continue
 
             data_x = []
             data_y = []
@@ -101,7 +101,10 @@ def fit(input_file, input_dir, plot_dir):
             rb_fit_errors = float('%.2g' % m.errors["b"])
             rc_fit_errors = float('%.2g' % m.errors["c"])
 
-            row = [i, n, ra_fit, ra_fit_errors, rb_fit, rb_fit_errors, rc_fit, rc_fit_errors]
+            fval = round(m.fval,1)
+            dof = len(data_x)-m.nfit
+
+            row = [i, n, ra_fit, ra_fit_errors, rb_fit, rb_fit_errors, rc_fit, rc_fit_errors, fval, dof]
             output_writer.writerow(row)
 
             a_fit_list = np.array(n*[a_fit])
@@ -130,7 +133,7 @@ def fit(input_file, input_dir, plot_dir):
             plt.xlabel("phi")
             plt.ylabel("occupancy")
             plt.xlim([-np.pi, np.pi])
-            plt.ylim([0, 300000])
+            plt.ylim([0, 20000])
             #plt.savefig("plots/ring{0}".format(i))
             pp.savefig()
             plt.clf()
@@ -151,7 +154,7 @@ def loop():
 
     input_dir = "output"
     plot_dir = "phi_fit_plots"
-    input_files = ["SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters"]
+    input_files = ["SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters", "TTBar_AllClusters_zsmear", "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters"]
 
     for i in range(len(input_files)):
         fit(input_files[i], input_dir, plot_dir)
