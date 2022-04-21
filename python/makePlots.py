@@ -106,6 +106,31 @@ def makePlots():
     y_title    = "Ladder"
     plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
 
+    # weighted
+    input_file = "output/TTBar_AllClusters_zsmear_weighted_avg.root"
+    plot_name  = "plots/TTBar_AllClusters_zsmear_weighted_avg_occupancy"
+    hist_name  = "h2d_occupancy"
+    title      = "TTBar Occ. (Weighted Avg.)"
+    x_title    = "Ring"
+    y_title    = "Ladder"
+    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+    
+    input_file = "output/SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters_weighted_avg.root"
+    plot_name  = "plots/SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters_weighted_avg_occupancy"
+    hist_name  = "h2d_occupancy"
+    title      = "Single Muon 2017B Occ. (Weighted Avg.)"
+    x_title    = "Ring"
+    y_title    = "Ladder"
+    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+    
+    input_file = "output/ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters_weighted_avg.root"
+    plot_name  = "plots/ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters_weighted_avg_occupancy"
+    hist_name  = "h2d_occupancy"
+    title      = "Zero Bias 2017B Occ. (Weighted Avg.)"
+    x_title    = "Ring"
+    y_title    = "Ladder"
+    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+
 def makePlots2():
     input_file = "output/design_0_ge_2pix.root"
     plot_name  = "plots/design_0_ge_2pix_occupancy"
@@ -115,7 +140,8 @@ def makePlots2():
     plot(input_file, plot_name, title, x_title, y_title)
 
 def main():
-    makePlots2()
+    makePlots()
+    #makePlots2()
 
 if __name__ == "__main__":
     main()

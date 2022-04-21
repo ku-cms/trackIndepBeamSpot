@@ -66,7 +66,7 @@ def read_file(input_file_):
     return np.load(input_file_, allow_pickle=True, encoding='latin1')
 
 def remake_arrays(input_arr_, root_output_name, csv_output_name):
-    useWeightedAve = False
+    useWeightedAve = True
     fixPhi         = True
 
     print("Running to create output file: {0}".format(root_output_name))
@@ -174,15 +174,17 @@ def remake_arrays(input_arr_, root_output_name, csv_output_name):
         #print("roc {0}: z_avg = {1:.3f}, phi_avg = {2:.3f}, phi_fixed_avg = {3:.3f}".format(roc, np.average(z), np.average(phi), np.average(phi_fixed)))
         
         occ.append(np.sum(occ_tmp))
+
+        sumOfWeight = np.sum(occ_tmp)
         
-        if useWeightedAve:
+        if useWeightedAve and sumOfWeight != 0:
             # use weights
             x_array.append(np.average(x,            weights=occ_tmp))
             y_array.append(np.average(y,            weights=occ_tmp))
             z_array.append(np.average(z,            weights=occ_tmp))
             z_err_array.append(np.std(z))
             phi_array.append(np.average(phi_fixed,  weights=occ_tmp))
-            phi_err_array.append(np.std(phi_fixed,  weights=occ_tmp))
+            phi_err_array.append(np.std(phi_fixed))
             r_array.append(np.average(r,            weights=occ_tmp))
             r_err_array.append(np.std(r))
 
@@ -735,10 +737,20 @@ if __name__ == "__main__":
         "design_0_ge_2pix",
         "design_0_ge_2pix_nosmear",
     ]
+    inputs_v6 = [
+        "TTBar_AllClusters_zsmear",
+        "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
+        "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
+    ]
+    
+    #output_tag = ""
+    #output_tag = "_avg"
+    output_tag = "_weighted_avg"
 
-    for sample in inputs_v4:
+    #for sample in inputs_v1:
+    for sample in inputs_v6:
         in_array            = read_file("data/{0}.npy".format(sample))
-        root_output_name    = "{0}/{1}.root".format(output_dir, sample)
-        csv_output_name     = "{0}/{1}.csv".format(output_dir, sample)
+        root_output_name    = "{0}/{1}{2}.root".format(output_dir, sample, output_tag)
+        csv_output_name     = "{0}/{1}{2}.csv".format(output_dir, sample, output_tag)
         remake_arrays(in_array, root_output_name, csv_output_name)
  
