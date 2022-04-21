@@ -195,9 +195,9 @@ def runMC():
     run(input_directory, num_files, name, isData)
 
 def main():
-    #runData2017B()
+    runData2017B()
     #runData2018C()
-    runData2021()
+    #runData2021()
     #runMC()
 
 if __name__ == "__main__":
