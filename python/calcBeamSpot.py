@@ -36,18 +36,18 @@ def printBeamSpot(beam_spot):
     x = beam_spot[0]
     y = beam_spot[1]
     z = beam_spot[2]
-    print("x = {0:.2f}".format(x))
-    print("y = {0:.2f}".format(y))
-    print("z = {0:.2f}".format(z))
+    print("x = {0:.3f}".format(x))
+    print("y = {0:.3f}".format(y))
+    print("z = {0:.3f}".format(z))
 
 # print parameters (b, r_2D, r_3D)
 def printParams(params):
     b    = params[0]
     r_2D = params[1]
     r_3D = params[2]
-    print("b    = {0:.2f}".format(b))
-    print("r_2D = {0:.2f}".format(r_2D))
-    print("r_3D = {0:.2f}".format(r_3D))
+    print("b    = {0:.3f}".format(b))
+    print("r_2D = {0:.3f}".format(r_2D))
+    print("r_3D = {0:.3f}".format(r_3D))
 
 def run(dataset):
     name      = dataset["name"]
@@ -72,47 +72,67 @@ def main():
     datasets = []
 
     # TTBar MC (z-smeared)
-    x =  0.10
-    y = -0.08
-    z =  0.00
-    beam_spot = [x, y, z]
-    dataset = {}
-    dataset["name"] = "TTBar MC (z-smeared)"
-    dataset["beam_spot"] = beam_spot
-    datasets.append(dataset)
+    #x =  0.10
+    #y = -0.08
+    #z =  0.00
+    #beam_spot = [x, y, z]
+    #dataset = {}
+    #dataset["name"] = "TTBar MC (z-smeared)"
+    #dataset["beam_spot"] = beam_spot
+    #datasets.append(dataset)
 
     # Single Muon 2017B
-    x =  0.09
-    y = -0.04
-    z =  0.09
+    #x =  0.09
+    #y = -0.04
+    #z =  0.15
+    #beam_spot = [x, y, z]
+    #dataset = {}
+    #dataset["name"] = "Single Muon 2017B"
+    #dataset["beam_spot"] = beam_spot
+    #datasets.append(dataset)
+    
+    # Single Muon 2017B (PvZ < 0)
+    x =  0.085
+    y = -0.036
+    z =  0.147
     beam_spot = [x, y, z]
     dataset = {}
-    dataset["name"] = "Single Muon 2017B"
+    dataset["name"] = "Single Muon 2017B (PvZ < 0)"
+    dataset["beam_spot"] = beam_spot
+    datasets.append(dataset)
+    
+    # Single Muon 2017B (PvZ >= 0)
+    x =  0.086
+    y = -0.036
+    z =  0.147
+    beam_spot = [x, y, z]
+    dataset = {}
+    dataset["name"] = "Single Muon 2017B (PvZ >= 0)"
     dataset["beam_spot"] = beam_spot
     datasets.append(dataset)
 
     # Zero Bias 2017B
-    x =  0.09
-    y = -0.04
-    z =  0.17
-    beam_spot = [x, y, z]
-    dataset = {}
-    dataset["name"] = "Zero Bias 2017B"
-    dataset["beam_spot"] = beam_spot
-    datasets.append(dataset)
+    #x =  0.09
+    #y = -0.04
+    #z =  0.17
+    #beam_spot = [x, y, z]
+    #dataset = {}
+    #dataset["name"] = "Zero Bias 2017B"
+    #dataset["beam_spot"] = beam_spot
+    #datasets.append(dataset)
 
     # Express Data 2021, run 346512
     #x =  0.1727
     #y = -0.1913
     #z =  0.3813
-    x =  0.17
-    y = -0.19
-    z =  0.38
-    beam_spot = [x, y, z]
-    dataset = {}
-    dataset["name"] = "Express Data 2021"
-    dataset["beam_spot"] = beam_spot
-    datasets.append(dataset)
+    #x =  0.17
+    #y = -0.19
+    #z =  0.38
+    #beam_spot = [x, y, z]
+    #dataset = {}
+    #dataset["name"] = "Express Data 2021"
+    #dataset["beam_spot"] = beam_spot
+    #datasets.append(dataset)
 
     for dataset in datasets:
         run(dataset)

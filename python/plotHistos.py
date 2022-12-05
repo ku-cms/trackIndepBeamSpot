@@ -84,28 +84,28 @@ def makePlots(chain, name, isData):
 
 def runData2017B():
     # # Min Bias 2017B
-    # input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/MinimumBias/crab_PixelTree_MinBias_2017B_RAW_v3/210715_152921/0000'
+    # input_directory = '/home/t3-ku/calebsmith/store/PixelTrees/MinimumBias/crab_PixelTree_MinBias_2017B_RAW_v3/210715_152921/0000'
     # name            = "MinBias2017B"
     # isData          = True
     # num_files       = 30
     # run(input_directory, num_files, name, isData)
     
     # Zero Bias 2017B
-    # input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2017B_RAW_v2/210824_165140/0000'
+    # input_directory = '/home/t3-ku/calebsmith/store/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2017B_RAW_v2/210824_165140/0000'
     # name            = "ZeroBias_2017B_MoreEvents"
     # isData          = True
     # num_files       = 15
     # run(input_directory, num_files, name, isData)
     
     # Single Muon 2017B
-    # input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2017B_RAW_v1/210810_160009/0000'
+    # input_directory = '/home/t3-ku/calebsmith/store/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2017B_RAW_v1/210810_160009/0000'
     # name            = "SingleMuon_2017B_MoreEvents"
     # isData          = True
     # num_files       = 20
     # run(input_directory, num_files, name, isData)
     
     # Zero Bias 2017B v2: using golden json
-    input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2017B_RAW_v4/210909_195432/0000'
+    input_directory = '/home/t3-ku/calebsmith/store/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2017B_RAW_v4/210909_195432/0000'
     name            = "ZeroBias_2017B_v2_MoreEvents"
     isData          = True
     #num_files       = 20
@@ -113,7 +113,7 @@ def runData2017B():
     run(input_directory, num_files, name, isData)
     
     # Single Muon 2017B v2: using golden json
-    input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2017B_RAW_v2/210909_000356/0000'
+    input_directory = '/home/t3-ku/calebsmith/store/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2017B_RAW_v2/210909_000356/0000'
     name            = "SingleMuon_2017B_v2_MoreEvents"
     isData          = True
     #num_files       = 20
@@ -122,35 +122,35 @@ def runData2017B():
 
 def runData2018C():
     # # Single Muon
-    # input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
+    # input_directory = '/home/t3-ku/calebsmith/store/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
     # name            = "SingleMuon"
     # isData          = True
     # num_files       = 12
     # run(input_directory, num_files, name, isData)
     
     # # Zero Bias
-    # input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
+    # input_directory = '/home/t3-ku/calebsmith/store/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
     # name            = "ZeroBias"
     # isData          = True
     # num_files       = 2
     # run(input_directory, num_files, name, isData)
     
     # # Min Bias 2018C
-    # input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/MinimumBias2/crab_PixelTree_MinBias_2018C_RAW_v2/210707_165008/0000'
+    # input_directory = '/home/t3-ku/calebsmith/store/PixelTrees/MinimumBias2/crab_PixelTree_MinBias_2018C_RAW_v2/210707_165008/0000'
     # name            = "MinBias2018C"
     # isData          = True
     # num_files       = 2
     # run(input_directory, num_files, name, isData)
     
     # Single Muon 2018C
-    input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
+    input_directory = '/home/t3-ku/calebsmith/store/PixelTrees/SingleMuon/crab_PixelTree_SingleMuon_2018C_RAW_Run319337_v1/210403_235502/0000'
     name            = "SingleMuon_2018C_MoreEvents"
     isData          = True
     num_files       = 20
     run(input_directory, num_files, name, isData)
     
     # Zero Bias 2018C
-    input_directory = '/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/caleb/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
+    input_directory = '/home/t3-ku/calebsmith/store/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2018C_RAW_AllRuns_v1/210405_171418/0000'
     name            = "ZeroBias_2018C_MoreEvents"
     isData          = True
     num_files       = 3
@@ -195,9 +195,9 @@ def runMC():
     run(input_directory, num_files, name, isData)
 
 def main():
-    #runData2017B()
+    runData2017B()
     #runData2018C()
-    runData2021()
+    #runData2021()
     #runMC()
 
 if __name__ == "__main__":
