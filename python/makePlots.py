@@ -31,7 +31,6 @@ def plot2D(input_file, plot_name, hist_name, title, x_title, y_title):
     
     c1.Update()
     c1.SaveAs(plot_name + ".pdf")
-    c1.SaveAs(plot_name + ".png")
 
 def makePlots():
     input_file = "output/TTBar_AllClusters_zsmear.root"
@@ -139,9 +138,44 @@ def makePlots2():
     y_title    = "Ladder"
     plot(input_file, plot_name, title, x_title, y_title)
 
+def makePlots3():
+    # using weighted average
+    input_file = "output/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg.root"
+    plot_name  = "plots2D/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg"
+    hist_name  = "h2d_occupancy"
+    title      = "Zero Bias 2022F Occ."
+    x_title    = "Ring"
+    y_title    = "Ladder"
+    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+    
+    input_file = "output/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg.root"
+    plot_name  = "plots2D/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg_cut"
+    hist_name  = "h2d_occupancy_cut"
+    title      = "Zero Bias 2022F Occ. (after cut)"
+    x_title    = "Ring"
+    y_title    = "Ladder"
+    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+    
+    input_file = "output/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg.root"
+    plot_name  = "plots2D/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg"
+    hist_name  = "h2d_occupancy"
+    title      = "Zero Bias 2022F Occ."
+    x_title    = "Ring"
+    y_title    = "Ladder"
+    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+    
+    input_file = "output/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg.root"
+    plot_name  = "plots2D/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg_cut"
+    hist_name  = "h2d_occupancy_cut"
+    title      = "Zero Bias 2022F Occ. (after cut)"
+    x_title    = "Ring"
+    y_title    = "Ladder"
+    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+
 def main():
-    makePlots()
+    #makePlots()
     #makePlots2()
+    makePlots3()
 
 if __name__ == "__main__":
     main()
