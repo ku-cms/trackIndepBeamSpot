@@ -21,12 +21,24 @@ def getData(input_file):
 
 # get chain from list of ROOT files
 def getChain(input_files, num_files):
+    verbose = True
+    
     # use num_files as max if it is not negative
     if num_files >= 0:
         input_files = input_files[0:num_files]
+    n_input_files = len(input_files)
+    
+    # Create TChain
     chain = ROOT.TChain('pixelTree')
+    
+    # Add files to chain
+    if verbose:
+        print("Adding {0} file(s) to chain:".format(n_input_files))
     for f in input_files:
+        if verbose:
+            print(" - {0}".format(f))
         chain.Add(f)
+    
     return chain
 
 # get list of local files

@@ -8,13 +8,35 @@ ROOT.gROOT.SetBatch(ROOT.kTRUE)
 # Tell ROOT not to be in charge of memory, fix issue of histograms being deleted when ROOT file is closed:
 ROOT.TH1.AddDirectory(False)
 
+def getCleanName(name):
+    result  = name
+    # map: keys replaced by values in name
+    clean_map = {
+        "=="    : "eq",
+        "!="    : "neq",
+        ">="    : "gte",
+        "<="    : "lte",
+        ">"     : "gt",
+        "<"     : "lt",
+        "&&"    : "and",
+        "||"    : "or",
+        " "     : "_"
+    }
+    # Order matters! Define order here:
+    keys = ["==", "!=", ">=", "<=", ">", "<", "&&", "||", " "]
+    for key in keys:
+        value = clean_map[key]
+        result = result.replace(key, value)
+    return result
+
 def plotChain(chain, name, var, cuts=""):
     plot_dir  = "plots/"
     makeDir(plot_dir)
     if cuts:
-        plot_name = "{0}hist_{1}_{2}_{3}.png".format(plot_dir, name, var, cuts)
+        cuts_name = getCleanName(cuts)
+        plot_name = "{0}hist_{1}_{2}_{3}.pdf".format(plot_dir, name, var, cuts_name)
     else:
-        plot_name = "{0}hist_{1}_{2}.png".format(plot_dir, name, var)
+        plot_name = "{0}hist_{1}_{2}.pdf".format(plot_dir, name, var)
     
     c = ROOT.TCanvas("c", "c", 800, 800)
 
@@ -44,20 +66,27 @@ def makePlots(chain, name, isData):
     #plotChain(chain, name, "ClSize", "ClN>=2000 && ClSize>=2")
     
     plotChain(chain, name, "ClN")
+    plotChain(chain, name, "ClN", "ClN>=2000 && ClSize>=2")
     #plotChain(chain, name, "ClN", "ClTkN<1")
     #plotChain(chain, name, "ClN", "ClTkN>=1")
     #plotChain(chain, name, "ClN", "ClTkN>=0")
     
     #plotChain(chain, name, "ClSize")
+    #plotChain(chain, name, "ClSize", "ClN>=2000 && ClSize>=2")
+    
     #plotChain(chain, name, "ClSizeX")
     #plotChain(chain, name, "ClSizeY")
     #plotChain(chain, name, "ClCharge")
     #plotChain(chain, name, "ClChargeCorr")
     
-    plotChain(chain, name, "PvN")
-    plotChain(chain, name, "PvX")
-    plotChain(chain, name, "PvY")
-    plotChain(chain, name, "PvZ")
+    #plotChain(chain, name, "PvN")
+    #plotChain(chain, name, "PvX")
+    #plotChain(chain, name, "PvY")
+    #plotChain(chain, name, "PvZ")
+    #plotChain(chain, name, "PvN", "ClN>=2000 && ClSize>=2")
+    #plotChain(chain, name, "PvX", "ClN>=2000 && ClSize>=2")
+    #plotChain(chain, name, "PvY", "ClN>=2000 && ClSize>=2")
+    #plotChain(chain, name, "PvZ", "ClN>=2000 && ClSize>=2")
     #plotChain(chain, name, "PvX", "ClTkN<1")
     #plotChain(chain, name, "PvX", "ClTkN>=1")
     #plotChain(chain, name, "PvY", "ClTkN<1")
@@ -159,10 +188,19 @@ def runData2018C():
 def runData2021():
     # directory on root://cmseos.fnal.gov
     # use eos functions for eos files
-    input_directory = '/store/user/lpcsusylep/PixelTrees/ExpressPhysics/crab_PixelTree_Express_2021_Run346512_v1/211110_190014/0000'
+    input_directory = "/store/user/lpcsusylep/PixelTrees/ExpressPhysics/crab_PixelTree_Express_2021_Run346512_v1/211110_190014/0000"
     name            = "ExpressPhysics_2021_Run346512"
     isData          = True
     num_files       = -1
+    runEOS(input_directory, num_files, name, isData)
+
+def runData2022():
+    # directory on root://cmseos.fnal.gov
+    # use eos functions for eos files
+    input_directory = "/store/user/lpcsusylep/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2022F_RAW_v1_Run362154_v2/221206_141708/0000"
+    name            = "ZeroBias_2022F_NumFiles1"
+    isData          = True
+    num_files       = 1
     runEOS(input_directory, num_files, name, isData)
 
 def runMC():
@@ -195,9 +233,10 @@ def runMC():
     run(input_directory, num_files, name, isData)
 
 def main():
-    runData2017B()
+    #runData2017B()
     #runData2018C()
     #runData2021()
+    runData2022()
     #runMC()
 
 if __name__ == "__main__":
