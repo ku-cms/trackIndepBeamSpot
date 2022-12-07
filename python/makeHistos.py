@@ -742,6 +742,10 @@ if __name__ == "__main__":
         "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
         "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
+    inputs_v7 = [
+        "ZeroBias_2022F_nFiles1_NoCuts.npy",
+        "ZeroBias_2022F_nFiles1_ClustSize2_nClust2000.npy",
+    ]
     
     #output_tag = ""
     #output_tag = "_avg"

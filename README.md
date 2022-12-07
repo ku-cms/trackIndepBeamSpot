@@ -6,6 +6,8 @@ This repository contains python scripts used for reading layer 1 pixel clusters 
 
 Prepare your working area.
 
+WARNING: root_numpy is available in python3 for CMSSW_11_2_0, but not CMSSW_12_5_2.
+
 Setup for CMSSW_11_2_0:
 ```
 export SCRAM_ARCH=slc7_amd64_gcc900
