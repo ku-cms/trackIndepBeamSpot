@@ -4,13 +4,25 @@ This repository contains python scripts used for reading layer 1 pixel clusters 
 
 ## Setup
 
-Create CMSSW area and clone this repository.
+Prepare your working area.
+
+Setup for CMSSW_11_2_0:
 ```
 export SCRAM_ARCH=slc7_amd64_gcc900
 cmsrel CMSSW_11_2_0
 cd CMSSW_11_2_0/src
 cmsenv
-git clone https://github.com/ku-cms/trackIndepBeamSpot.git
+git clone git@github.com:ku-cms/trackIndepBeamSpot.git
+cd trackIndepBeamSpot
+```
+
+Setup for CMSSW_12_5_2 (supports PyROOT in python3, but not python2):
+```
+export SCRAM_ARCH=slc7_amd64_gcc900
+cmsrel CMSSW_12_5_2
+cd CMSSW_12_5_2/src
+cmsenv
+git clone git@github.com:ku-cms/trackIndepBeamSpot.git
 cd trackIndepBeamSpot
 ```
 
@@ -19,29 +31,30 @@ There are instructions for each of these provided below.
 
 ## Reading Clusters
 
-The script readClusters.py should be run in python 2 and requires these packages (use cmsenv):
+The script readClusters.py can be run in python3 (supported in CMSSW_12_5_2) and requires these packages:
 - numpy
 - pyROOT
 
-You can run readClusters.py like this:
+You can run readClusters.py from a CMSSW area like this:
 ```
 cmsenv
-cd python
-python readClusters.py
+mkdir -p data
+python3 python/readClusters.py
 ```
 
 However, the script takes a long time to finish, especially when running over a large number of events.
 The command "nohup" can be used so that the script can continue running even if you logout of your session.
 Here we chose the log file name "readClusters_SingleMuon_v1.log."
 ```
-cd trackIndepBeamSpot/python
-mkdir logs
-nohup python readClusters.py > logs/readClusters_SingleMuon_v1.log 2>&1 &
+cmsenv
+mkdir -p data
+mkdir -p log
+nohup python3 python/readClusters.py > log/readClusters_SingleMuon_v1.log 2>&1 &
 ```
 
 You can watch the log with tail (-f for follow as the log file grows, and -n for the max number of lines).
 ```
-tail -f -n 100 logs/readClusters_SingleMuon_v1.log
+tail -f -n 100 log/readClusters_SingleMuon_v1.log
 ```
 
 You can see your jobs with this command (only before logging out):
@@ -64,7 +77,7 @@ The script readClusters.py will create a .npy file when it finished running.
 In addition, there is a script for plotting pixel tree variables, plotHistos.py.
 In can be run like this:
 ```
-python python/plotHistos.py
+python3 python/plotHistos.py
 ```
 Depending on the number of root files loaded, the number of events, and the number of variables plotted, this script can take some time to run (e.g. 15 min).
 
