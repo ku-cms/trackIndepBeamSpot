@@ -117,6 +117,8 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         h_dummy[i]->SetBinContent(1, 80000.0);
         h_dummy[i]->SetBinContent(2, 80000.0);
 
+        c[i]->cd();
+        g[i]->Draw("AP");
         
         // TODO: TGraph auto zooms in on x-axis
         // may need to use dummy hist to set x-axis range to [-pi, pi]
@@ -128,9 +130,12 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         h_dummy[i]->GetXaxis()->SetRangeUser(-M_PI, M_PI);
         h_dummy[i]->GetYaxis()->SetRangeUser(y_min, y_max);
    
-        c[i]->cd();
-        h_dummy[i]->Draw("hist");
-        //g[i]->Draw("AP same");
+        //c[i]->cd();
+        //g[i]->Draw("AP");
+        //h_dummy[i]->Draw("hist same");
+
+        g[i]->Draw("AP");
+        c[i]->Update();
 
         double num_phi_x = num_phi->GetPointX(i);
         double num_phi_y = num_phi->GetPointY(i);
