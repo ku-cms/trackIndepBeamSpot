@@ -6,6 +6,8 @@ This repository contains python scripts used for reading layer 1 pixel clusters 
 
 Prepare your working area.
 
+It is recommended to use CMSSW_11_2_0 and Python 3.8.2.
+
 WARNING: root_numpy is available in python3 for CMSSW_11_2_0, but not CMSSW_12_5_2.
 
 Setup for CMSSW_11_2_0:
@@ -18,22 +20,12 @@ git clone git@github.com:ku-cms/trackIndepBeamSpot.git
 cd trackIndepBeamSpot
 ```
 
-Setup for CMSSW_12_5_2 (supports PyROOT in python3, but not python2):
-```
-export SCRAM_ARCH=slc7_amd64_gcc900
-cmsrel CMSSW_12_5_2
-cd CMSSW_12_5_2/src
-cmsenv
-git clone git@github.com:ku-cms/trackIndepBeamSpot.git
-cd trackIndepBeamSpot
-```
-
 There are two main steps that this framework does: reading clusters and fitting.
 There are instructions for each of these provided below.
 
 ## Reading Clusters
 
-The script readClusters.py can be run in python3 (supported in CMSSW_12_5_2) and requires these packages:
+The script readClusters.py can be run in python3 and requires these packages:
 - numpy
 - pyROOT
 
