@@ -275,15 +275,15 @@ void loop()
     //y_max_vals.push_back(30000.0);
     
     // limits for legacy 2017 data
-    y_min_vals.push_back(0.0); 
-    y_min_vals.push_back(0.0); 
-    y_max_vals.push_back(300000.0);
-    y_max_vals.push_back(300000.0);
+    //y_min_vals.push_back(0.0); 
+    //y_min_vals.push_back(0.0); 
+    //y_max_vals.push_back(300000.0);
+    //y_max_vals.push_back(300000.0);
     // limits for 2022 data (v1)
     y_min_vals.push_back(0.0); 
     y_min_vals.push_back(0.0); 
-    y_max_vals.push_back(10000.0);
-    y_max_vals.push_back(10000.0);
+    y_max_vals.push_back(5000.0);
+    y_max_vals.push_back(5000.0);
     
     // limits for subtracted version
     //y_min_vals.push_back(-100000.0); 
