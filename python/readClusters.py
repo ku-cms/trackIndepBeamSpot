@@ -667,9 +667,11 @@ def runExpressData2021():
 def runZeroBias2022F():
     directory   = '/store/user/lpcsusylep/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2022F_RAW_v1_Run362154_v2/221206_141708/0000'
     #output_file = 'data/ZeroBias_2022F_nFiles1_NoCuts.npy'
-    output_file = 'data/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000.npy'
+    #output_file = 'data/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000.npy'
+    #output_file = 'data/ZeroBias_2022F_nFiles10_NoCuts.npy'
+    output_file = 'data/ZeroBias_2022F_nFiles10_ClustSize2_nClust2000.npy'
     message     = 'Running over Zero Bias 2022F pixel trees.'
-    num_files   = 1
+    num_files   = 10
     doClusterSizeCut    = True
     doNumberClustersCut = True
     runEOS(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
