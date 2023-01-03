@@ -31,6 +31,7 @@ def plot2D(input_file, plot_name, hist_name, title, x_title, y_title):
     
     c1.Update()
     c1.SaveAs(plot_name + ".pdf")
+    c1.Close()
 
 def makePlots():
     input_file = "output/TTBar_AllClusters_zsmear.root"
