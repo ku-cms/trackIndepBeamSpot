@@ -141,37 +141,84 @@ def makePlots2():
 
 def makePlots3():
     # using weighted average
-    input_file = "output/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg.root"
-    plot_name  = "plots2D/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg"
-    hist_name  = "h2d_occupancy"
-    title      = "Zero Bias 2022F Occ."
-    x_title    = "Ring"
-    y_title    = "Ladder"
-    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+
+    # map for plot info
+    plot_info = {}
+
+    plot_info["plot_1"] = {}
+    plot_info["plot_1"]["input_file"] = "output/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg.root"
+    plot_info["plot_1"]["plot_name"]  = "plots2D/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg"
+    plot_info["plot_1"]["hist_name"]  = "h2d_occupancy"
+    plot_info["plot_1"]["title"]      = "Zero Bias 2022F Occ."
+    plot_info["plot_1"]["x_title"]    = "Ring"
+    plot_info["plot_1"]["y_title"]    = "Ladder"
     
-    input_file = "output/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg.root"
-    plot_name  = "plots2D/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg_cut"
-    hist_name  = "h2d_occupancy_cut"
-    title      = "Zero Bias 2022F Occ. (after cut)"
-    x_title    = "Ring"
-    y_title    = "Ladder"
-    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+    plot_info["plot_2"] = {}
+    plot_info["plot_2"]["input_file"] = "output/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg.root"
+    plot_info["plot_2"]["plot_name"]  = "plots2D/ZeroBias_2022F_nFiles1_NoCuts_weighted_avg_cut"
+    plot_info["plot_2"]["hist_name"]  = "h2d_occupancy_cut"
+    plot_info["plot_2"]["title"]      = "Zero Bias 2022F Occ. (after cut)"
+    plot_info["plot_2"]["x_title"]    = "Ring"
+    plot_info["plot_2"]["y_title"]    = "Ladder"
     
-    input_file = "output/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg.root"
-    plot_name  = "plots2D/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg"
-    hist_name  = "h2d_occupancy"
-    title      = "Zero Bias 2022F Occ."
-    x_title    = "Ring"
-    y_title    = "Ladder"
-    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+    plot_info["plot_3"] = {}
+    plot_info["plot_3"]["input_file"] = "output/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg.root"
+    plot_info["plot_3"]["plot_name"]  = "plots2D/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg"
+    plot_info["plot_3"]["hist_name"]  = "h2d_occupancy"
+    plot_info["plot_3"]["title"]      = "Zero Bias 2022F Occ."
+    plot_info["plot_3"]["x_title"]    = "Ring"
+    plot_info["plot_3"]["y_title"]    = "Ladder"
     
-    input_file = "output/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg.root"
-    plot_name  = "plots2D/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg_cut"
-    hist_name  = "h2d_occupancy_cut"
-    title      = "Zero Bias 2022F Occ. (after cut)"
-    x_title    = "Ring"
-    y_title    = "Ladder"
-    plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+    plot_info["plot_4"] = {}
+    plot_info["plot_4"]["input_file"] = "output/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg.root"
+    plot_info["plot_4"]["plot_name"]  = "plots2D/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg_cut"
+    plot_info["plot_4"]["hist_name"]  = "h2d_occupancy_cut"
+    plot_info["plot_4"]["title"]      = "Zero Bias 2022F Occ. (after cut)"
+    plot_info["plot_4"]["x_title"]    = "Ring"
+    plot_info["plot_4"]["y_title"]    = "Ladder"
+    
+    plot_info["plot_5"] = {}
+    plot_info["plot_5"]["input_file"] = "output/ZeroBias_2022F_nFiles10_NoCuts_weighted_avg.root"
+    plot_info["plot_5"]["plot_name"]  = "plots2D/ZeroBias_2022F_nFiles10_NoCuts_weighted_avg"
+    plot_info["plot_5"]["hist_name"]  = "h2d_occupancy"
+    plot_info["plot_5"]["title"]      = "Zero Bias 2022F Occ."
+    plot_info["plot_5"]["x_title"]    = "Ring"
+    plot_info["plot_5"]["y_title"]    = "Ladder"
+    
+    plot_info["plot_6"] = {}
+    plot_info["plot_6"]["input_file"] = "output/ZeroBias_2022F_nFiles10_NoCuts_weighted_avg.root"
+    plot_info["plot_6"]["plot_name"]  = "plots2D/ZeroBias_2022F_nFiles10_NoCuts_weighted_avg_cut"
+    plot_info["plot_6"]["hist_name"]  = "h2d_occupancy_cut"
+    plot_info["plot_6"]["title"]      = "Zero Bias 2022F Occ. (after cut)"
+    plot_info["plot_6"]["x_title"]    = "Ring"
+    plot_info["plot_6"]["y_title"]    = "Ladder"
+    
+    plot_info["plot_7"] = {}
+    plot_info["plot_7"]["input_file"] = "output/ZeroBias_2022F_nFiles10_ClustSize2_nClust2000_weighted_avg.root"
+    plot_info["plot_7"]["plot_name"]  = "plots2D/ZeroBias_2022F_nFiles10_ClustSize2_nClust2000_weighted_avg"
+    plot_info["plot_7"]["hist_name"]  = "h2d_occupancy"
+    plot_info["plot_7"]["title"]      = "Zero Bias 2022F Occ."
+    plot_info["plot_7"]["x_title"]    = "Ring"
+    plot_info["plot_7"]["y_title"]    = "Ladder"
+    
+    plot_info["plot_8"] = {}
+    plot_info["plot_8"]["input_file"] = "output/ZeroBias_2022F_nFiles10_ClustSize2_nClust2000_weighted_avg.root"
+    plot_info["plot_8"]["plot_name"]  = "plots2D/ZeroBias_2022F_nFiles10_ClustSize2_nClust2000_weighted_avg_cut"
+    plot_info["plot_8"]["hist_name"]  = "h2d_occupancy_cut"
+    plot_info["plot_8"]["title"]      = "Zero Bias 2022F Occ. (after cut)"
+    plot_info["plot_8"]["x_title"]    = "Ring"
+    plot_info["plot_8"]["y_title"]    = "Ladder"
+
+    for key in plot_info:
+        print("Creating '{0}'.".format(key))
+        input_file  = plot_info[key]["input_file"]
+        plot_name   = plot_info[key]["plot_name"]
+        hist_name   = plot_info[key]["hist_name"]
+        title       = plot_info[key]["title"]
+        x_title     = plot_info[key]["x_title"]
+        y_title     = plot_info[key]["y_title"]
+        plot2D(input_file, plot_name, hist_name, title, x_title, y_title)
+
 
 def main():
     #makePlots()

@@ -745,6 +745,8 @@ if __name__ == "__main__":
     inputs_v7 = [
         "ZeroBias_2022F_nFiles1_NoCuts",
         "ZeroBias_2022F_nFiles1_ClustSize2_nClust2000",
+        "ZeroBias_2022F_nFiles10_NoCuts",
+        "ZeroBias_2022F_nFiles10_ClustSize2_nClust2000",
     ]
     
     #output_tag = ""
