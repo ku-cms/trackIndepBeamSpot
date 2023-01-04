@@ -42,6 +42,7 @@ def make_cluster_map(input_files_, num_files, doClusterSizeCut, doNumberClusters
         n_cl = event.ClN
         # cut on number of clusters per event
         if doNumberClustersCut:
+            # require number of clusters per event >= 2000
             if n_cl < 2000:
                 continue
         #print("event: {0}, number of clusters: {1}".format(iev, n_cl))
@@ -60,8 +61,12 @@ def make_cluster_map(input_files_, num_files, doClusterSizeCut, doNumberClusters
             
             # cut on cluster size
             if doClusterSizeCut:
-                if clus_size < 2:
+                # test: require cluster size == 2
+                if clus_size != 2:
                     continue
+                # standard: require cluster size >= 2
+                #if clus_size < 2:
+                #    continue
 
             # cut on number of tracks per cluster
             
@@ -666,12 +671,19 @@ def runExpressData2021():
 
 def runZeroBias2022F():
     directory   = '/store/user/lpcsusylep/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2022F_RAW_v1_Run362154_v2/221206_141708/0000'
+    
     #output_file = 'data/ZeroBias_2022F_nFiles1_NoCuts.npy'
+    #output_file = 'data/ZeroBias_2022F_nFiles1_ClustSizeEq2_nClust2000.npy'
     #output_file = 'data/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000.npy'
+    
     #output_file = 'data/ZeroBias_2022F_nFiles10_NoCuts.npy'
+    #output_file = 'data/ZeroBias_2022F_nFiles10_ClustSizeEq2_nClust2000.npy'
     #output_file = 'data/ZeroBias_2022F_nFiles10_ClustSize2_nClust2000.npy'
+    
     #output_file = 'data/ZeroBias_2022F_nFiles20_NoCuts.npy'
-    output_file = 'data/ZeroBias_2022F_nFiles20_ClustSize2_nClust2000.npy'
+    output_file = 'data/ZeroBias_2022F_nFiles20_ClustSizeEq2_nClust2000.npy'
+    #output_file = 'data/ZeroBias_2022F_nFiles20_ClustSize2_nClust2000.npy'
+    
     message     = 'Running over Zero Bias 2022F pixel trees.'
     num_files   = 20
     doClusterSizeCut    = True
