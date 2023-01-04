@@ -198,7 +198,7 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     //draw(*h_amp,            base_name + "_amp",         "ring", "amplitude", 0, 64, 0, 5e4);
     //draw(*h_shift,          base_name + "_shift",       "ring", "shift",     0, 64, -M_PI, M_PI);
     //draw(*h_offset,         base_name + "_offset",      "ring", "offset",    0, 64, 0, 3e5);
-    
+    //
     //draw(*h_num_phi_cut,    base_name + "_num_phi_cut", "ring", "num_phi",   0, 64, 0, 20);
     //draw(*h_chisq_cut,      base_name + "_chisq_cut",   "ring", "chi sq.",   0, 64, 0, 2e10);
     //draw(*h_amp_cut,        base_name + "_amp_cut",     "ring", "amplitude", 0, 64, 0, 5e4);
@@ -206,17 +206,30 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     //draw(*h_offset_cut,     base_name + "_offset_cut",  "ring", "offset",    0, 64, 0, 3e5);
     
     // limits for legacy 2022 data (v1)
+    //draw(*h_num_phi,        base_name + "_num_phi",     "ring", "num_phi",   0, 64, 0, 20);
+    //draw(*h_chisq,          base_name + "_chisq",       "ring", "chi sq.",   0, 64, 0, 1e5);
+    //draw(*h_amp,            base_name + "_amp",         "ring", "amplitude", 0, 64, 0, 1e3);
+    //draw(*h_shift,          base_name + "_shift",       "ring", "shift",     0, 64, -M_PI, M_PI);
+    //draw(*h_offset,         base_name + "_offset",      "ring", "offset",    0, 64, 0, 1e4);
+    //
+    //draw(*h_num_phi_cut,    base_name + "_num_phi_cut", "ring", "num_phi",   0, 64, 0, 20);
+    //draw(*h_chisq_cut,      base_name + "_chisq_cut",   "ring", "chi sq.",   0, 64, 0, 1e5);
+    //draw(*h_amp_cut,        base_name + "_amp_cut",     "ring", "amplitude", 0, 64, 0, 1e3);
+    //draw(*h_shift_cut,      base_name + "_shift_cut",   "ring", "shift",     0, 64, -M_PI, M_PI);
+    //draw(*h_offset_cut,     base_name + "_offset_cut",  "ring", "offset",    0, 64, 0, 1e4);
+    
+    // limits for legacy 2022 data (v2)
     draw(*h_num_phi,        base_name + "_num_phi",     "ring", "num_phi",   0, 64, 0, 20);
-    draw(*h_chisq,          base_name + "_chisq",       "ring", "chi sq.",   0, 64, 0, 1e5);
-    draw(*h_amp,            base_name + "_amp",         "ring", "amplitude", 0, 64, 0, 1e3);
+    draw(*h_chisq,          base_name + "_chisq",       "ring", "chi sq.",   0, 64, 0, 3e8);
+    draw(*h_amp,            base_name + "_amp",         "ring", "amplitude", 0, 64, 0, 5e3);
     draw(*h_shift,          base_name + "_shift",       "ring", "shift",     0, 64, -M_PI, M_PI);
-    draw(*h_offset,         base_name + "_offset",      "ring", "offset",    0, 64, 0, 1e4);
+    draw(*h_offset,         base_name + "_offset",      "ring", "offset",    0, 64, 0, 1e5);
     
     draw(*h_num_phi_cut,    base_name + "_num_phi_cut", "ring", "num_phi",   0, 64, 0, 20);
-    draw(*h_chisq_cut,      base_name + "_chisq_cut",   "ring", "chi sq.",   0, 64, 0, 1e5);
-    draw(*h_amp_cut,        base_name + "_amp_cut",     "ring", "amplitude", 0, 64, 0, 1e3);
+    draw(*h_chisq_cut,      base_name + "_chisq_cut",   "ring", "chi sq.",   0, 64, 0, 3e8);
+    draw(*h_amp_cut,        base_name + "_amp_cut",     "ring", "amplitude", 0, 64, 0, 5e3);
     draw(*h_shift_cut,      base_name + "_shift_cut",   "ring", "shift",     0, 64, -M_PI, M_PI);
-    draw(*h_offset_cut,     base_name + "_offset_cut",  "ring", "offset",    0, 64, 0, 1e4);
+    draw(*h_offset_cut,     base_name + "_offset_cut",  "ring", "offset",    0, 64, 0, 1e5);
     
     // delete canvases
     for(int i = 0; i < 64; ++i)
@@ -263,9 +276,14 @@ void loop()
     // Legacy 2017
     //input_files.push_back("ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
     //input_files.push_back("SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
+    
     // 2022 (v1)
-    input_files.push_back("ZeroBias_2022F_nFiles1_NoCuts_weighted_avg");
-    input_files.push_back("ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg");
+    //input_files.push_back("ZeroBias_2022F_nFiles1_NoCuts_weighted_avg");
+    //input_files.push_back("ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg");
+    
+    // 2022 (v2)
+    input_files.push_back("ZeroBias_2022F_nFiles10_NoCuts_weighted_avg");
+    input_files.push_back("ZeroBias_2022F_nFiles10_ClustSize2_nClust2000_weighted_avg");
     
     std::vector<double> y_min_vals;
     std::vector<double> y_max_vals;
@@ -279,11 +297,18 @@ void loop()
     //y_min_vals.push_back(0.0); 
     //y_max_vals.push_back(300000.0);
     //y_max_vals.push_back(300000.0);
+    
     // limits for 2022 data (v1)
+    //y_min_vals.push_back(0.0); 
+    //y_min_vals.push_back(0.0); 
+    //y_max_vals.push_back(5000.0);
+    //y_max_vals.push_back(5000.0);
+    
+    // limits for 2022 data (v2)
     y_min_vals.push_back(0.0); 
     y_min_vals.push_back(0.0); 
-    y_max_vals.push_back(5000.0);
-    y_max_vals.push_back(5000.0);
+    y_max_vals.push_back(100000.0);
+    y_max_vals.push_back(100000.0);
     
     // limits for subtracted version
     //y_min_vals.push_back(-100000.0); 
