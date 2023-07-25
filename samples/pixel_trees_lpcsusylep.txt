@@ -1,0 +1,18 @@
+Pixel Trees 
+
+Location: lpcsusylep area on cmslpc
+Last updated: July 24, 2023
+Updated by: Caleb Smith
+
+# Pixel tree files:
+
+# Path:
+/store/group/lpcsusylep/PixelTrees
+
+# Directories:
+ExpressPhysics
+Muon
+SingleMuon
+ZeroBias
+
+

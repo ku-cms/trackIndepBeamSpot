@@ -1,9 +1,10 @@
 Occupancy Files
 
+Location: caleb's nobackup area on cmslpc
 Last updated: July 24, 2023
 Updated by: Caleb Smith
 
-# Occupancy (numpy) files on cmslpc:
+# Occupancy (numpy) files:
 
 # Path:
 /uscms/home/caleb/nobackup/DPG/CMSSW_11_2_0/src/trackIndepBeamSpot/data
