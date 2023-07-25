@@ -23,8 +23,13 @@ def run():
         return
     
     files = tools.get_eos_file_list(directory)
-    n_files = len(files)
-    print("Number of files: {0}".format(n_files))
+    files_matching = [f for f in files if pattern in f]
+    
+    n_files_total       = len(files)
+    n_files_matching    = len(files_matching)
+    
+    print("Number of files (total): {0}".format(n_files_total))
+    print("Number of files containing the pattern '{0}': {1}".format(pattern, n_files_matching))
 
 def main():
     t_start = time.time()
