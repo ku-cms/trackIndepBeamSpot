@@ -6,8 +6,11 @@ Updated by: Caleb Smith
 
 # Occupancy (numpy) files:
 
-# Path:
+# Primary Path (caleb's nobackup area)
 /uscms/home/caleb/nobackup/DPG/CMSSW_11_2_0/src/trackIndepBeamSpot/data
+
+# Backup Path (caleb's EOS area):
+/store/user/caleb/ClusterOccupancy
 
 # File list:
 ExpressPhysics_2021_Run346512_v1.npy
