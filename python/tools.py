@@ -10,6 +10,11 @@ def makeDir(dir_name):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 
+# get numbers from a string using a delimiter separation
+def getNumbers(string, delimiter):
+    numbers = [int(s) for s in string.split(delimiter) if s.isdigit()]
+    return numbers
+
 # takes a csv file as input and outputs data in a matrix
 def getData(input_file):
     data = []
