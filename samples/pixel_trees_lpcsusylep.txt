@@ -7,7 +7,7 @@ Updated by: Caleb Smith
 # Pixel tree files:
 
 # Path:
-/store/group/lpcsusylep/PixelTrees
+/store/user/lpcsusylep/PixelTrees
 
 # Directories:
 ExpressPhysics
