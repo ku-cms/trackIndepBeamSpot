@@ -22,7 +22,9 @@ def run():
         print("ERROR: 'pattern' is not set. Please provide a pattern using the -p option.")
         return
     
-    #tools.get_eos_file_list()
+    files = tools.get_eos_file_list(directory)
+    n_files = len(files)
+    print("Number of files: {0}".format(n_files))
 
 def main():
     t_start = time.time()
