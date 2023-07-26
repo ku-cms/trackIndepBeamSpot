@@ -6,13 +6,14 @@ import tools
 import argparse
 
 # TODO
-# - Add min/max number range as arguments for files to delete.
-# - Print files in min/max range and count files.
 # - Add flag to run deletion (e.g. -f). 
 # - Add eosrm command.
+
 # DONE
 # - List all files in a directory.
 # - Extract number from file name.
+# - Add min/max number range as arguments for files to delete.
+# - Print files in min/max range and count files.
 
 # Get file number from the file name.
 def getFileNumber(file_name):
@@ -37,10 +38,14 @@ def getFileNumber(file_name):
 def removeEOSFiles():
     # options
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--min_number", "-a", default=-1, help="minimum file number to delete (inclusive)")
+    parser.add_argument("--max_number", "-b", default=-1, help="maximum file number to delete (inclusive)")
     parser.add_argument("--directory",  "-d", default="", help="directory containing root files")
     parser.add_argument("--pattern",    "-p", default="", help="pattern for root file names")
 
     options     = parser.parse_args()
+    min_number  = int(options.min_number)
+    max_number  = int(options.max_number)
     directory   = options.directory
     pattern     = options.pattern
 
@@ -51,27 +56,45 @@ def removeEOSFiles():
     if not pattern:
         print("ERROR: 'pattern' is not set. Please provide a pattern using the -p option.")
         return
+
+    # require min_number >= 0 and max_number >= 0
+    if min_number < 0 or max_number < 0:
+        print("ERROR: Please provide min/max file numbers >= 0 to delete (inclusive) using the -a (min) and -b (max) options.")
+        return
+
+    # require min_number <= max_number
+    if min_number > max_number:
+        print("ERROR: min_number ({0}) is greater than max_number ({1}); please change so that min_number is less than or equal to max_number.".format(min_number, max_number))
+        return
     
     # match pattern to base file name, but save full path to file
     files = tools.get_eos_file_list(directory)
     files_matching = [f for f in files if pattern in os.path.basename(f)]
-    
-    n_files_total       = len(files)
-    n_files_matching    = len(files_matching)
+    files_matching_in_range = []
 
     print("directory: {0}".format(directory))
     print("pattern: {0}".format(pattern))
+    print("min_number: {0}".format(min_number))
+    print("max_number: {0}".format(max_number))
     print("----------------------------")
     
-    print("matching files:")
+    print("matching files in range:")
     for f in files_matching:
         file_name = os.path.basename(f)
         file_number = getFileNumber(file_name)
-        print(" - {0}; file number: {1}".format(file_name, file_number))
+        #print("Checking file '{0}': file_number = {1}, min_number = {2}, max_number = {3}".format(file_name, file_number, min_number, max_number))
+        if tools.numberInRange(file_number, min_number, max_number):
+            files_matching_in_range.append(f)
+            print(" - {0}; file number: {1}".format(file_name, file_number))
+    
+    n_files_total               = len(files)
+    n_files_matching            = len(files_matching)
+    n_files_matching_in_range   = len(files_matching_in_range)
     
     print("----------------------------")
     print("Number of files (total): {0}".format(n_files_total))
     print("Number of files containing the pattern '{0}': {1}".format(pattern, n_files_matching))
+    print("Number of files containing the pattern '{0}' and in the number range [{1}, {2}]: {3}".format(pattern, min_number, max_number, n_files_matching_in_range))
 
 def main():
     t_start = time.time()

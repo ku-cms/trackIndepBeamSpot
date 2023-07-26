@@ -15,6 +15,13 @@ def getNumbers(string, delimiter):
     numbers = [int(s) for s in string.split(delimiter) if s.isdigit()]
     return numbers
 
+# determine if number is in range
+def numberInRange(number, range_min, range_max):
+    if number >= range_min and number <= range_max:
+        return True
+    else:
+        return False
+
 # takes a csv file as input and outputs data in a matrix
 def getData(input_file):
     data = []
