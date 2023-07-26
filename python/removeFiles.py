@@ -52,8 +52,9 @@ def removeEOSFiles():
         print("ERROR: 'pattern' is not set. Please provide a pattern using the -p option.")
         return
     
+    # match pattern to base file name, but save full path to file
     files = tools.get_eos_file_list(directory)
-    files_matching = [f for f in files if pattern in f]
+    files_matching = [f for f in files if pattern in os.path.basename(f)]
     
     n_files_total       = len(files)
     n_files_matching    = len(files_matching)
