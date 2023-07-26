@@ -6,7 +6,6 @@ import tools
 import argparse
 
 # TODO
-# - Use eosrm command.
 
 # DONE
 # - List all files in a directory.
@@ -15,6 +14,7 @@ import argparse
 # - Print files in min/max range and count files.
 # - Add flag to remove files (run deletion).
 # - Write eosrm command.
+# - Use eosrm command.
 
 # Get file number from the file name.
 def getFileNumber(file_name):
@@ -51,6 +51,14 @@ def removeEOSFiles():
     directory   = options.directory
     pattern     = options.pattern
     remove      = options.remove
+
+    # EOS URL
+    eos_url = "root://cmseos.fnal.gov"
+    
+    # EOS URL tag: include backslash at the end!
+    eos_url_tag = eos_url
+    if eos_url_tag[-1] != "/":
+        eos_url_tag += "/"
 
     if not directory:
         print("ERROR: 'directory' is not set. Please provide a directory using the -d option.")
@@ -105,6 +113,15 @@ def removeEOSFiles():
 
     # remove files
     if remove:
+        for f in files_matching_in_range:
+            # remove EOS URL tag
+            f_to_rm = f.replace(eos_url_tag, "")
+            
+            #print("f: {0}".format(f))
+            #print("f_to_rm: {0}".format(f_to_rm))
+            
+            tools.eosrm(f_to_rm)
+        
         print("These files were removed!")
         print("Have a great day!")
     else:
