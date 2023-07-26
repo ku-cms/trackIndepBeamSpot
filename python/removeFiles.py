@@ -6,14 +6,15 @@ import tools
 import argparse
 
 # TODO
-# - Add flag to run deletion (e.g. -f). 
-# - Add eosrm command.
+# - Use eosrm command.
 
 # DONE
 # - List all files in a directory.
 # - Extract number from file name.
 # - Add min/max number range as arguments for files to delete.
 # - Print files in min/max range and count files.
+# - Add flag to remove files (run deletion).
+# - Write eosrm command.
 
 # Get file number from the file name.
 def getFileNumber(file_name):
@@ -38,16 +39,18 @@ def getFileNumber(file_name):
 def removeEOSFiles():
     # options
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--min_number", "-a", default=-1, help="minimum file number to delete (inclusive)")
-    parser.add_argument("--max_number", "-b", default=-1, help="maximum file number to delete (inclusive)")
-    parser.add_argument("--directory",  "-d", default="", help="directory containing root files")
-    parser.add_argument("--pattern",    "-p", default="", help="pattern for root file names")
+    parser.add_argument("--min_number", "-a", default=-1,   help="minimum file number to delete (inclusive)")
+    parser.add_argument("--max_number", "-b", default=-1,   help="maximum file number to delete (inclusive)")
+    parser.add_argument("--directory",  "-d", default="",   help="directory containing root files")
+    parser.add_argument("--pattern",    "-p", default="",   help="pattern for root file names")
+    parser.add_argument("--remove",     "-r", default=False, action="store_true", help="remove files; flag to run file deletion")
 
     options     = parser.parse_args()
     min_number  = int(options.min_number)
     max_number  = int(options.max_number)
     directory   = options.directory
     pattern     = options.pattern
+    remove      = options.remove
 
     if not directory:
         print("ERROR: 'directory' is not set. Please provide a directory using the -d option.")
@@ -71,13 +74,16 @@ def removeEOSFiles():
     files = tools.get_eos_file_list(directory)
     files_matching = [f for f in files if pattern in os.path.basename(f)]
     files_matching_in_range = []
-
+    
+    print("----------------------------")
+    print("remove: {0}".format(remove))
     print("directory: {0}".format(directory))
     print("pattern: {0}".format(pattern))
     print("min_number: {0}".format(min_number))
     print("max_number: {0}".format(max_number))
     print("----------------------------")
     
+    # get matching files in range
     print("matching files in range:")
     for f in files_matching:
         file_name = os.path.basename(f)
@@ -95,6 +101,17 @@ def removeEOSFiles():
     print("Number of files (total): {0}".format(n_files_total))
     print("Number of files containing the pattern '{0}': {1}".format(pattern, n_files_matching))
     print("Number of files containing the pattern '{0}' and in the number range [{1}, {2}]: {3}".format(pattern, min_number, max_number, n_files_matching_in_range))
+    print("----------------------------")
+
+    # remove files
+    if remove:
+        print("These files were removed!")
+        print("Have a great day!")
+    else:
+        print("These files were not removed.")
+        print("Use the -r flag to remove the files matching the pattern in the specified number range.")
+    
+    print("----------------------------")
 
 def main():
     t_start = time.time()

@@ -66,7 +66,7 @@ def get_file_list_glob(directory, pattern="*.root"):
     return glob.glob(d + pattern)
 
 # get list of EOS files
-def get_eos_file_list(path, eosurl = "root://cmseos.fnal.gov"):
+def get_eos_file_list(path, eosurl="root://cmseos.fnal.gov"):
     output = [] 
     with eosls(path, "", eosurl) as files:
         for f in files:
@@ -77,8 +77,12 @@ def get_eos_file_list(path, eosurl = "root://cmseos.fnal.gov"):
                 output.append(full_name)
     return output
 
-# eosls command
-def eosls(path, option = "", eosurl = "root://cmseos.fnal.gov"):
-    return os.popen("xrdfs %s ls %s %s"%(eosurl, option, path))
+# eosls command using xrdfs
+def eosls(path, option="", eosurl="root://cmseos.fnal.gov"):
+    return os.popen("xrdfs %s ls %s %s" % (eosurl, option, path))
+
+# eosrm command using xrdfs
+def eosrm(path, option="", eosurl="root://cmseos.fnal.gov"):
+    return os.popen("xrdfs %s rm %s %s" % (eosurl, option, path))
 
 
