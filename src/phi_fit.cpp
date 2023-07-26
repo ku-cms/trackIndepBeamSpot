@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <math.h>
 
 #include "TFile.h"
 #include "TF1.h"
@@ -42,8 +43,6 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     gStyle->SetStatY(0.99);
     gStyle->SetTitleFontSize(0.04);
     
-    double pi = 3.14159265;
-    
     double chisq[64];
     double amp[64];
     double shift[64];
@@ -51,9 +50,12 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     double amp_err[64];
     double shift_err[64];
     double offset_err[64];
+
+    //printf("M_PI = %f\n", M_PI);
     
     TGraph  *g[64];
     TCanvas *c[64];
+    TH1F    *h_dummy[64];
     
     TH1F *h_num_phi     = new TH1F("h_num_phi",     "Number of phi points", 64, 0, 64);
     TH1F *h_chisq       = new TH1F("h_chisq",       "Fit chi squares", 64, 0, 64);
@@ -67,11 +69,13 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     TH1F *h_offset_cut  = new TH1F("h_offset_cut",  "Fit offsets after cut", 64, 0, 64);
     
     TFile *a = new TFile(Form("%s/%s.root", input_dir.c_str(), input_file.c_str()), "READ");
-    TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -pi, pi);
+    TF1   *f = new TF1("f", "[0]*sin(x - [1]) + [2]", -M_PI, M_PI);
     
+    // set parameter names and limits
     f->SetParNames("amp", "shift", "offset");
     f->SetParLimits(0, 0, 1e10);
-    f->SetParLimits(1, -pi, pi);
+    f->SetParLimits(1, -M_PI, M_PI);
+    f->SetParLimits(2, 0, 1e10);
 
     std::string tag = "";
     int option = 2;
@@ -96,26 +100,46 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
     if (num_phi) printf("PASS: loaded num_phi\n");
     else         printf("FAIL: did not load num_phi\n");
 
-  
     for(int i = 0; i < 64; ++i)
     {
         // set parameter starting values for each fit
-        //f->SetParameters(1000, 0, 1.0e4);
-        f->SetParameters(4386, 1.484, 1.132e5);
+        // starting values for 2017B data
+        //f->SetParameters(10000, 1.0, 1.0e5);
+        // starting values for 2022F data
+        f->SetParameters(10000, 1.0, 1.0e5);
         
         const char* ring_name = Form("gr_phi_occ_ring_%s_%d", tag.c_str(), i);
         const char* file_ring_name = Form("%s gr_phi_occ_ring_%s_%d", input_file.c_str(), tag.c_str(), i);
         
-        g[i] = (TGraph*) a->Get(ring_name);
         c[i] = new TCanvas(file_ring_name, file_ring_name);
+        g[i] = (TGraph*) a->Get(ring_name);
+        h_dummy[i] = new TH1F("h_dummy", "h_dummy", 2, -M_PI, M_PI);
         g[i]->Fit(f, "R");
         g[i]->SetTitle(ring_name);
         
-        g[i]->SetMarkerStyle(20);
-        g[i]->GetYaxis()->SetRangeUser(y_min, y_max);
-   
+        // test dummy
+        //h_dummy[i]->SetBinContent(1, 80000.0);
+        //h_dummy[i]->SetBinContent(2, 80000.0);
+
         c[i]->cd();
         g[i]->Draw("AP");
+        
+        // TODO: TGraph auto zooms in on x-axis
+        // may need to use dummy hist to set x-axis range to [-pi, pi]
+        g[i]->SetMarkerStyle(20);
+        g[i]->GetXaxis()->SetRangeUser(-M_PI, M_PI);
+        g[i]->GetYaxis()->SetRangeUser(y_min, y_max);
+        //g[i]->GetXaxis()->SetRangeUser(-10, 10);
+        //g[i]->GetYaxis()->SetRangeUser(0, 1e6);
+        //h_dummy[i]->GetXaxis()->SetRangeUser(-M_PI, M_PI);
+        //h_dummy[i]->GetYaxis()->SetRangeUser(y_min, y_max);
+   
+        //c[i]->cd();
+        //g[i]->Draw("AP");
+        //h_dummy[i]->Draw("hist same");
+
+        g[i]->Draw("AP");
+        c[i]->Update();
 
         double num_phi_x = num_phi->GetPointX(i);
         double num_phi_y = num_phi->GetPointY(i);
@@ -159,29 +183,59 @@ void fit(std::string input_file, std::string input_dir, std::string plot_dir, do
         c[i]->Print(Form("%s.pdf", base_name.c_str()));
     }
     c[63]->Print(Form("%s.pdf)", base_name.c_str()));
+    
+    // draw histograms
 
     // limits for ttbar
     //draw(*h_chisq,  base_name + "_chisq",  "ring", "chi sq.",   0, 64, 0, 1e6);
     //draw(*h_amp,    base_name + "_amp",    "ring", "amplitude", 0, 64, 0, 2e3);
-    //draw(*h_shift,  base_name + "_shift",  "ring", "shift",     0, 64, -pi, pi);
+    //draw(*h_shift,  base_name + "_shift",  "ring", "shift",     0, 64, -M_PI, M_PI);
     //draw(*h_offset, base_name + "_offset", "ring", "offset",    0, 64, 0, 2e4);
     
     // limits for legacy 2017 data
+    //draw(*h_num_phi,        base_name + "_num_phi",     "ring", "num_phi",   0, 64, 0, 20);
+    //draw(*h_chisq,          base_name + "_chisq",       "ring", "chi sq.",   0, 64, 0, 2e10);
+    //draw(*h_amp,            base_name + "_amp",         "ring", "amplitude", 0, 64, 0, 5e4);
+    //draw(*h_shift,          base_name + "_shift",       "ring", "shift",     0, 64, -M_PI, M_PI);
+    //draw(*h_offset,         base_name + "_offset",      "ring", "offset",    0, 64, 0, 3e5);
+    //
+    //draw(*h_num_phi_cut,    base_name + "_num_phi_cut", "ring", "num_phi",   0, 64, 0, 20);
+    //draw(*h_chisq_cut,      base_name + "_chisq_cut",   "ring", "chi sq.",   0, 64, 0, 2e10);
+    //draw(*h_amp_cut,        base_name + "_amp_cut",     "ring", "amplitude", 0, 64, 0, 5e4);
+    //draw(*h_shift_cut,      base_name + "_shift_cut",   "ring", "shift",     0, 64, -M_PI, M_PI);
+    //draw(*h_offset_cut,     base_name + "_offset_cut",  "ring", "offset",    0, 64, 0, 3e5);
+    
+    // limits for legacy 2022 data (v1)
+    //draw(*h_num_phi,        base_name + "_num_phi",     "ring", "num_phi",   0, 64, 0, 20);
+    //draw(*h_chisq,          base_name + "_chisq",       "ring", "chi sq.",   0, 64, 0, 1e5);
+    //draw(*h_amp,            base_name + "_amp",         "ring", "amplitude", 0, 64, 0, 1e3);
+    //draw(*h_shift,          base_name + "_shift",       "ring", "shift",     0, 64, -M_PI, M_PI);
+    //draw(*h_offset,         base_name + "_offset",      "ring", "offset",    0, 64, 0, 1e4);
+    //
+    //draw(*h_num_phi_cut,    base_name + "_num_phi_cut", "ring", "num_phi",   0, 64, 0, 20);
+    //draw(*h_chisq_cut,      base_name + "_chisq_cut",   "ring", "chi sq.",   0, 64, 0, 1e5);
+    //draw(*h_amp_cut,        base_name + "_amp_cut",     "ring", "amplitude", 0, 64, 0, 1e3);
+    //draw(*h_shift_cut,      base_name + "_shift_cut",   "ring", "shift",     0, 64, -M_PI, M_PI);
+    //draw(*h_offset_cut,     base_name + "_offset_cut",  "ring", "offset",    0, 64, 0, 1e4);
+    
+    // limits for legacy 2022 data (v2)
     draw(*h_num_phi,        base_name + "_num_phi",     "ring", "num_phi",   0, 64, 0, 20);
-    draw(*h_chisq,          base_name + "_chisq",       "ring", "chi sq.",   0, 64, 0, 2e10);
-    draw(*h_amp,            base_name + "_amp",         "ring", "amplitude", 0, 64, 0, 5e4);
-    draw(*h_shift,          base_name + "_shift",       "ring", "shift",     0, 64, -pi, pi);
-    draw(*h_offset,         base_name + "_offset",      "ring", "offset",    0, 64, 0, 3e5);
+    draw(*h_chisq,          base_name + "_chisq",       "ring", "chi sq.",   0, 64, 0, 3e8);
+    draw(*h_amp,            base_name + "_amp",         "ring", "amplitude", 0, 64, 0, 5e3);
+    draw(*h_shift,          base_name + "_shift",       "ring", "shift",     0, 64, -M_PI, M_PI);
+    draw(*h_offset,         base_name + "_offset",      "ring", "offset",    0, 64, 0, 1e5);
+    
     draw(*h_num_phi_cut,    base_name + "_num_phi_cut", "ring", "num_phi",   0, 64, 0, 20);
-    draw(*h_chisq_cut,      base_name + "_chisq_cut",   "ring", "chi sq.",   0, 64, 0, 2e10);
-    draw(*h_amp_cut,        base_name + "_amp_cut",     "ring", "amplitude", 0, 64, 0, 5e4);
-    draw(*h_shift_cut,      base_name + "_shift_cut",   "ring", "shift",     0, 64, -pi, pi);
-    draw(*h_offset_cut,     base_name + "_offset_cut",  "ring", "offset",    0, 64, 0, 3e5);
+    draw(*h_chisq_cut,      base_name + "_chisq_cut",   "ring", "chi sq.",   0, 64, 0, 3e8);
+    draw(*h_amp_cut,        base_name + "_amp_cut",     "ring", "amplitude", 0, 64, 0, 5e3);
+    draw(*h_shift_cut,      base_name + "_shift_cut",   "ring", "shift",     0, 64, -M_PI, M_PI);
+    draw(*h_offset_cut,     base_name + "_offset_cut",  "ring", "offset",    0, 64, 0, 1e5);
     
     // delete canvases
     for(int i = 0; i < 64; ++i)
     {
         delete c[i];
+        delete h_dummy[i];
     }
     
     delete a;
@@ -204,6 +258,7 @@ void loop()
     std::string plot_dir  = "phi_fit_plots";
     
     std::vector<std::string> input_files;
+    // input files: do not include ".root", as this is added later
     
     //input_files.push_back("TTBar_AllClusters_zsmear");
     
@@ -220,7 +275,15 @@ void loop()
 
     // Legacy 2017
     //input_files.push_back("ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
-    input_files.push_back("SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
+    //input_files.push_back("SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters");
+    
+    // 2022 (v1)
+    //input_files.push_back("ZeroBias_2022F_nFiles1_NoCuts_weighted_avg");
+    //input_files.push_back("ZeroBias_2022F_nFiles1_ClustSize2_nClust2000_weighted_avg");
+    
+    // 2022 (v2)
+    input_files.push_back("ZeroBias_2022F_nFiles10_NoCuts_weighted_avg");
+    input_files.push_back("ZeroBias_2022F_nFiles10_ClustSize2_nClust2000_weighted_avg");
     
     std::vector<double> y_min_vals;
     std::vector<double> y_max_vals;
@@ -230,10 +293,22 @@ void loop()
     //y_max_vals.push_back(30000.0);
     
     // limits for legacy 2017 data
+    //y_min_vals.push_back(0.0); 
+    //y_min_vals.push_back(0.0); 
+    //y_max_vals.push_back(300000.0);
+    //y_max_vals.push_back(300000.0);
+    
+    // limits for 2022 data (v1)
+    //y_min_vals.push_back(0.0); 
+    //y_min_vals.push_back(0.0); 
+    //y_max_vals.push_back(5000.0);
+    //y_max_vals.push_back(5000.0);
+    
+    // limits for 2022 data (v2)
     y_min_vals.push_back(0.0); 
     y_min_vals.push_back(0.0); 
-    y_max_vals.push_back(300000.0);
-    y_max_vals.push_back(300000.0);
+    y_max_vals.push_back(100000.0);
+    y_max_vals.push_back(100000.0);
     
     // limits for subtracted version
     //y_min_vals.push_back(-100000.0); 

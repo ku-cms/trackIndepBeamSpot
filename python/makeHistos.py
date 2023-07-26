@@ -742,13 +742,18 @@ if __name__ == "__main__":
         "ZeroBias_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
         "SingleMuon_2017B_Legacy_MoreEvents_ClusterSize2_NumberClusters2000_AllClusters",
     ]
+    inputs_v7 = [
+        "ZeroBias_2022F_nFiles1_NoCuts",
+        "ZeroBias_2022F_nFiles1_ClustSize2_nClust2000",
+        "ZeroBias_2022F_nFiles10_NoCuts",
+        "ZeroBias_2022F_nFiles10_ClustSize2_nClust2000",
+    ]
     
     #output_tag = ""
     #output_tag = "_avg"
     output_tag = "_weighted_avg"
 
-    #for sample in inputs_v1:
-    for sample in inputs_v6:
+    for sample in inputs_v7:
         in_array            = read_file("data/{0}.npy".format(sample))
         root_output_name    = "{0}/{1}{2}.root".format(output_dir, sample, output_tag)
         csv_output_name     = "{0}/{1}{2}.csv".format(output_dir, sample, output_tag)

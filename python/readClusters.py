@@ -27,7 +27,7 @@ def make_cluster_map(input_files_, num_files, doClusterSizeCut, doNumberClusters
     n_events = chain.GetEntries()
     max_events = -1
 
-    print "Number of events: {0}".format(n_events)
+    print("Number of events: {0}".format(n_events))
 
     info_dict = {}
     phi_dict  = {}
@@ -36,17 +36,18 @@ def make_cluster_map(input_files_, num_files, doClusterSizeCut, doNumberClusters
         if max_events > 0 and iev > max_events:
             break
         if iev % 10 == 0:
-            print 'Event', iev, ' / ', n_events
+            print('Event', iev, ' / ', n_events)
             sys.stdout.flush()
         
         n_cl = event.ClN
         # cut on number of clusters per event
         if doNumberClustersCut:
+            # require number of clusters per event >= 2000
             if n_cl < 2000:
                 continue
         #print("event: {0}, number of clusters: {1}".format(iev, n_cl))
 
-        for icl in xrange(n_cl):
+        for icl in range(n_cl):
 
             detid_cl = event.ClDetId[icl]
 
@@ -54,14 +55,18 @@ def make_cluster_map(input_files_, num_files, doClusterSizeCut, doNumberClusters
             if not(303000000 < detid_cl < 304000000):
                 continue  # layer 1
 
-            clus_size = chain.ClSize[icl]
+            clus_size   = chain.ClSize[icl]
             clus_size_x = chain.ClSizeX[icl]
             clus_size_y = chain.ClSizeY[icl]
             
             # cut on cluster size
             if doClusterSizeCut:
-                if clus_size < 2:
+                # test: require cluster size == 2
+                if clus_size != 2:
                     continue
+                # standard: require cluster size >= 2
+                #if clus_size < 2:
+                #    continue
 
             # cut on number of tracks per cluster
             
@@ -87,7 +92,7 @@ def make_cluster_map(input_files_, num_files, doClusterSizeCut, doNumberClusters
             try:
                 phi_cl = np.arctan2(gy_cl, gx_cl)
             except ZeroDivisionError:
-                print "ERROR: ZeroDivisionError"
+                print("ERROR: ZeroDivisionError")
                 gy_cl += 0.00001
                 phi_cl = np.arctan2(gy_cl, gx_cl)
 
@@ -122,7 +127,7 @@ def make_cluster_map(input_files_, num_files, doClusterSizeCut, doNumberClusters
                     phi_dict[ladder_index] = [phi_cl]
 
     if debug:
-        # print phi
+        # print(phi)
         for ladder_index in phi_dict:
             phi_list = phi_dict[ladder_index]
             phi_min  = np.min(phi_list)
@@ -239,7 +244,7 @@ def read_clusters(input_files, f_name_):
     #    list_hot_pixels[i] = list(pix)
     # hot_pixels = [list(pix) for pix in hot_pixels]
     # hot_rocs = [list(roc) for roc in hot_rocs]
-    for iev in xrange(nEvents):
+    for iev in range(nEvents):
         if iev % 10 == 0:
             print('Event: ', iev, '/ ', nEvents)
             sys.stdout.flush()
@@ -253,7 +258,7 @@ def read_clusters(input_files, f_name_):
         beamspot_y.Fill(tChain.BsY)
         beamspot_width_x.Fill(tChain.Bs_widthX)
         beamspot_width_y.Fill(tChain.Bs_widthY)
-        for iCl in xrange(nClus):
+        for iCl in range(nClus):
 
             layer = tChain.ClLayer[iCl]
 
@@ -403,9 +408,9 @@ def read_clusters(input_files, f_name_):
     # clustOccIn_prescale.Scale(1. / nEvents)
     # r_phi_map = []
 
-    # for ibin in xrange(clustRPhi.GetNbinsX()):
+    # for ibin in range(clustRPhi.GetNbinsX()):
     #     r_values = []
-    #     for jbin in xrange(clustRPhi.GetNbinsY()):
+    #     for jbin in range(clustRPhi.GetNbinsY()):
     #         if clustRPhi.GetBinContent(ibin,jbin) > 0.:
     #             r_values.append(clustRPhi.GetYaxis().GetBinCenter(jbin))
     #     if not r_values:
@@ -417,7 +422,7 @@ def read_clusters(input_files, f_name_):
     # clustOccIn_plus_scaled = clustOccIn_plus.Clone("hclustOccIn_1_scaled")
     # clustOccIn_scaled = clustOccIn.Clone("hclustOccIn_scaled")
 
-    # for ibin in xrange(clustOccIn.GetNbinsX()):
+    # for ibin in range(clustOccIn.GetNbinsX()):
     #     occ = clustOccIn.GetBinContent(ibin)
     #     occ_plus = clustOccIn_plus.GetBinContent(ibin)
     #     occ_scaled = occ * (r_phi_map[ibin]**2/2.776**2)
@@ -428,7 +433,7 @@ def read_clusters(input_files, f_name_):
     #     if occ_plus_scaled > 0.:
     #         clustOccIn_plus_scaled.SetBinContent(ibin, occ_plus_scaled)
 
-    # for i in xrange(clustOccIn_plus.GetNbinsX()):
+    # for i in range(clustOccIn_plus.GetNbinsX()):
     #     occBin = clustOccIn_scaled.GetBinContent(i)
     #     phiBin = clustOccIn_scaled.GetBinCenter(i)
     #     plusBin = clustOccIn_plus_scaled.GetBinContent(i)
@@ -507,10 +512,10 @@ def read_clusters(input_files, f_name_):
     #     outer_ladders = np.array([-6, -4, -2, 1, 3, 5])
     #     n_pixels = 2304
     #     if np.any(inner_ladders[inner_ladders==lad]):
-    #         for ipix in xrange(n_pixels):
+    #         for ipix in range(n_pixels):
     #             clust_per_mod[mod]['quad'].Fill(quad)
     #     elif np.any(outer_ladders[outer_ladders==lad]):
-    #         for ipix in xrange(n_pixels):
+    #         for ipix in range(n_pixels):
     #             clust_per_mod_outer[mod]['quad'].Fill(quad)
 
     of.Write()
@@ -519,13 +524,13 @@ def read_clusters(input_files, f_name_):
 
 
 def run(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut):
-    print message
+    print(message)
     file_list   = get_file_list(directory)
     occ_map     = make_cluster_map(file_list, num_files, doClusterSizeCut, doNumberClustersCut)
     np.save(output_file, occ_map)
 
 def runEOS(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut):
-    print message
+    print(message)
     file_list   = get_eos_file_list(directory)
     occ_map     = make_cluster_map(file_list, num_files, doClusterSizeCut, doNumberClustersCut)
     np.save(output_file, occ_map)
@@ -664,6 +669,27 @@ def runExpressData2021():
     doNumberClustersCut = False
     runEOS(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
 
+def runZeroBias2022F():
+    directory   = '/store/user/lpcsusylep/PixelTrees/ZeroBias/crab_PixelTree_ZeroBias_2022F_RAW_v1_Run362154_v2/221206_141708/0000'
+    
+    #output_file = 'data/ZeroBias_2022F_nFiles1_NoCuts.npy'
+    #output_file = 'data/ZeroBias_2022F_nFiles1_ClustSizeEq2_nClust2000.npy'
+    #output_file = 'data/ZeroBias_2022F_nFiles1_ClustSize2_nClust2000.npy'
+    
+    #output_file = 'data/ZeroBias_2022F_nFiles10_NoCuts.npy'
+    #output_file = 'data/ZeroBias_2022F_nFiles10_ClustSizeEq2_nClust2000.npy'
+    #output_file = 'data/ZeroBias_2022F_nFiles10_ClustSize2_nClust2000.npy'
+    
+    #output_file = 'data/ZeroBias_2022F_nFiles20_NoCuts.npy'
+    output_file = 'data/ZeroBias_2022F_nFiles20_ClustSizeEq2_nClust2000.npy'
+    #output_file = 'data/ZeroBias_2022F_nFiles20_ClustSize2_nClust2000.npy'
+    
+    message     = 'Running over Zero Bias 2022F pixel trees.'
+    num_files   = 20
+    doClusterSizeCut    = True
+    doNumberClustersCut = True
+    runEOS(directory, output_file, message, num_files, doClusterSizeCut, doNumberClustersCut)
+
 def runTTBarPU():
     
     # TTBar with pileup
@@ -706,15 +732,16 @@ def main():
     #runSingleMuon2018C()
     #runMinBias2018C()
     #runZeroBias2018C()
-
-    runExpressData2021()
     
     #runTTBarPU()
     #runTTBar()
 
+    #runExpressData2021()
+
+    runZeroBias2022F()
     
     t_stop = time.time()
-    print "run time (sec): {0}".format(t_stop - t_start)
+    print("run time (sec): {0}".format(t_stop - t_start))
 
 if __name__ == "__main__":
     main()
